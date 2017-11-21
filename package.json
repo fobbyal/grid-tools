@@ -1,0 +1,31 @@
+{
+  "name": "universal-grid",
+  "version": "0.0.0-alpha",
+  "description": "Universal Grid",
+  "main": "dist/universal-grid.js",
+  "module": "src/index.js",
+  "scripts": {
+    "build": "webpack --env.dev"
+  },
+  "author": "alex.c.liang@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-module-resolver": "^3.0.0",
+    "babel-plugin-ramda": "^1.4.3",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "data.maybe": "^1.2.2",
+    "fbjs": "^0.8.16",
+    "ramda": "^0.25.0",
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
+    "styled-components": "^2.2.3"
+  }
+}

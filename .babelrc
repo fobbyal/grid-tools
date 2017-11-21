@@ -1,0 +1,19 @@
+{
+  "presets": [
+    ["env",{"modules":false }],
+    "react"
+  ],
+  "plugins": [
+    "ramda",
+    "transform-object-rest-spread",
+    ["module-resolver", {
+      "root": ["./"],
+      "alias": { }
+    }]
+  ],
+	"env": {
+		"test": {
+			"plugins": ["transform-es2015-modules-commonjs"]
+		}
+  }
+}
