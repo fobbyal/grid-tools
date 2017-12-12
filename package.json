@@ -3,7 +3,6 @@
   "version": "0.0.2",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
-  "module": "src/index.js",
   "scripts": {
     "build": "webpack --env.dev"
   },
