@@ -3,7 +3,6 @@
   "version": "0.0.5",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
-  "module": "src/index.js",
   "scripts": {
     "build": "webpack --env.dev"
   },
@@ -21,14 +20,20 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1"
-  },
-  "dependencies": {
+    "babel-preset-react": "^6.24.1",
     "data.maybe": "^1.2.2",
     "fbjs": "^0.8.16",
     "ramda": "^0.25.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
+    "styled-components": "^2.2.3"
+  },
+  "peerDependencies": {
+    "data.maybe": "^1.2.2",
+    "fbjs": "^0.8.16",
+    "ramda": "^0.25.0",
+    "react": ">=15",
+    "react-dom": ">=15",
     "styled-components": "^2.2.3"
   }
 }
