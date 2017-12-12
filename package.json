@@ -1,9 +1,9 @@
 {
   "name": "@integec/grid-tools",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
-  "module":"src/index.js",
+  "module": "src/index.js",
   "scripts": {
     "build": "webpack --env.dev"
   },
