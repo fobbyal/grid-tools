@@ -1,15 +1,15 @@
 {
   "name": "@integec/grid-tools",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "module": "src/index.js",
   "scripts": {
     "build": "webpack --env.dev"
   },
-  "repository" : { 
-    "type" : "git", 
-    "url" : "git@github.com:fobbyal/grid-tools.git"
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:fobbyal/grid-tools.git"
   },
   "author": "Alex Liang <aliang@integconsulting.com>",
   "license": "ISC",
