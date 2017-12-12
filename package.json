@@ -7,6 +7,10 @@
   "scripts": {
     "build": "webpack --env.dev"
   },
+  "repository" : { 
+    "type" : "git", 
+    "url" : "git@github.com:fobbyal/grid-tools.git"
+  },
   "author": "Alex Liang <aliang@integconsulting.com>",
   "license": "ISC",
   "devDependencies": {
