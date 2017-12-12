@@ -4,7 +4,7 @@ module.exports = env => ({
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname,'dist'),
-    filename: 'universal-grid.js',
+    filename: 'integ-grid-tools.js',
   },
   module: {
   rules: [
