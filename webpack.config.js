@@ -5,6 +5,8 @@ module.exports = env => ({
   output: {
     path: path.resolve(__dirname,'dist'),
     filename: 'integ-grid-tools.js',
+    library: '@integec/grid-tools',
+    libraryTarget:'umd'
   },
   externals: [
     "data.maybe",
