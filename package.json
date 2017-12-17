@@ -4,7 +4,9 @@
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "scripts": {
-    "build": "webpack --env.dev"
+    "build": "webpack --env.dev",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,10 @@
     "ramda": "^0.25.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
-    "styled-components": "^2.2.3"
+    "styled-components": "^2.2.3",
+    "@storybook/react": "^3.2.17",
+    "@storybook/addon-actions": "^3.2.17",
+    "@storybook/addon-links": "^3.2.17"
   },
   "peerDependencies": {
     "data.maybe": "^1.2.2",
