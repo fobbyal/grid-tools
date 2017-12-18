@@ -104,8 +104,8 @@ class FlexGrid extends React.Component {
       //let input style override
       ...style,
     },
-    isSelected: this.state.selectedRow.contains(index),
-    isHovered: this.state.hoveredRow === index,
+    isSelected: !isHeader && this.state.selectedRow.contains(index),
+    isHovered: !isHeader && this.state.hoveredRow === index,
     //TODO add on click and remember to call the input onClick as well as
   })
 
@@ -123,7 +123,8 @@ class FlexGrid extends React.Component {
 
   renderColumnContent = ({ display }) => 'header-content'
 
-  renderCellContent = ({ header, rowIndex, columnIndex, data }) => 'cell-content'
+  renderCellContent = ({ header, rowIndex, columnIndex, data }) =>
+    'cell-content'
 
   render() {
     return this.props.children({
