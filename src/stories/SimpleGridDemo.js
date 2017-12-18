@@ -87,11 +87,55 @@ const defaultCellRenderer = ({ className, style, value, formatter }) => (
   </div>
 )
 
-class SimpleGrid extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state={ selectedRow:[]}
+class FlexGrid extends React.Component {
+  state = { selectedRow: [], hoveredRow: undefined }
+
+  getColumnHeaderProps = ({ key, ...rest }) => ({
+    key,
+    style: flexCellStyle(rest),
+  })
+
+  getRowProps = ({ key, index, isHeader = false, style, onClick }) => ({
+    key,
+    style: {
+      ...flexRowStyle({
+        rowWidth: this.props.rowWidth || sumWidth(this.props.headers),
+      }),
+      //let input style override
+      ...style,
+    },
+    isSelected: this.state.selectedRow.contains(index),
+    isHovered: this.state.hoveredRow === index,
+    //TODO add on click and remember to call the input onClick as well as
+  })
+
+  getCellProps = ({ key, rowIndex, columnIndex, header, data, style }) => ({
+    key,
+    rowIndex,
+    columnIndex,
+    style: {
+      ...flexCellStyle({
+        width,
+      }),
+      ...style,
+    },
+  })
+
+  renderColumnContent = ({ display }) => 'header-content'
+
+  renderCellContent = ({ header, rowIndex, columnIndex, data }) => 'cell-content'
+
+  render() {
+    return this.props.children({
+      getColumnHeaderProps: this.getColumnHeaderProps,
+      getRowProps: this.getRowProps,
+      getCellProps: this.getCellProps,
+    })
   }
+}
+
+class SimpleGrid extends React.Component {
+  state = { selectedRow: [] }
 
   renderFlex() {
     const {
@@ -102,11 +146,13 @@ class SimpleGrid extends React.Component {
       HeaderRowComponent = DivPassThrough,
       RowComponent = DivPassThrough,
       rowWidth = sumWidth(headers),
+      style,
+      className,
     } = this.props
 
     const rowStyle = flexRowStyle({ headers, rowWidth })
     return (
-      <div>
+      <div style={style} className={className}>
         <HeaderRowComponent style={rowStyle}>
           {headers.map(header =>
             headerRenderer({ ...header, style: flexCellStyle(header) })
