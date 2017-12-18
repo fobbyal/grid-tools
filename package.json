@@ -15,6 +15,9 @@
   "author": "Alex Liang <aliang@integconsulting.com>",
   "license": "ISC",
   "devDependencies": {
+    "@storybook/addon-actions": "^3.2.17",
+    "@storybook/addon-links": "^3.2.17",
+    "@storybook/react": "^3.2.17",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-module-resolver": "^3.0.0",
@@ -23,22 +26,20 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "chance": "^1.0.12",
     "data.maybe": "^1.2.2",
     "fbjs": "^0.8.16",
     "ramda": "^0.25.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
-    "styled-components": "^2.2.3",
-    "@storybook/react": "^3.2.17",
-    "@storybook/addon-actions": "^3.2.17",
-    "@storybook/addon-links": "^3.2.17"
+    "react-virtualized": "^9.13.0",
   },
   "peerDependencies": {
     "data.maybe": "^1.2.2",
     "fbjs": "^0.8.16",
     "ramda": "^0.25.0",
-    "react": ">=15",
-    "react-dom": ">=15",
-    "styled-components": "^2.2.3"
+    "react": ">=16",
+    "react-dom": ">=16",
+    "styled-components": "^2.3.0"
   }
 }

@@ -4,14 +4,14 @@ import { fromNullable, Just, Nothing } from 'data.maybe'
 import R from 'ramda'
 import styled from 'styled-components'
 import shallowEqual from 'fbjs/lib/shallowEqual'
-import { normalizeBounds } from './utils.js'
+import { normalizeBounds } from '../utils.js'
 import {
   toClipboardData,
   fromPasteEvent,
   expandDataToSelection,
-} from './clipboard-utils'
-import { fromEmpty } from './utils'
-import HiddenClipboardHelper from './HiddenClipboardHelper'
+} from '../clipboard-utils'
+import { fromEmpty } from '../utils'
+import HiddenClipboardHelper from '../HiddenClipboardHelper'
 
 /* grid helper methods */
 // const HiddenInput = styled.input`

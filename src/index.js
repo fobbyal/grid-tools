@@ -1,3 +1,3 @@
-import Grid from './GenericEditableGrid'
+import FreeEditGrid from './free-edit/FreeEditGrid'
 
-export default Grid
+export default { EditableGrid }
