@@ -66,31 +66,20 @@ const flexRowStyle = ({ rowWidth }) => ({
   width: sumWidth(headers),
 })
 
-const defaultHeaderRenderer = ({
-  className,
-  ident,
-  display,
-  style,
-  ...rest
-}) => (
-  <div className={className} style={style}>
-    {display}
-  </div>
-)
-
-const DivPassThrough = props => <div {...props}> {props.children} </div>
-
-// render
-const defaultCellRenderer = ({ className, style, value, formatter }) => (
-  <div className={className} style={style}>
-    {value}
-  </div>
-)
-
 const eventBroadcaster = listeners => e =>
   listeners.filter(l => !R.isNil(l)).forEach(l => l(e))
 
 class FlexGrid extends React.Component {
+  /** move over code to select and copy data */
+  static ROW_INDEX_ATTRIBUTE = 'data-row-index'
+  static COLUMN_INDEX_ATTRIBUTE = 'data-column-index'
+  static extractPosition = evt => ({
+    rowIndex: parseInt(evt.target.getAttribute(FlexGrid.ROW_INDEX_ATTRIBUTE)),
+    columnIndex: parseInt(
+      evt.target.getAttribute(FlexGrid.COLUMN_INDEX_ATTRIBUTE)
+    ),
+  })
+
   state = { selectedRow: undefined, hoveredRow: undefined }
 
   getColumnHeaderProps = ({ key, ...rest }) => ({
@@ -112,10 +101,13 @@ class FlexGrid extends React.Component {
     // TODO add on click and remember to call the input onClick as well as
   })
 
-  // TODO report listener
-  selectRow = rowIndex => this.setState(s => ({ selectedRow: rowIndex }))
+  cellMouseDown = e => {
+    console.log('this is ', this, 'event is ', e)
+  }
 
-  hoveredRow = rowIndex => this.setState(s => ({ hoveredRow: rowIndex }))
+  cellMouseOver = e => {
+    console.log('this is ', this, 'event is ', e)
+  }
 
   getCellProps = ({
     key,
@@ -127,24 +119,28 @@ class FlexGrid extends React.Component {
     onClick,
     onMouseOver,
     rowData,
+    ...rest
   }) => ({
     key: key || rowIndex + '*' + columnIndex,
-    rowIndex,
-    columnIndex,
+    'data-row-index': rowIndex,
+    'data-column-index': columnIndex,
     style: {
       ...flexCellStyle({ ...header }),
       ...style,
     },
     // TODO no broadcast... use rowIndex and columnIndex to identify clicked cells
     // and use common onClicked event
-    onClick: eventBroadcaster([onClick, _ => this.selectRow(rowIndex)]),
-    onMouseOver: eventBroadcaster([onMouseOver, _ => this.selectRow(rowIndex)]),
+    onMouseDown: this.cellMouseDown,
+    onMouseOver: this.cellMouseOver,
+    ...rest,
   })
 
   renderColumnHeaderContent = ({ display }) => 'header-content'
 
-  renderCellContent = ({ header, rowIndex, columnIndex, data, rowData }) =>
-    'cell-content'
+  renderCellContent = ({ header, rowIndex, columnIndex, data, rowData }) => {
+    console.log('rendered cell')
+    return 'cell-content'
+  }
 
   render() {
     return this.props.render({
@@ -200,49 +196,6 @@ const defaultFlexGridRenderer = ({ data, headers, style, className }) => ({
   </div>
 )
 
-class SimpleGrid extends React.Component {
-  state = { selectedRow: [] }
-
-  renderFlex() {
-    const {
-      data,
-      headers,
-      headerRenderer = defaultHeaderRenderer,
-      cellRenderer = defaultCellRenderer,
-      HeaderRowComponent = DivPassThrough,
-      RowComponent = DivPassThrough,
-      rowWidth = sumWidth(headers),
-      style,
-      className,
-    } = this.props
-
-    const rowStyle = flexRowStyle({ headers, rowWidth })
-    return (
-      <div style={style} className={className}>
-        <HeaderRowComponent style={rowStyle}>
-          {headers.map(header =>
-            headerRenderer({ ...header, style: flexCellStyle(header) })
-          )}
-        </HeaderRowComponent>
-        {data.map(row => (
-          <RowComponent style={rowStyle}>
-            {headers.map(header =>
-              cellRenderer({
-                style: flexCellStyle(header),
-                value: row[header.ident],
-                ...header,
-              })
-            )}
-          </RowComponent>
-        ))}
-      </div>
-    )
-  }
-  render() {
-    return this.renderFlex()
-  }
-}
-
 const GridDemo = () => {
   return (
     <FlexGrid
@@ -255,5 +208,3 @@ const GridDemo = () => {
 }
 
 export default GridDemo
-
-// return <SimpleGrid headers={headers} data={createData(15)} />

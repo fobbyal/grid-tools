@@ -153,11 +153,11 @@ class GenericEditableGrid extends React.Component {
   }
 
   _mouseDown(evt) {
-    //prevent focus
-    //for left click selection
+    // prevent focus
+    // for left click selection
     const pos = extractPosition(evt)
-    //const { editingCell } = this.state
-    //kconsole.log('pos datus',pos,editingCell)
+    // const { editingCell } = this.state
+    // kconsole.log('pos datus',pos,editingCell)
 
     if (isPosition(pos) && this.hiddenInput) {
       evt.preventDefault()
@@ -168,10 +168,10 @@ class GenericEditableGrid extends React.Component {
       this._selectionStarts(pos)
     }
 
-    //for righ click selection
+    // for righ click selection
     if (evt.buttons === 2) {
       const { rowIndex, columnIndex } = extractPosition(evt)
-      const selectionBounds = normalizeBounds(this.state.selection) //getSelectedBounds(getState())
+      const selectionBounds = normalizeBounds(this.state.selection) // getSelectedBounds(getState())
       if (R.isNil(selectionBounds) || R.isEmpty(selectionBounds)) {
         this.setState({
           selection: {
@@ -202,7 +202,7 @@ class GenericEditableGrid extends React.Component {
     }
   }
   _mouseUp(evt) {
-    //return when not selecting
+    // return when not selecting
     if (this.selecting) {
       const position = extractPosition(evt)
       this._selectionExpands(position, true)
@@ -249,7 +249,7 @@ class GenericEditableGrid extends React.Component {
         .ap(clipboardInfo)
         .ap(selectedData)
     } else {
-      /* eslint-disable no-console*/
+      /* eslint-disable no-console */
       console.log(
         'Prop getDataInRange not on GenericEditableGrid. Copy function is disabled'
       )
@@ -273,7 +273,7 @@ class GenericEditableGrid extends React.Component {
         .ap(selection)
         .ap(clipboardData)
     } else {
-      /* eslint-disable no-console*/
+      /* eslint-disable no-console */
       console.log(
         'Prop pasteData not on GenericEditableGrid. Paste function is disabled'
       )
@@ -283,7 +283,7 @@ class GenericEditableGrid extends React.Component {
 
   _ensureCellVisible({ rowIndex, columnIndex }) {
     if (this.scroll) {
-      //cosnt {rowCount, colCount} = this.props
+      // cosnt {rowCount, colCount} = this.props
       const scroll = ReactDOM.findDOMNode(this.scroll)
       if (scroll) {
         const elements = scroll.getElementsByTagName('*')
@@ -325,16 +325,16 @@ class GenericEditableGrid extends React.Component {
   }
 
   _keyDown(e) {
-    //have col and row size has to be pased
-    //TODO: this stuff must be passed from parent
-    //cosnt {rowCount, colCount} = this.props
+    // have col and row size has to be pased
+    // TODO: this stuff must be passed from parent
+    // cosnt {rowCount, colCount} = this.props
     const { isCellEditable, rowCount, colCount } = this.props
     console.log(rowCount, colCount)
 
     console.log('key Pressed....', e.keyCode, e.key, e.shift, e.metaKey)
     const arrowAction = this.arrowActions[e.keyCode]
     const editing = !R.isNil(this.state.editingCell)
-    //console.log('entery is editing',editing)
+    // console.log('entery is editing',editing)
     /* prevent default on enter escape and tab */
     if ([13, 9, 27].includes(e.keyCode)) {
       e.preventDefault()
@@ -349,7 +349,7 @@ class GenericEditableGrid extends React.Component {
       e.key.length === 1
 
     if (!editing) {
-      /*arrow keys */
+      /* arrow keys */
       if (arrowAction) {
         const {
           scrollToColumn: scrollToColumnPrevious,
@@ -366,7 +366,7 @@ class GenericEditableGrid extends React.Component {
         e.preventDefault()
         e.stopPropagation()
       } else if (isDelete) {
-        //TODO: need to implment edelete
+        // TODO: need to implment edelete
         const { onDelete } = this.props
         if (onDelete) {
           onDelete(this.state.selection)
@@ -409,14 +409,14 @@ class GenericEditableGrid extends React.Component {
     if (commitEdit) {
       commitEdit(editInfo)
     } else {
-      /* eslint-disable no-console*/
+      /* eslint-disable no-console */
       console.log(
         'Prop commitEdit not on GenericEditableGrid. edit function is disabled'
       )
       /* eslint-enable no-console */
     }
 
-    //call into props.commitEdit when refactoring
+    // call into props.commitEdit when refactoring
   }
 
   _cancelEdit() {
@@ -428,7 +428,7 @@ class GenericEditableGrid extends React.Component {
   /** api methods **/
 
   render() {
-    /*start editing grid*/
+    /* start editing grid*/
     const { editingCell } = this.state
     const selection = normalizeBounds(this.state.selection)
     const isCellSelected = isSelected(selection)
@@ -439,7 +439,7 @@ class GenericEditableGrid extends React.Component {
     const editWithValue = fromNullable(editingCell)
       .chain(({ editWithValue }) => fromNullable(editWithValue))
       .getOrElse(false)
-    /*end editor grid */
+    /* end editor grid */
     const { className, children } = this.props
 
     const props = {
