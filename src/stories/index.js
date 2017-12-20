@@ -19,7 +19,4 @@ import SimpleGridDemo from './SimpleGridDemo'
 //     <Button onClick={action('clicked')}>😀 😎 👍 💯</Button>
 //   ))
 
-storiesOf('Simple Grid', module)
-  .add('simple grid', () => (
-    <SimpleGridDemo/>
-  ))
+storiesOf('Simple Grid', module).add('simple grid', () => <SimpleGridDemo />)

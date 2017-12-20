@@ -1,3 +1,6 @@
-import FreeEditGrid from './free-edit/FreeEditGrid'
+// import FreeEditGrid from './free-edit/FreeEditGrid'
+import Grid from './Grid'
+import flexGridRenderer from './flexRenderer'
 
-export default { EditableGrid }
+export { Grid, flexGridRenderer }
+export default Grid
