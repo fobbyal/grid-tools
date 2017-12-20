@@ -6,9 +6,7 @@ class Grid extends React.Component {
   /** move over code to select and copy data */
   static extractPosition = evt => ({
     rowIndex: parseInt(evt.target.getAttribute(ROW_INDEX_ATTRIBUTE)),
-    columnIndex: parseInt(
-      evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE)
-    ),
+    columnIndex: parseInt(evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE)),
   })
 
   state = { selectedRow: undefined, hoveredRow: undefined }
@@ -18,9 +16,12 @@ class Grid extends React.Component {
     header,
   })
 
-  getRowProps = ({ key, index, isHeader = false, style, headers }) => ({
+  getRowProps = ({ key, index, isHeader = false, headers, rowWidth }) => ({
     key: key || index,
-    rowWidth: this.props.rowWidth || sumWidth(headers),
+    rowWidth:
+      rowWidth === undefined || rowWidth === null
+        ? sumWidth(headers)
+        : rowWidth,
   })
 
   cellMouseDown = e => {
@@ -65,7 +66,7 @@ class Grid extends React.Component {
     isHovered: this.state.hoveredRow === rowIndex,
     data,
     rowIndex,
-    columnIndex
+    columnIndex,
   })
 
   render() {

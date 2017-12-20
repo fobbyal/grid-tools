@@ -13,7 +13,7 @@ const flexRowStyle = ({ rowWidth }) => ({
 export class FlexGridRow extends React.PureComponent {
   render() {
     const { key, rowWidth, style, ...rest } = this.props
-
+    //console.log('row rendered')
     return (
       <div
         {...{
@@ -30,7 +30,7 @@ export class FlexGridRow extends React.PureComponent {
 
 export class FlexGridCell extends React.PureComponent {
   render() {
-    console.log('cell rendered')
+    //console.log('cell rendered')
     const {
       isSelected,
       isHovered,
@@ -58,7 +58,7 @@ export class FlexGridCell extends React.PureComponent {
 
 export class FlexGridColHeader extends React.PureComponent {
   render() {
-    console.log('header rendered')
+    //console.log('header rendered')
     const { header, style, ...rest } = this.props
     return (
       <div
