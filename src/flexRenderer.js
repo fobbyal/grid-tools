@@ -1,105 +1,152 @@
 import React from 'react'
+import styled from 'styled-components'
 import R from 'ramda'
 
-const flexCellStyle = ({ width }) => ({
-  flex: `0 0 ${width}px`,
-})
+const Cell = styled.div`
+  flex: 0 0 ${props => props.width}px;
+  width: ${props => props.width}px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  border-right: 1px solid #ccc;
+`
 
-const flexRowStyle = ({ rowWidth }) => ({
-  display: 'flex',
-  width: rowWidth,
-})
+/* prettier-ignore */
+const Row = styled.div`
+  display: flex;
+  width: ${props => props.width}px;
+  ${props => props.height ? 'height: '+ props.height + 'px;' : ''} 
+  border-bottom: 1px solid #ccc;
+  ${props => props.isHeader && `
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      overflow:hidden;
+    `
+    } 
+`
+
+const ColHeader = styled.div`
+  flex: 0 0 ${props => props.width}px;
+  width: ${props => props.width}px;
+  border-right: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: steelblue;
+  color: white;
+  font-weight: bold;
+  font-size: 0.85em;
+`
 
 export class FlexGridRow extends React.PureComponent {
   render() {
-    const { key, rowWidth, style, ...rest } = this.props
-    //console.log('row rendered')
-    return (
-      <div
-        {...{
-          key,
-          style: { ...flexRowStyle({ rowWidth }), ...style },
-          ...rest,
-        }}
-      >
-        {this.props.children}
-      </div>
-    )
+    const { children, ...rest } = this.props
+    return <Row {...rest}>{this.props.children}</Row>
   }
 }
 
 export class FlexGridCell extends React.PureComponent {
   render() {
-    //console.log('cell rendered')
+    // console.log('cell rendered')
     const {
       isSelected,
       isHovered,
       rowIndex,
       columnIndex,
       header,
+      width,
+      height,
       data,
-      style,
       ...rest
     } = this.props
     return (
-      <div
-        {...{
-          style: { ...flexCellStyle(header), ...style },
-          ...rest,
-        }}
+      <Cell
+        {...rest}
+        width={width}
+        height={height}
+        title={data[rowIndex][header.ident]}
       >
-        {isHovered && '**'}
-        {isSelected && '++'}
         {data[rowIndex][header.ident]}
-      </div>
+      </Cell>
     )
   }
 }
 
 export class FlexGridColHeader extends React.PureComponent {
   render() {
-    //console.log('header rendered')
-    const { header, style, ...rest } = this.props
+    const { header, width, ...rest } = this.props
     return (
-      <div
-        {...{
-          style: { ...flexCellStyle(header), ...style },
-          ...rest,
-        }}
-      >
+      <ColHeader width={width} {...rest}>
         {header.display}
-      </div>
+      </ColHeader>
     )
   }
 }
 
-const flexGridRenderer = ({ data, headers, style, className }) => ({
-  getColumnHeaderProps,
-  getRowProps,
-  getCellProps,
-}) => (
-  <div style={style} className={className}>
+const flexGridRenderer = ({
+  data,
+  headers,
+  style,
+  className,
+  height,
+  width,
+  rowHeight,
+  headerRowHeight,
+} = {}) => ({ getColumnHeaderProps, getRowProps, getCellProps }) => (
+  <div
+    style={{
+      position: 'relative',
+      ...style,
+    }}
+    className={className}
+  >
     {/* the header row */}
-    <FlexGridRow {...getRowProps({ isHeader: true, headers })}>
+    <FlexGridRow
+      {...getRowProps({
+        isHeader: true,
+        headers,
+        width,
+        rowHeight,
+        headerRowHeight,
+      })}
+    >
       {headers.map((header, index) => (
         <FlexGridColHeader {...getColumnHeaderProps({ index, header })} />
       ))}
     </FlexGridRow>
     {/* table body */}
-    {R.range(0, data.length).map(rowIndex => (
-      <FlexGridRow {...getRowProps({ index: rowIndex, headers })}>
-        {headers.map((header, columnIndex) => (
-          <FlexGridCell
-            {...getCellProps({
-              rowIndex,
-              columnIndex,
-              header,
-              data,
-            })}
-          />
-        ))}
-      </FlexGridRow>
-    ))}
+    <div
+      style={{
+        position: 'absolute',
+        left: '0',
+        top: headerRowHeight + 'px',
+        width: width + 17 + 'px',
+        height: height - headerRowHeight + 17,
+        overflow: 'scroll',
+      }}
+    >
+      {R.range(0, data.length).map(rowIndex => (
+        <FlexGridRow
+          {...getRowProps({
+            index: rowIndex,
+            headers,
+            rowHeight,
+          })}
+        >
+          {headers.map((header, columnIndex) => (
+            <FlexGridCell
+              {...getCellProps({
+                rowIndex,
+                columnIndex,
+                header,
+                data,
+              })}
+            />
+          ))}
+        </FlexGridRow>
+      ))}
+    </div>
   </div>
 )
 export default flexGridRenderer

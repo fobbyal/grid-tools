@@ -10,6 +10,7 @@ const randomRow = R.compose(
   R.map(({ ident, type }) => {
     if (ident === 'commitStatusOvr')
       return [ident, chance.pickone(['UNA', 'ECO', 'EMER', 'MUST'])]
+    if (ident === 'he') return [ident, chance.integer({ min: 1, max: 24 })]
     switch (type) {
       case 'str':
       case 'sel':
@@ -65,7 +66,8 @@ const GridDemo = () => {
     <Grid
       render={flexGridRenderer({
         headers,
-        data: createData(15),
+        data: createData(80),
+        headerRowHeight: 60,
       })}
     />
   )
