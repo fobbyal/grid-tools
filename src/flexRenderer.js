@@ -13,14 +13,14 @@ const Cell = styled.div`
 /* prettier-ignore */
 const Row = styled.div`
   display: flex;
-  width: ${props => props.width}px;
+  width: ${props => props.width+props.colCount}px;
   ${props => props.height ? 'height: '+ props.height + 'px;' : ''} 
   border-bottom: 1px solid #ccc;
   ${props => props.isHeader && `
       position: absolute;
       top: 0px;
       left: 0px;
-      overflow:hidden;
+      overflow: hidden;
     `
     } 
 `

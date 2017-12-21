@@ -39,6 +39,7 @@ class Grid extends React.Component {
     key: key || index,
     width: width === undefined || width === null ? sumWidth(headers) : width,
     height: isHeader ? headerRowHeight : rowHeightOf(index, rowHeight),
+    colCount: headers.length,
     isHeader,
   })
 
