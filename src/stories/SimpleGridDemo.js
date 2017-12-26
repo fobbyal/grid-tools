@@ -59,7 +59,7 @@ const headers = [
 ]
 /*   grid code starts here */
 
-console.log(JSON.stringify(headers))
+console.log(headers)
 
 const GridDemo = () => {
   return (
@@ -68,6 +68,8 @@ const GridDemo = () => {
         headers,
         data: createData(80),
         headerRowHeight: 60,
+        width: 800,
+        height: 400,
       })}
     />
   )

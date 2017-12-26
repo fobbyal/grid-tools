@@ -1,6 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import R from 'ramda'
+import Grid from './Grid'
+
+//const isScrolledTable = props => pro
 
 const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
@@ -8,22 +11,29 @@ const Cell = styled.div`
   text-overflow: ellipsis;
   overflow: hidden;
   border-right: 1px solid #ccc;
+  display: flex;
+  justify-content: ${props => props.alignment || 'center'};
 `
 
 /* prettier-ignore */
 const Row = styled.div`
   display: flex;
-  width: ${props => props.width+props.colCount}px;
+  width: ${props => props.width}px;
   ${props => props.height ? 'height: '+ props.height + 'px;' : ''} 
   border-bottom: 1px solid #ccc;
-  ${props => props.isHeader && `
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      overflow: hidden;
-    `
-    } 
 `
+
+const ScrollingHeaderRow = Row.extend`
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+  /*
+   * colCount is for the 1px border for each Header... 
+   * box-sizing doesn't work here because it does not count children
+ */
+  width: ${props => props.width + props.colCount}px;
+`.withComponent(Grid.SyncedScrollPane)
 
 const ColHeader = styled.div`
   flex: 0 0 ${props => props.width}px;
@@ -37,12 +47,38 @@ const ColHeader = styled.div`
   color: white;
   font-weight: bold;
   font-size: 0.85em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
 `
+
+const TableContentContainer = styled(Grid.SyncedScrollPane)`
+  position: absolute;
+  left: 0px;
+  top: ${props => props.headerRowHeight}px;
+  //header.length is for the border box and 17 is for the scroll height = width
+  width: ${props => props.width + 17 + props.headers.length}px;
+  height: ${props => props.height - props.headerRowHeight + 17}px;
+  overflow: scroll;
+`
+
+const TableContent = props =>
+  props.scroll ? (
+    <TableContentContainer {...props}>{props.children}</TableContentContainer>
+  ) : (
+    props.children
+  )
+
+// const ScrollingPane
 
 export class FlexGridRow extends React.PureComponent {
   render() {
-    const { children, ...rest } = this.props
-    return <Row {...rest}>{this.props.children}</Row>
+    const { children, scroll, ...rest } = this.props
+
+    return scroll ? (
+      <ScrollingHeaderRow {...rest}>{children}</ScrollingHeaderRow>
+    ) : (
+      <Row {...rest}>{children}</Row>
+    )
   }
 }
 
@@ -93,60 +129,65 @@ const flexGridRenderer = ({
   width,
   rowHeight,
   headerRowHeight,
-} = {}) => ({ getColumnHeaderProps, getRowProps, getCellProps }) => (
-  <div
-    style={{
-      position: 'relative',
-      ...style,
-    }}
-    className={className}
-  >
-    {/* the header row */}
-    <FlexGridRow
-      {...getRowProps({
-        isHeader: true,
-        headers,
-        width,
-        rowHeight,
-        headerRowHeight,
-      })}
-    >
-      {headers.map((header, index) => (
-        <FlexGridColHeader {...getColumnHeaderProps({ index, header })} />
-      ))}
-    </FlexGridRow>
-    {/* table body */}
+  /**
+   * add headerRenderer
+   * and rowRenderer
+   */
+} = {}) => ({ getColumnHeaderProps, getRowProps, getCellProps }) => {
+  const scroll = width && height && headerRowHeight
+  return (
     <div
       style={{
-        position: 'absolute',
-        left: '0',
-        top: headerRowHeight + 'px',
-        width: width + 17 + 'px',
-        height: height - headerRowHeight + 17,
-        overflow: 'scroll',
+        position: 'relative',
+        ...style,
       }}
+      className={className}
     >
-      {R.range(0, data.length).map(rowIndex => (
-        <FlexGridRow
-          {...getRowProps({
-            index: rowIndex,
-            headers,
-            rowHeight,
-          })}
-        >
-          {headers.map((header, columnIndex) => (
-            <FlexGridCell
-              {...getCellProps({
-                rowIndex,
-                columnIndex,
-                header,
-                data,
-              })}
-            />
-          ))}
-        </FlexGridRow>
-      ))}
+      {/* the header row */}
+      <FlexGridRow
+        {...getRowProps({
+          isHeader: true,
+          headers,
+          width,
+          rowHeight,
+          headerRowHeight,
+        })}
+        scroll={scroll}
+      >
+        {headers.map((header, index) => (
+          <FlexGridColHeader {...getColumnHeaderProps({ index, header })} />
+        ))}
+      </FlexGridRow>
+      {/* table body */}
+      <TableContent
+        height={height}
+        width={width}
+        headerRowHeight={headerRowHeight}
+        headers={headers}
+        scroll={scroll}
+      >
+        {R.range(0, data.length).map(rowIndex => (
+          <FlexGridRow
+            {...getRowProps({
+              index: rowIndex,
+              headers,
+              rowHeight,
+            })}
+          >
+            {headers.map((header, columnIndex) => (
+              <FlexGridCell
+                {...getCellProps({
+                  rowIndex,
+                  columnIndex,
+                  header,
+                  data,
+                })}
+              />
+            ))}
+          </FlexGridRow>
+        ))}
+      </TableContent>
     </div>
-  </div>
-)
+  )
+}
 export default flexGridRenderer
