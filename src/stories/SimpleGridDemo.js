@@ -29,8 +29,8 @@ const createData = R.compose(R.map(createRow), R.range(1))
 
 /* prettier-ignore */
 const headers = [
-  strCol({ ident: 'unitId', display: 'Unit', width:180 }),
-  numCol({ ident: 'he', display: 'HE', width: 40 }),
+  strCol({ ident: 'unitId', display: 'Unit', width:180,isKey:true }),
+  numCol({ ident: 'he', display: 'HE', width: 40,isKey:true }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
   numCol({ ident: 'emerMinOvr', display: 'Emer Min' }),
   numCol({ ident: 'ecoMinOvr', display: 'Eco Min' }),
@@ -70,6 +70,7 @@ const GridDemo = () => {
         headerRowHeight: 60,
         width: 800,
         height: 400,
+        autoFixColByKey: true,
       })}
     />
   )

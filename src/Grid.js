@@ -13,27 +13,48 @@ const SCROLL_SYNC_CONTEXT = '$$GRID_SCROLL_SYNC_CONTEXT$$'
 
 class ScrollPane extends React.Component {
   static propTypes = {
-    horizontal: PropTypes.bool.isRequired,
+    horizontal: PropTypes.bool,
+    vertical: PropTypes.bool,
   }
   static defaultProps = {
     horizontal: true,
+    vertical: false,
   }
   static contextTypes = {
     [SCROLL_SYNC_CONTEXT]: PropTypes.object.isRequired,
   }
   componentDidMount() {
-    const { horizontal } = this.props
+    const { horizontal, vertical } = this.props
     const scrollSync = this.context[SCROLL_SYNC_CONTEXT]
     const node = ReactDOM.findDOMNode(this.pane)
-    //console.log('registering', node, 'with', scrollSync)
-    scrollSync.registerPane(
-      node,
-      horizontal ? ScrollSyncHelper.HORIZONTAL : ScrollSyncHelper.VERTICAL
-    )
+    if (horizontal) {
+      scrollSync.registerPane(node, ScrollSyncHelper.HORIZONTAL)
+    }
+    if (vertical) {
+      scrollSync.registerPane(node, ScrollSyncHelper.VERTICAL)
+    }
+    console.log(scrollSync)
+  }
+
+  componentWillUnmount() {
+    const scrollSync = this.context[SCROLL_SYNC_CONTEXT]
+    const node = ReactDOM.findDOMNode(this.pane)
+    scrollSync.unReisterPane(node)
   }
 
   render() {
-    const { children, vertical, ...props } = this.props
+    const {
+      children,
+      // props that was passed down to figure out sytle
+      vertical,
+      horizontal,
+      colCount,
+      isHeader,
+      scroll,
+      xOffSet,
+      headerRowHeight,
+      ...props
+    } = this.props
     return (
       <div ref={n => (this.pane = n)} {...props}>
         {children}
@@ -87,7 +108,7 @@ class Grid extends React.PureComponent {
     isHeader,
   })
 
-  /** find out ways to not use rowIndex, columnIndex
+  /** TODO find out ways to not use rowIndex, columnIndex
    * listener on each Cell. that is supposedly optimized by react
    * meaning even though a lot of listeners are created. only one actually exists
    * **/
@@ -117,8 +138,8 @@ class Grid extends React.PureComponent {
     rowHeight,
     ...rest
   }) => ({
-    key: key || rowIndex + '*' + header.ident,
     'data-row-index': rowIndex,
+    key: key || rowIndex + '*' + header.ident,
     'data-column-index': columnIndex,
     header,
     onMouseDown: this.cellMouseDown,

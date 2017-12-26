@@ -2,8 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import R from 'ramda'
 import Grid from './Grid'
+import { sumWidth } from './utils'
 
-//const isScrolledTable = props => pro
+// const isScrolledTable = props => pro
 
 const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
@@ -26,7 +27,7 @@ const Row = styled.div`
 const ScrollingHeaderRow = Row.extend`
   position: absolute;
   top: 0px;
-  left: 0px;
+  left: ${props => props.xOffSet || '0'}px;
   overflow: hidden;
   /*
    * colCount is for the 1px border for each Header... 
@@ -51,7 +52,10 @@ const ColHeader = styled.div`
   padding-right: 0.2em;
 `
 
-const TableContentContainer = styled(Grid.SyncedScrollPane)`
+const TableContentContainer = styled(Grid.SyncedScrollPane).attrs({
+  vertical: true,
+  horizontal: true,
+})`
   position: absolute;
   left: 0px;
   top: ${props => props.headerRowHeight}px;
@@ -120,7 +124,32 @@ export class FlexGridColHeader extends React.PureComponent {
   }
 }
 
-const flexGridRenderer = ({
+const FlexGridContainer = styled.div`
+  position: relative;
+`
+
+const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
+
+const flexGridRenderer = dataProps => renderProps => {
+  const { autoFixColByKey, headers, fixedColCount } = dataProps
+  const fixedCols = autoFixColByKey ? countKeyCols(headers) : fixedColCount
+  if (R.isNil(fixedCols) || fixedCols === 0) {
+    return renderGridWithNoFixedCol({ ...dataProps, ...renderProps })
+  } else {
+    return renderGridWithFixedCols({
+      ...dataProps,
+      ...renderProps,
+      numOfFixedCols: fixedCols,
+    })
+  }
+}
+
+const splitFixedCols = (numOfFixedCols, headers) => ({
+  colHeaders: R.take(numOfFixedCols, headers),
+  dataHeaders: R.drop(numOfFixedCols, headers),
+})
+
+const renderGridWithFixedCols = ({
   data,
   headers,
   style,
@@ -129,20 +158,101 @@ const flexGridRenderer = ({
   width,
   rowHeight,
   headerRowHeight,
-  /**
-   * add headerRenderer
-   * and rowRenderer
-   */
-} = {}) => ({ getColumnHeaderProps, getRowProps, getCellProps }) => {
+  fixedColCount,
+  autoFixColByKey,
+  // renderprops
+  getColumnHeaderProps,
+  getRowProps,
+  getCellProps,
+  numOfFixedCols,
+}) => {
+  const { colHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
+  const colHeaderWidth = sumWidth(colHeaders)
+  const dataScrollWidth =  width - colHeaderWidth + colHeaders.length
+
+  return (
+    <FlexGridContainer style={style} className={className}>
+      {/* col header + row header + non-scrolling part */}
+      <FlexGridRow
+        {...getRowProps({
+          isHeader: true,
+          headers: colHeaders,
+          headerRowHeight,
+        })}
+        scroll
+      >
+        {colHeaders.map((header, index) => (
+          <FlexGridColHeader {...getColumnHeaderProps({ index, header })} />
+        ))}
+      </FlexGridRow>
+      {/* row header + scrolling part */}
+      <FlexGridRow
+        {...getRowProps({
+          isHeader: true,
+          headers: dataHeaders,
+          width: dataScrollWidth,
+          headerRowHeight,
+        })}
+        xOffSet={colHeaderWidth}
+        scroll
+      >
+        {dataHeaders.map((header, index) => (
+          <FlexGridColHeader {...getColumnHeaderProps({ index, header })} />
+        ))}
+      </FlexGridRow>
+      {/* table body */}
+      <TableContent
+        height={height}
+        width={width}
+        headerRowHeight={headerRowHeight}
+        headers={headers}
+        scroll
+      >
+        {R.range(0, data.length).map(rowIndex => (
+          <FlexGridRow
+            {...getRowProps({
+              index: rowIndex,
+              headers,
+              rowHeight,
+            })}
+          >
+            {headers.map((header, columnIndex) => (
+              <FlexGridCell
+                {...getCellProps({
+                  rowIndex,
+                  columnIndex,
+                  header,
+                  data,
+                })}
+              />
+            ))}
+          </FlexGridRow>
+        ))}
+      </TableContent>
+    </FlexGridContainer>
+  )
+}
+
+
+const renderGridWithNoFixedCol = ({
+  data,
+  headers,
+  style,
+  className,
+  height,
+  width,
+  rowHeight,
+  headerRowHeight,
+  fixedColCount,
+  autoFixColByKey,
+  // renderprops
+  getColumnHeaderProps,
+  getRowProps,
+  getCellProps,
+}) => {
   const scroll = width && height && headerRowHeight
   return (
-    <div
-      style={{
-        position: 'relative',
-        ...style,
-      }}
-      className={className}
-    >
+    <FlexGridContainer style={style} className={className}>
       {/* the header row */}
       <FlexGridRow
         {...getRowProps({
@@ -187,7 +297,7 @@ const flexGridRenderer = ({
           </FlexGridRow>
         ))}
       </TableContent>
-    </div>
+    </FlexGridContainer>
   )
 }
 export default flexGridRenderer

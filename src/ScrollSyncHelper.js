@@ -22,12 +22,24 @@ class ScrollSyncHelper {
 
   registerPane(pane, MODE) {
     this.addEvents(pane)
-    if (MODE === ScrollSyncHelper.HORIZONTAL) {
+    if (
+      MODE === ScrollSyncHelper.HORIZONTAL &&
+      !this.horizonalPanes.includes(pane)
+    ) {
       this.horizonalPanes = [...this.horizonalPanes, pane]
     }
-    if (MODE === ScrollSyncHelper.VERTICAL) {
+    if (
+      MODE === ScrollSyncHelper.VERTICAL &&
+      !this.verticalPanes.includes(pane)
+    ) {
       this.verticalPanes = [...this.verticalPanes, pane]
     }
+  }
+
+  unReisterPane(pane) {
+    this.verticalPanes = this.verticalPanes.filter(p => p !== pane)
+    this.horizonalPanes = this.horizonalPanes.filter(p => p !== pane)
+    this.removeEvents(pane)
   }
 
   isHorizontallySynced = pane => this.horizonalPanes.includes(pane)
