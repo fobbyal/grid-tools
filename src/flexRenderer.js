@@ -19,6 +19,7 @@ export const ColHeader = styled.div`
   align-items: center;
   text-align: center;
   user-select: none;
+  cursor: ${props => (props.sortable ? 'pointer' : 'default')};
   background-color: ${props => props.backgroundColor || 'steelblue'};
   color: ${props => props.color || 'white'};
   font-weight: ${props => props.fontWeight || 'bold'};
@@ -35,7 +36,7 @@ export const Cell = styled.div`
   display: flex;
   align-items: center;
   user-select: none;
-  cursor: pointer;
+  cursor: default;
   justify-content: ${props =>
     mapAlignmentToJustifyContent(props.alignment) || 'center'};
   ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')};
@@ -142,14 +143,20 @@ class FlexGridCell extends React.PureComponent {
   }
 }
 
+const SortIndicator = styled.i`
+  justify-self: flex-end;
+  margin-left: 0.2em;
+`
+
 export const defaultColHeaderRenderer = ({
   header,
   width,
   render,
   ...rest
 }) => (
-  <ColHeader width={width} {...rest}>
+  <ColHeader width={width} {...rest} sortable={header.sortable}>
     {header.display}
+    <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
   </ColHeader>
 )
 
@@ -172,8 +179,6 @@ const FlexGridContainer = styled.div`
 const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
 
 const flexGridRenderer = ({
-  data,
-  headers,
   style,
   className,
   height,
@@ -184,11 +189,13 @@ const flexGridRenderer = ({
   autoFixColByKey,
   cellRenderer,
   colHeaderRenderer,
-}) => ({
+} = {}) => ({
   getColumnHeaderProps,
   getRowProps,
   getCellProps,
   getContainerProps,
+  data,
+  headers,
 }) => {
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)

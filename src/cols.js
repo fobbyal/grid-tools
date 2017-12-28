@@ -2,7 +2,8 @@ const defaultProps = {
   editable: true,
   isKey: false,
   alignment: 'center',
-  width: 80,
+  width: 100,
+  sortable:true,
 }
 
 // numearls display is here

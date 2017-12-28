@@ -92,20 +92,16 @@ const splitColHeaderRenderer = props => {
   return defaultFlexColHeaderRenderer(props)
 }
 
+const commonProps = { headers, data }
+
 storiesOf('Flex Grid', module)
   .add('Broswer Scroll/No Scroll', () => (
-    <Grid
-      render={flexGridRenderer({
-        headers,
-        data,
-      })}
-    />
+    <Grid {...commonProps} render={flexGridRenderer()} />
   ))
   .add('Simple Scroll', () => (
     <Grid
+      {...commonProps}
       render={flexGridRenderer({
-        headers,
-        data,
         headerRowHeight: 60,
         width: 800,
         height: 400,
@@ -114,9 +110,8 @@ storiesOf('Flex Grid', module)
   ))
   .add('Scroll with fixed col', () => (
     <Grid
+      {...commonProps}
       render={flexGridRenderer({
-        headers,
-        data,
         headerRowHeight: 60,
         width: 800,
         height: 400,
@@ -126,9 +121,8 @@ storiesOf('Flex Grid', module)
   ))
   .add('Customized Cell Renderer', () => (
     <Grid
+      {...commonProps}
       render={flexGridRenderer({
-        headers,
-        data,
         headerRowHeight: 60,
         width: 800,
         height: 400,
@@ -139,9 +133,8 @@ storiesOf('Flex Grid', module)
   ))
   .add('Customized Row Header Renderer', () => (
     <Grid
+      {...commonProps}
       render={flexGridRenderer({
-        headers,
-        data,
         headerRowHeight: 60,
         width: 800,
         height: 400,
