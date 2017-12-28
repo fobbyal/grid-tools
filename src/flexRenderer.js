@@ -10,6 +10,22 @@ const mapAlignmentToJustifyContent = alignment =>
     ? 'flex-start'
     : alignment === 'right' ? 'flex-end' : alignment
 
+export const ColHeader = styled.div`
+  flex: 0 0 ${props => props.width}px;
+  width: ${props => props.width}px;
+  border-right: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  user-select: none;
+  background-color: ${props => props.backgroundColor || 'steelblue'};
+  color: ${props => props.color || 'white'};
+  font-weight: ${props => props.fontWeight || 'bold'};
+  font-size: ${props => props.fontSize || '0.85em'};
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+`
 export const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
@@ -57,22 +73,6 @@ const ScrollingHeaderRow = Row.extend`
  */
   width: ${props => props.width + props.colCount}px;
 `.withComponent(Grid.SyncedScrollPane)
-
-export const ColHeader = styled.div`
-  flex: 0 0 ${props => props.width}px;
-  width: ${props => props.width}px;
-  border-right: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  background-color: ${props => props.backgroundColor || 'steelblue'};
-  color: ${props => props.color || 'white'};
-  font-weight: ${props => props.fontWeight || 'bold'};
-  font-size: ${props => props.fontSize || '0.85em'};
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-`
 
 const TableContentContainer = styled(Grid.SyncedScrollPane)`
   position: absolute;
@@ -184,7 +184,12 @@ const flexGridRenderer = ({
   autoFixColByKey,
   cellRenderer,
   colHeaderRenderer,
-}) => ({ getColumnHeaderProps, getRowProps, getCellProps }) => {
+}) => ({
+  getColumnHeaderProps,
+  getRowProps,
+  getCellProps,
+  getContainerProps,
+}) => {
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)
     : fixedColCount || 0
@@ -194,7 +199,11 @@ const flexGridRenderer = ({
   const dataScrollWidth = width - rowHeaderWidth + rowHeaders.length
 
   return (
-    <FlexGridContainer style={style} className={className}>
+    <FlexGridContainer
+      {...getContainerProps()}
+      style={style}
+      className={className}
+    >
       {/* col header non-scrolling part/fixed columns */}
       <FlexGridRow
         {...getRowProps({

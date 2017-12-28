@@ -20,8 +20,12 @@ export const normalizeBounds = selection => {
 export const sumWidth = R.compose(R.sum, R.map(({ width }) => width))
 
 export const extractPosition = evt => ({
-  rowIndex: parseInt(evt.target.getAttribute(ROW_INDEX_ATTRIBUTE)),
-  columnIndex: parseInt(evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE)),
+  rowIndex: fromNullable(evt.target.getAttribute(ROW_INDEX_ATTRIBUTE))
+    .map(parseInt)
+    .getOrElse(undefined),
+  columnIndex: fromNullable(evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE))
+    .map(parseInt)
+    .getOrElse(undefined),
 })
 
 export const isPositionValid = pos =>

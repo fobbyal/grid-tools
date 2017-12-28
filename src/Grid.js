@@ -30,16 +30,19 @@ const isCellSelected = (rowIndex, columnIndex, selection) => {
   )
 }
 
+const isRowSelected = (rowIndex, selection) => {
+  const { y1, y2 } = normalizeBounds(selection)
+  return selectionType === 'cell' && rowIndex <= y2 && rowIndex >= y1
+}
+
 class ScrollPane extends React.Component {
   static propTypes = {
     horizontal: PropTypes.bool,
     vertical: PropTypes.bool,
-    selectionType: PropTypes.oneOf(['row', 'cell']),
   }
   static defaultProps = {
     horizontal: true,
     vertical: false,
-    selectionType: 'cell',
   }
   static contextTypes = {
     [SCROLL_SYNC_CONTEXT]: PropTypes.object.isRequired,
@@ -89,7 +92,15 @@ class ScrollPane extends React.Component {
 class Grid extends React.PureComponent {
   static propTypes = {
     render: PropTypes.func.isRequired,
+    selectionType: PropTypes.oneOf(['row', 'cell']),
+    hoverType: PropTypes.oneOf(['row', 'cell']),
   }
+
+  static defaultProps = {
+    selectionType: 'cell',
+    hoverType: 'row',
+  }
+
   static SyncedScrollPane = ScrollPane
   static childContextTypes = {
     [SCROLL_SYNC_CONTEXT]: PropTypes.object.isRequired,
@@ -100,11 +111,26 @@ class Grid extends React.PureComponent {
     }
   }
 
-  /** move over code to select and copy data */
-  static extractPosition = evt => ({
-    rowIndex: parseInt(evt.target.getAttribute(ROW_INDEX_ATTRIBUTE)),
-    columnIndex: parseInt(evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE)),
-  })
+  bodyMouseUp = e => {
+    /* 
+    * this will only work with one grid on screen 
+    * may need to figureout another solution
+    * isPositionValid only cares if data-row-index data-column-index is there
+    * */
+    if (this.selecting && !isPositionValid(extractPosition(e))) {
+      this.selecting = false
+    }
+  }
+
+  componentDidMount() {
+    console.log(window.document.body)
+    window.document.body.addEventListener('mouseup', this.bodyMouseUp)
+    window.document.body.addEventListener('mouseleave', this.bodyMouseUp)
+  }
+  componentWillUnmount() {
+    window.document.body.removeEventListener('mouseleave', this.bodyMouseUp)
+    window.document.body.removeEventListener('mouseup', this.bodyMouseUp)
+  }
 
   state = {
     hoveredRow: undefined,
@@ -138,15 +164,23 @@ class Grid extends React.PureComponent {
     isHeader,
   })
 
-  startSelectionState(pos) {
+  startSelectionState(rowIndex, columnIndex) {
     this.selecting = true
-    const { rowIndex: y1, columnIndex: x1 } = pos
-    return { x1, y1 }
+    return { x1: columnIndex, y1: rowIndex, x2: columnIndex, y2: rowIndex }
   }
 
-  expandSelectionState(pos, ended) {
-    this.selecting = ended ? false : this.selecting
-    return { y2: pos.rowIndex, x2: pos.columnIndex }
+  expandSelectionState(rowIndex, columnIndex, ended) {
+    if (this.selecting) {
+      this.selecting = ended ? false : this.selecting
+      return { y2: rowIndex, x2: columnIndex }
+    }
+  }
+
+  hoverState(rowIndex, columnIndex) {
+    const { hoverType } = this.props
+    return hoverType === 'cell'
+      ? { hoveredRow: rowIndex, hoveredColumn: columnIndex }
+      : { hoveredRow: rowIndex }
   }
 
   /** TODO find out ways to not use rowIndex, columnIndex
@@ -155,39 +189,28 @@ class Grid extends React.PureComponent {
    * **/
   cellMouseDown = e => {
     const pos = extractPosition(e)
-    this.setState(_ => this.startSelectionState(pos))
+    const { rowIndex, columnIndex } = pos
+    if (e.button === 2 && isCellSelected(rowIndex, columnIndex, this.state))
+      return
+    this.setState(_ => this.startSelectionState(rowIndex, columnIndex))
   }
 
   cellMouseUp = e => {
     const pos = extractPosition(e)
-    this.setState(_ => this.expandSelectionState(pos, true))
+    const { rowIndex, columnIndex } = pos
+    this.setState(_ => this.expandSelectionState(rowIndex, columnIndex, true))
   }
 
   cellMouseEnter = e => {
     const pos = extractPosition(e)
-    const { selectionType = 'cell' } = this.props
-    if (isPositionValid(pos)) {
-      const { rowIndex, columnIndex } = pos
-      this.setState(
-        _ =>
-          selectionType === 'cell'
-            ? { hoveredRow: rowIndex, hoveredColumn: columnIndex }
-            : { hoveredRow: rowIndex }
-      )
-    }
+    const { rowIndex, columnIndex } = pos
+    this.setState(_ => ({
+      ...this.hoverState(rowIndex, columnIndex),
+      ...this.expandSelectionState(rowIndex, columnIndex),
+    }))
   }
-
   cellMouseLeave = e => {
-    const pos = extractPosition(e)
-    const { selectionType = 'cell' } = this.props
-    if (isPositionValid(pos)) {
-      this.setState(
-        _ =>
-          selectionType === 'cell'
-            ? { hoveredRow: undefined, hoveredColumn: undefined }
-            : { hoveredRow: undefined }
-      )
-    }
+    this.setState(_ => ({ ...this.hoverState() }))
   }
 
   getCellProps = ({
@@ -200,22 +223,22 @@ class Grid extends React.PureComponent {
     rowHeight,
     ...rest
   }) => {
-    const { selectionType = 'cell' } = this.props
+    const { selectionType, hoverType } = this.props
     return {
       'data-row-index': rowIndex,
       key: key || rowIndex + '*' + header.ident,
       'data-column-index': columnIndex,
       header,
       onMouseDown: this.cellMouseDown,
-      onMouseUp: this.cellMouseUp,
       onMouseEnter: this.cellMouseEnter,
+      onMouseUp: this.cellMouseUp,
       onMouseLeave: this.cellMouseLeave,
       isSelected:
         selectionType === 'cell'
           ? isCellSelected(rowIndex, columnIndex, this.state)
-          : this.state.selectedRow === rowIndex,
+          : isRowSelected(rowIndex, this.state),
       isHovered:
-        selectionType === 'cell'
+        hoverType === 'cell'
           ? this.state.hoveredRow === rowIndex &&
             this.state.hoveredColumn === columnIndex
           : this.state.hoveredRow === rowIndex,
@@ -228,15 +251,14 @@ class Grid extends React.PureComponent {
     }
   }
 
-  getGridContainerProps = () => ({
-    display: 'relative',
-  })
+  getGridContainerProps = () => ({})
 
   render() {
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
       getRowProps: this.getRowProps,
       getCellProps: this.getCellProps,
+      getContainerProps: this.getGridContainerProps,
     })
   }
 }
