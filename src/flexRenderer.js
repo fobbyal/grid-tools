@@ -3,8 +3,12 @@ import styled from 'styled-components'
 import R from 'ramda'
 import Grid from './Grid'
 import { sumWidth } from './utils'
+import numeral from 'numeral'
 
-// const isScrolledTable = props => pro
+const mapAlignmentToJustifyContent = alignment =>
+  alignment === 'left'
+    ? 'flex-start'
+    : alignment === 'right' ? 'flex-end' : alignment
 
 export const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
@@ -14,13 +18,23 @@ export const Cell = styled.div`
   border-right: 1px solid #ccc;
   display: flex;
   align-items: center;
-  justify-content: ${props => props.alignment || 'center'};
+  user-select: none;
+  cursor: pointer;
+  justify-content: ${props =>
+    mapAlignmentToJustifyContent(props.alignment) || 'center'};
   ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')};
-  ${props => (props.color ? 'color:' + props.color + ';' : '')};
   ${props =>
-    props.backgroundColor
-      ? 'background-color:' + props.backgroundColor + ';'
-      : ''};
+    props.isSelected && !props.isHovered
+      ? 'color: #efefef;'
+      : props.color ? 'color:' + props.color + ';' : ''};
+  ${props =>
+    props.isHovered
+      ? 'background-color:#ddd;'
+      : props.isSelected
+        ? 'background-color:#666;'
+        : props.backgroundColor
+          ? 'background-color:' + props.backgroundColor + ';'
+          : ''};
   ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')};
 `
 
@@ -94,9 +108,14 @@ class FlexGridRow extends React.PureComponent {
   }
 }
 
+const formatData = ({ displayMapper, type, numFormat, value }) =>
+  displayMapper
+    ? displayMapper(value)
+    : R.isNil(value)
+      ? ''
+      : type === 'num' && numFormat ? numeral(value).format(numFormat) : value
+
 export const defaultCellRenderer = ({
-  isSelected,
-  isHovered,
   rowIndex,
   columnIndex,
   header,
@@ -105,16 +124,16 @@ export const defaultCellRenderer = ({
   data,
   render,
   ...rest
-}) => (
-  <Cell
-    {...rest}
-    width={width}
-    height={height}
-    title={data[rowIndex][header.ident]}
-  >
-    {data[rowIndex][header.ident]}
-  </Cell>
-)
+}) => {
+  console.log('rendering..')
+  const value = data[rowIndex][header.ident]
+  const display = formatData({ ...header, value })
+  return (
+    <Cell {...rest} width={width} height={height} title={value}>
+      {display}
+    </Cell>
+  )
+}
 
 class FlexGridCell extends React.PureComponent {
   render() {
@@ -268,7 +287,7 @@ const flexGridRenderer = ({
                 render={cellRenderer}
                 {...getCellProps({
                   rowIndex,
-                  columnIndex,
+                  columnIndex: columnIndex + numOfFixedCols,
                   header,
                   data,
                 })}

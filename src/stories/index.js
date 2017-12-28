@@ -4,7 +4,15 @@ import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 // import { linkTo } from '@storybook/addon-links'
 import R from 'ramda'
-import { strCol, numCol, boolCol, selCol } from '../cols'
+import {
+  strCol,
+  numCol,
+  boolCol,
+  selCol,
+  intCol,
+  dollarCol,
+  pctCol,
+} from '../cols'
 import { randomRow } from './data'
 
 import Grid, {
@@ -21,33 +29,33 @@ const createData = R.compose(R.map(createRow), R.range(1))
 
 /* prettier-ignore */
 const headers = [
-  strCol({ ident: 'unitId', display: 'Unit', width:180,isKey:true }),
-  numCol({ ident: 'he', display: 'HE', width: 40,isKey:true }),
+  strCol({ ident: 'unitId', display: 'Unit', width:180,isKey:true, }),
+  intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
-  numCol({ ident: 'emerMinOvr', display: 'Emer Min' }),
-  numCol({ ident: 'ecoMinOvr', display: 'Eco Min' }),
-  numCol({ ident: 'ecoMaxOvr', display: 'Eco Max' }),
-  numCol({ ident: 'emerMaxOvr', display: 'Emer Max' }),
+  numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', }),
+  numCol({ ident: 'ecoMinOvr', display: 'Eco Min', }),
+  numCol({ ident: 'ecoMaxOvr', display: 'Eco Max', }),
+  numCol({ ident: 'emerMaxOvr', display: 'Emer Max', }),
   strCol({ ident: 'commitStatusOvr', display: 'Commit Status', }),
-  numCol({ ident: 'regMwOvr', display: 'Reg Mw' }),
-  numCol({ ident: 'regMinOvr', display: 'Reg Min' }),
-  numCol({ ident: 'regMaxOvr', display: 'Reg Max' }),
-  strCol({ ident: 'regAStatusOvr', display: 'Reg A Status' }),
-  strCol({ ident: 'spilling', display: 'Spilling' }),
-  numCol({ ident: 'reducedRampRatePct', display: 'Reduce Ramp Percent', }),
-  numCol({ ident: 'regAPrice', display: 'Reg A Price' }),
-  numCol({ ident: 'regACost', display: 'Reg A Cost' }),
-  numCol({ ident: 'regAPerfPrice', display: 'Reg A Perf Price', }),
-  numCol({ ident: 'regAPerfCost', display: 'Reg A Perf Cost' }),
-  strCol({ ident: 'regDStatus', display: 'Reg D status' }),
-  numCol({ ident: 'regDPrice', display: 'Reg D Price' }),
-  numCol({ ident: 'regDCost', display: 'Reg D Cost' }),
-  numCol({ ident: 'regDPerfPrice', display: 'Reg D Perf Price', }),
-  numCol({ ident: 'regDPerfCost', display: 'Reg D Perf Cost' }),
-  numCol({ ident: 'spinMwOvr', display: 'Spin Mw' }),
-  numCol({ ident: 'spinMaxOvr', display: 'Spin Max' }),
-  strCol({ ident: 'spinStatusOvr', display: 'Spin Status' }),
-  numCol({ ident: 'spinPrice', display: 'Spin Price' }),
+  numCol({ ident: 'regMwOvr', display: 'Reg Mw', }),
+  numCol({ ident: 'regMinOvr', display: 'Reg Min', }),
+  numCol({ ident: 'regMaxOvr', display: 'Reg Max', }),
+  strCol({ ident: 'regAStatusOvr', display: 'Reg A Status', }),
+  strCol({ ident: 'spilling', display: 'Spilling', }),
+  pctCol({ ident: 'reducedRampRatePct', display: 'Reduce Ramp Percent', width:220, }),
+  dollarCol({ ident: 'regAPrice', display: 'Reg A Price', width:120, }),
+  dollarCol({ ident: 'regACost', display: 'Reg A Cost', width:120, }),
+  dollarCol({ ident: 'regAPerfPrice', display: 'Reg A Perf Price', width:120, }),
+  dollarCol({ ident: 'regAPerfCost', display: 'Reg A Perf Cost', width:120, }),
+  strCol({ ident: 'regDStatus', display: 'Reg D status', }),
+  dollarCol({ ident: 'regDPrice', display: 'Reg D Price', width:120, }),
+  dollarCol({ ident: 'regDCost', display: 'Reg D Cost', width:120, }),
+  dollarCol({ ident: 'regDPerfPrice', display: 'Reg D Perf Price', width:120, }),
+  dollarCol({ ident: 'regDPerfCost', display: 'Reg D Perf Cost', width:120, }),
+  numCol({ ident: 'spinMwOvr', display: 'Spin Mw', }),
+  numCol({ ident: 'spinMaxOvr', display: 'Spin Max', }),
+  strCol({ ident: 'spinStatusOvr', display: 'Spin Status', }),
+  dollarCol({ ident: 'spinPrice', display: 'Spin Price', width:120, }),
 ]
 /*   grid code starts here */
 
@@ -55,7 +63,7 @@ const data = createData(80)
 
 const redOn3X3Renderer = props => {
   const { rowIndex, columnIndex, width, height, data, header } = props
-  if (rowIndex == 3 && columnIndex == 3) {
+  if (rowIndex === 3 && columnIndex === 3) {
     return (
       <FlexCell
         color="red"
@@ -85,7 +93,7 @@ const splitColHeaderRenderer = props => {
 }
 
 storiesOf('Flex Grid', module)
-  .add('Scroll', () => (
+  .add('Broswer Scroll/No Scroll', () => (
     <Grid
       render={flexGridRenderer({
         headers,

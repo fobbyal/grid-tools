@@ -17,6 +17,21 @@ export const numCol = (
   ...rest,
 })
 
+export const intCol = props => ({
+  ...numCol(props),
+  numFormat: '0',
+})
+
+export const dollarCol = props => ({
+  ...numCol(props),
+  numFormat: '$0,0.00',
+})
+
+export const pctCol = props => ({
+  ...numCol(props),
+  numFormat: '0.00%',
+})
+
 export const strCol = ({ ident, display, ...rest } = {}) => ({
   ident,
   display: display || ident,

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { sumWidth, isPositionValid, extractPosition } from './utils'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
+import R from 'ramda'
 
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 
@@ -10,15 +11,35 @@ const rowHeightOf = (index, rowHeight) =>
   typeof rowHeight === 'function' ? rowHeight(index) : rowHeight
 
 const SCROLL_SYNC_CONTEXT = '$$GRID_SCROLL_SYNC_CONTEXT$$'
+const empty = {}
+
+const normalizeBounds = selection => {
+  const { x1, y1, x2, y2 } = selection
+  if (R.isNil(x1) && R.isNil(x2) && R.isNil(y1) && R.isNil(y2)) return empty
+
+  const xMin = !R.isNil(x2) ? Math.min(x1, x2) : x1
+  const xMax = !R.isNil(x2) ? Math.max(x1, x2) : x1
+  const yMin = !R.isNil(y2) ? Math.min(y1, y2) : y1
+  const yMax = !R.isNil(y2) ? Math.max(y1, y2) : y1
+  return { x1: xMin, x2: xMax, y1: yMin, y2: yMax }
+}
+const isCellSelected = (rowIndex, columnIndex, selection) => {
+  const { x1, x2, y1, y2 } = normalizeBounds(selection)
+  return (
+    rowIndex <= y2 && rowIndex >= y1 && columnIndex <= x2 && columnIndex >= x1
+  )
+}
 
 class ScrollPane extends React.Component {
   static propTypes = {
     horizontal: PropTypes.bool,
     vertical: PropTypes.bool,
+    selectionType: PropTypes.oneOf(['row', 'cell']),
   }
   static defaultProps = {
     horizontal: true,
     vertical: false,
+    selectionType: 'cell',
   }
   static contextTypes = {
     [SCROLL_SYNC_CONTEXT]: PropTypes.object.isRequired,
@@ -53,6 +74,8 @@ class ScrollPane extends React.Component {
       scroll,
       xOffSet,
       headerRowHeight,
+      showScroll,
+      selectionType,
       ...props
     } = this.props
     return (
@@ -83,7 +106,14 @@ class Grid extends React.PureComponent {
     columnIndex: parseInt(evt.target.getAttribute(COLUMN_INDEX_ATTRIBUTE)),
   })
 
-  state = { selectedRow: undefined, hoveredRow: undefined }
+  state = {
+    hoveredRow: undefined,
+    hoveredColumn: undefined,
+    x1: undefined,
+    x2: undefined,
+    y1: undefined,
+    y2: undefined,
+  }
   scrollSync = new ScrollSyncHelper()
 
   getColumnHeaderProps = ({ key, index, header }) => ({
@@ -108,23 +138,55 @@ class Grid extends React.PureComponent {
     isHeader,
   })
 
+  startSelectionState(pos) {
+    this.selecting = true
+    const { rowIndex: y1, columnIndex: x1 } = pos
+    return { x1, y1 }
+  }
+
+  expandSelectionState(pos, ended) {
+    this.selecting = ended ? false : this.selecting
+    return { y2: pos.rowIndex, x2: pos.columnIndex }
+  }
+
   /** TODO find out ways to not use rowIndex, columnIndex
    * listener on each Cell. that is supposedly optimized by react
    * meaning even though a lot of listeners are created. only one actually exists
    * **/
   cellMouseDown = e => {
     const pos = extractPosition(e)
+    this.setState(_ => this.startSelectionState(pos))
+  }
+
+  cellMouseUp = e => {
+    const pos = extractPosition(e)
+    this.setState(_ => this.expandSelectionState(pos, true))
+  }
+
+  cellMouseEnter = e => {
+    const pos = extractPosition(e)
+    const { selectionType = 'cell' } = this.props
     if (isPositionValid(pos)) {
       const { rowIndex, columnIndex } = pos
-      this.setState(_ => ({ selectedRow: rowIndex }))
+      this.setState(
+        _ =>
+          selectionType === 'cell'
+            ? { hoveredRow: rowIndex, hoveredColumn: columnIndex }
+            : { hoveredRow: rowIndex }
+      )
     }
   }
 
-  cellMouseOver = e => {
+  cellMouseLeave = e => {
     const pos = extractPosition(e)
+    const { selectionType = 'cell' } = this.props
     if (isPositionValid(pos)) {
-      const { rowIndex, columnIndex } = pos
-      this.setState(_ => ({ hoveredRow: rowIndex }))
+      this.setState(
+        _ =>
+          selectionType === 'cell'
+            ? { hoveredRow: undefined, hoveredColumn: undefined }
+            : { hoveredRow: undefined }
+      )
     }
   }
 
@@ -137,22 +199,34 @@ class Grid extends React.PureComponent {
     rowData,
     rowHeight,
     ...rest
-  }) => ({
-    'data-row-index': rowIndex,
-    key: key || rowIndex + '*' + header.ident,
-    'data-column-index': columnIndex,
-    header,
-    onMouseDown: this.cellMouseDown,
-    onMouseOver: this.cellMouseOver,
-    isSelected: this.state.selectedRow === rowIndex,
-    isHovered: this.state.hoveredRow === rowIndex,
-    data,
-    rowIndex,
-    columnIndex,
-    height: rowHeightOf(rowIndex, rowHeight),
-    width: header.width,
-    alignment: header.alignment,
-  })
+  }) => {
+    const { selectionType = 'cell' } = this.props
+    return {
+      'data-row-index': rowIndex,
+      key: key || rowIndex + '*' + header.ident,
+      'data-column-index': columnIndex,
+      header,
+      onMouseDown: this.cellMouseDown,
+      onMouseUp: this.cellMouseUp,
+      onMouseEnter: this.cellMouseEnter,
+      onMouseLeave: this.cellMouseLeave,
+      isSelected:
+        selectionType === 'cell'
+          ? isCellSelected(rowIndex, columnIndex, this.state)
+          : this.state.selectedRow === rowIndex,
+      isHovered:
+        selectionType === 'cell'
+          ? this.state.hoveredRow === rowIndex &&
+            this.state.hoveredColumn === columnIndex
+          : this.state.hoveredRow === rowIndex,
+      data,
+      rowIndex,
+      columnIndex,
+      height: rowHeightOf(rowIndex, rowHeight),
+      width: header.width,
+      alignment: header.alignment,
+    }
+  }
 
   getGridContainerProps = () => ({
     display: 'relative',
