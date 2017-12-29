@@ -1,14 +1,21 @@
 import React from 'react'
-import { sumWidth, isPositionValid, extractPosition } from './utils'
+import {
+  sumWidth,
+  isPositionValid,
+  extractPosition,
+  extractColIdent,
+} from './utils'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
 import R from 'ramda'
 import ScrollPane from './ScrollPane'
+import moment from 'moment'
 
 import {
   ROW_INDEX_ATTRIBUTE,
   COLUMN_INDEX_ATTRIBUTE,
   SCROLL_SYNC_CONTEXT,
+  COL_IDENT_ATTRIBUTE,
 } from './constants.js'
 
 const rowHeightOf = (index, rowHeight) =>
@@ -39,8 +46,72 @@ const isRowSelected = (rowIndex, selection) => {
   return selectionType === 'cell' && rowIndex <= y2 && rowIndex >= y1
 }
 
-class Grid extends React.PureComponent {
+const toggleSortOrder = order =>
+  order === 'asc' ? 'desc' : order === 'desc' ? undefined : 'asc'
 
+const normalizeValue = (val, type) =>
+  type === 'num' && typeof val === 'string'
+    ? parseFloat(val)
+    : type === 'date' && (moment.isDate(val) || moment.isMoment(val))
+      ? val.valueOf()
+      : type === 'date' && typeof val === 'string' ? moment(val).valueOf() : val
+
+const defaultDataComparator = sortOptions => (a, b) => {
+  for (let i = 0; i < sortOptions.length; i++) {
+    const { ident, type, sortOrder } = sortOptions[i]
+    // TODO may need to look into getting custom data for example date
+    const aVal = normalizeValue(a[ident], type)
+    const bVal = normalizeValue(b[ident], type)
+    const greaterThanResult = sortOrder === 'asc' ? 1 : -1
+    const lessThanResult = sortOrder === 'asc' ? -1 : 1
+
+    if (!R.isNil(aVal) || !R.isNil(bVal)) {
+      if (R.isNil(aVal)) return greaterThanResult
+      if (R.isNil(bVal)) return lessThanResult
+      if (
+        typeof aVal === 'string' &&
+        typeof bVal === 'string' &&
+        aVal.toLowerCase().localeCompare(bVal.toLowerCase()) === 1
+      )
+        return greaterThanResult
+      if (
+        typeof aVal === 'string' &&
+        typeof bVal === 'string' &&
+        bVal.toLowerCase().localeCompare(aVal.toLowerCase()) === 1
+      )
+        return lessThanResult
+
+      if (typeof aVal === 'number' && typeof bVal === 'number' && aVal > bVal)
+        return greaterThanResult
+      if (typeof aVal === 'number' && typeof bVal === 'number' && bVal > aVal)
+        return lessThanResult
+    }
+  }
+  return 0
+}
+const computeSortOptions = (ident, type, sortOptions) => {
+  if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
+    return sortOptions
+      .map(
+        opt =>
+          opt.ident === ident
+            ? { ident, type, sortOrder: toggleSortOrder(opt.sortOrder) }
+            : opt
+      )
+      .filter(opt => opt.sortOrder !== undefined)
+  } else {
+    return [...sortOptions, { ident, type, sortOrder: 'asc' }]
+  }
+}
+
+const computeView = (data, sortOptions, comparator = defaultDataComparator) => {
+  console.log('computing resutls with', sortOptions, data)
+  return R.isNil(sortOptions) || R.isEmpty(sortOptions)
+    ? data
+    : data.sort(comparator(sortOptions))
+}
+
+class Grid extends React.PureComponent {
   /* compond components */
   static SyncedScrollPane = ScrollPane
 
@@ -50,7 +121,7 @@ class Grid extends React.PureComponent {
     headers: PropTypes.object.isRequired,
     selectionType: PropTypes.oneOf(['row', 'cell']),
     hoverType: PropTypes.oneOf(['row', 'cell']),
-    sortOptions: PropTypes.object,
+    sortOptions: PropTypes.array,
     onSort: PropTypes.func,
   }
 
@@ -77,7 +148,11 @@ class Grid extends React.PureComponent {
     x2: undefined,
     y1: undefined,
     y2: undefined,
-    view: this.props.data,
+    view: computeView(
+      this.props.data,
+      this.props.initialSortOptions || this.props.sortOptions
+    ),
+    sortOptions: this.props.initialSortOptions,
   }
 
   bodyMouseRelease = e => {
@@ -103,17 +178,48 @@ class Grid extends React.PureComponent {
     window.document.body.removeEventListener('mouseup', this.bodyMouseRelease)
   }
 
-
-  isSortControlled() {
-    const { sortOptions, onSort } = this.props
-    return !R.isNil(sortOptions) && !R.isNil(onSort)
+  componentWillReceiveProps(nextProps) {
+    if (this.props.data !== nextProps.data) this.generateView(nextProps.data)
+    if (this.props.sortOptions !== nextProps.sortOptions)
+      this.generateView(this.props.data)
   }
 
-  getColumnHeaderProps = ({ key, index, header }) => ({
-    key: key || header.ident,
-    header,
-    width: header.width,
-  })
+  /* sorting starts */
+
+  isSortControlled() {
+    return this.props.sortOptions !== undefined
+  }
+
+  toggleSort({ ident, type }) {
+    if (this.isSortControlled()) {
+      this.props.onSort({ ident, type })
+    } else {
+      this.setState(({ sortOptions = [] }) => {
+        const newOptions = computeSortOptions(ident, type, sortOptions)
+        const view = computeView(this.props.data, newOptions)
+        console.log('new view is', view)
+        return {
+          sortOptions: newOptions,
+          view,
+        }
+      })
+    }
+  }
+
+  sortOptions() {
+    return this.isSortControlled()
+      ? this.props.sortOptions
+      : this.state.sortOptions
+  }
+
+  /* sorting ends */
+
+  generateView(data) {
+    // TODO need to apply edit first
+    const sortOptions = this.sortOptions()
+    const view = computeView(data, sortOptions, defaultDataComparator)
+    this.setState(_ => ({ view }))
+  }
 
   /*  selection starts */
   startSelectionState(rowIndex, columnIndex) {
@@ -160,8 +266,18 @@ class Grid extends React.PureComponent {
       ...this.expandSelectionState(rowIndex, columnIndex),
     }))
   }
+
   cellMouseLeave = e => {
     this.setState(_ => ({ ...this.hoverState() }))
+  }
+
+  columnHeaderClick = e => {
+    console.log('clicked')
+    const ident = extractColIdent(e)
+    const header = this.props.headers.filter(h => h.ident === ident)[0]
+    if (!R.isNil(header)) {
+      this.toggleSort(header)
+    }
   }
 
   /** prop getters */
@@ -194,9 +310,9 @@ class Grid extends React.PureComponent {
   }) => {
     const { selectionType, hoverType } = this.props
     return {
-      'data-row-index': rowIndex,
+      [ROW_INDEX_ATTRIBUTE]: rowIndex,
       key: key || rowIndex + '*' + header.ident,
-      'data-column-index': columnIndex,
+      [COLUMN_INDEX_ATTRIBUTE]: columnIndex,
       header,
       onMouseDown: this.cellMouseDown,
       onMouseEnter: this.cellMouseEnter,
@@ -221,6 +337,14 @@ class Grid extends React.PureComponent {
   }
 
   getGridContainerProps = () => ({})
+
+  getColumnHeaderProps = ({ key, index, header }) => ({
+    key: key || header.ident,
+    header,
+    width: header.width,
+    [COL_IDENT_ATTRIBUTE]: header.ident,
+    onClick: this.columnHeaderClick,
+  })
 
   render() {
     return this.props.render({

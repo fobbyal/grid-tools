@@ -96,7 +96,7 @@ const commonProps = { headers, data }
 
 storiesOf('Flex Grid', module)
   .add('Broswer Scroll/No Scroll', () => (
-    <Grid {...commonProps} render={flexGridRenderer()} />
+    <Grid {...commonProps} data={createData(10)} render={flexGridRenderer()} />
   ))
   .add('Simple Scroll', () => (
     <Grid

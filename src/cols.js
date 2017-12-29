@@ -3,7 +3,7 @@ const defaultProps = {
   isKey: false,
   alignment: 'center',
   width: 100,
-  sortable:true,
+  sortable: true,
 }
 
 // numearls display is here

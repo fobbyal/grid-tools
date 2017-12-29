@@ -1,6 +1,10 @@
 import R from 'ramda'
 import { fromNullable, Just, Nothing } from 'data.maybe'
-import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
+import {
+  ROW_INDEX_ATTRIBUTE,
+  COLUMN_INDEX_ATTRIBUTE,
+  COL_IDENT_ATTRIBUTE,
+} from './constants.js'
 
 export const fromEmpty = d =>
   fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
@@ -27,6 +31,9 @@ export const extractPosition = evt => ({
     .map(parseInt)
     .getOrElse(undefined),
 })
+
+export const extractColIdent = evt =>
+  evt.target.getAttribute(COL_IDENT_ATTRIBUTE)
 
 export const isPositionValid = pos =>
   !R.isNil(pos) && !R.isNil(pos.rowIndex) && !R.isNil(pos.columnIndex)
