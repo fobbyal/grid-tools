@@ -72,7 +72,7 @@ const ScrollingHeaderRow = Row.extend`
    * colCount is for the 1px border for each Header... 
    * box-sizing doesn't work here because it does not count children
  */
-  width: ${props => props.width + props.colCount}px;
+  width: ${props => props.width}px;
 `.withComponent(Grid.SyncedScrollPane)
 
 const TableContentContainer = styled(Grid.SyncedScrollPane)`
@@ -86,7 +86,7 @@ const TableContentContainer = styled(Grid.SyncedScrollPane)`
   overflow: ${props => (props.showScroll ? 'scroll' : 'hidden')};
 `
 
-const TableContent = ({ scroll, showScroll = true, children, ...props }) =>
+const TableContent = ({ scroll, showScroll, children, ...props }) =>
   R.isNil(props.width) || props.width === 0 ? null : scroll ? (
     <TableContentContainer showScroll={showScroll} {...props}>
       {children}
@@ -100,7 +100,6 @@ const TableContent = ({ scroll, showScroll = true, children, ...props }) =>
 class FlexGridRow extends React.PureComponent {
   render() {
     const { children, scroll, ...rest } = this.props
-
     return R.isNil(rest.width) || rest.width === 0 ? null : scroll ? (
       <ScrollingHeaderRow {...rest}>{children}</ScrollingHeaderRow>
     ) : (
@@ -126,7 +125,6 @@ export const defaultCellRenderer = ({
   render,
   ...rest
 }) => {
-  console.log('rendering..')
   const value = data[rowIndex][header.ident]
   const display = formatData({ ...header, value })
   return (
@@ -138,6 +136,7 @@ export const defaultCellRenderer = ({
 
 class FlexGridCell extends React.PureComponent {
   render() {
+    //console.log('rendering cell..')
     const { render = defaultCellRenderer } = this.props
     return render(this.props)
   }
@@ -150,13 +149,18 @@ const SortIndicator = styled.i`
 
 export const defaultColHeaderRenderer = ({
   header,
+  sortOrder,
   width,
   render,
   ...rest
 }) => (
   <ColHeader width={width} {...rest} sortable={header.sortable}>
     {header.display}
-    <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
+    {sortOrder === 'asc' ? (
+      <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
+    ) : sortOrder === 'desc' ? (
+      <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
+    ) : null}
   </ColHeader>
 )
 
@@ -200,10 +204,14 @@ const flexGridRenderer = ({
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)
     : fixedColCount || 0
-  const scroll = width && height && headerRowHeight
+  const scroll = width && height && headerRowHeight && true
   const { rowHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
   const rowHeaderWidth = sumWidth(rowHeaders)
-  const dataScrollWidth = width - rowHeaderWidth + rowHeaders.length
+  const dataScrollWidth =
+    numOfFixedCols > 0
+      ? width - rowHeaderWidth + dataHeaders.length
+      : scroll ? width + headers.length : sumWidth(headers) + headers.length
+  //console.log('rendering grid ...', scroll, width, dataScrollWidth)
 
   return (
     <FlexGridContainer
@@ -212,21 +220,23 @@ const flexGridRenderer = ({
       className={className}
     >
       {/* col header non-scrolling part/fixed columns */}
-      <FlexGridRow
-        {...getRowProps({
-          isHeader: true,
-          headers: rowHeaders,
-          headerRowHeight,
-        })}
-        scroll={scroll}
-      >
-        {rowHeaders.map((header, index) => (
-          <FlexGridColHeader
-            render={colHeaderRenderer}
-            {...getColumnHeaderProps({ index, header })}
-          />
-        ))}
-      </FlexGridRow>
+      {numOfFixedCols > 0 && (
+        <FlexGridRow
+          {...getRowProps({
+            isHeader: true,
+            headers: rowHeaders,
+            headerRowHeight,
+          })}
+          scroll={scroll}
+        >
+          {rowHeaders.map((header, index) => (
+            <FlexGridColHeader
+              render={colHeaderRenderer}
+              {...getColumnHeaderProps({ index, header })}
+            />
+          ))}
+        </FlexGridRow>
+      )}
       {/* col header scrolling part */}
       <FlexGridRow
         {...getRowProps({
@@ -246,47 +256,49 @@ const flexGridRenderer = ({
         ))}
       </FlexGridRow>
       {/* table body fixed columns */}
-      <TableContent
-        height={height}
-        width={rowHeaderWidth}
-        headerRowHeight={headerRowHeight}
-        headers={rowHeaders}
-        scroll
-        showScroll={false}
-        vertical
-        horizontal={false}
-      >
-        {R.range(0, data.length).map(rowIndex => (
-          <FlexGridRow
-            {...getRowProps({
-              index: rowIndex,
-              headers,
-              rowHeight,
-            })}
-          >
-            {rowHeaders.map((header, columnIndex) => (
-              <FlexGridCell
-                render={cellRenderer}
-                {...getCellProps({
-                  rowIndex,
-                  columnIndex,
-                  header,
-                  data,
-                })}
-              />
-            ))}
-          </FlexGridRow>
-        ))}
-      </TableContent>
+      {numOfFixedCols > 0 && (
+        <TableContent
+          height={height}
+          width={rowHeaderWidth}
+          headerRowHeight={headerRowHeight}
+          headers={rowHeaders}
+          scroll
+          showScroll={false}
+          vertical
+          horizontal={false}
+        >
+          {R.range(0, data.length).map(rowIndex => (
+            <FlexGridRow
+              {...getRowProps({
+                index: rowIndex,
+                headers,
+                rowHeight,
+              })}
+            >
+              {rowHeaders.map((header, columnIndex) => (
+                <FlexGridCell
+                  render={cellRenderer}
+                  {...getCellProps({
+                    rowIndex,
+                    columnIndex,
+                    header,
+                    data,
+                  })}
+                />
+              ))}
+            </FlexGridRow>
+          ))}
+        </TableContent>
+      )}
       {/* table body data columns */}
       <TableContent
         height={height}
-        width={dataScrollWidth + dataHeaders.length}
+        width={dataScrollWidth}
         headerRowHeight={headerRowHeight}
         headers={dataHeaders}
-        scroll
+        scroll={scroll}
         xOffSet={rowHeaderWidth}
-        showScroll
+        showScroll={scroll}
         vertical
         horizontal
       >

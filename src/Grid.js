@@ -105,10 +105,18 @@ const computeSortOptions = (ident, type, sortOptions) => {
 }
 
 const computeView = (data, sortOptions, comparator = defaultDataComparator) => {
-  console.log('computing resutls with', sortOptions, data)
+  // TODO have to addd filter
   return R.isNil(sortOptions) || R.isEmpty(sortOptions)
     ? data
-    : data.sort(comparator(sortOptions))
+    : R.sort(comparator(sortOptions), data)
+}
+
+const sortOrderOf = header => options => {
+  if (R.isNil(options)) return undefined
+  return R.compose(
+    opt => (opt ? opt.sortOrder : undefined),
+    R.find(opt => opt.ident === header.ident)
+  )(options)
 }
 
 class Grid extends React.PureComponent {
@@ -118,7 +126,7 @@ class Grid extends React.PureComponent {
   static propTypes = {
     render: PropTypes.func.isRequired,
     data: PropTypes.array.isRequired,
-    headers: PropTypes.object.isRequired,
+    headers: PropTypes.array.isRequired,
     selectionType: PropTypes.oneOf(['row', 'cell']),
     hoverType: PropTypes.oneOf(['row', 'cell']),
     sortOptions: PropTypes.array,
@@ -197,7 +205,6 @@ class Grid extends React.PureComponent {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(ident, type, sortOptions)
         const view = computeView(this.props.data, newOptions)
-        console.log('new view is', view)
         return {
           sortOptions: newOptions,
           view,
@@ -272,7 +279,6 @@ class Grid extends React.PureComponent {
   }
 
   columnHeaderClick = e => {
-    console.log('clicked')
     const ident = extractColIdent(e)
     const header = this.props.headers.filter(h => h.ident === ident)[0]
     if (!R.isNil(header)) {
@@ -344,16 +350,18 @@ class Grid extends React.PureComponent {
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
     onClick: this.columnHeaderClick,
+    sortOrder: sortOrderOf(header)(this.state.sortOptions),
   })
 
   render() {
+    const { view } = this.state
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
       getRowProps: this.getRowProps,
       getCellProps: this.getCellProps,
       getContainerProps: this.getGridContainerProps,
       headers: this.props.headers,
-      data: this.state.view,
+      data: view,
     })
   }
 }

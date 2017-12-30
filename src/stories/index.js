@@ -25,7 +25,7 @@ import Grid, {
 
 const createRow = _ => randomRow(headers)
 
-const createData = R.compose(R.map(createRow), R.range(1))
+const createData = R.compose(R.map(createRow), R.range(0))
 
 /* prettier-ignore */
 const headers = [
@@ -94,9 +94,14 @@ const splitColHeaderRenderer = props => {
 
 const commonProps = { headers, data }
 
+const [unit] = headers
+
+const testData = [randomRow([unit]), randomRow([unit]), randomRow([unit])]
+console.log(testData)
+
 storiesOf('Flex Grid', module)
   .add('Broswer Scroll/No Scroll', () => (
-    <Grid {...commonProps} data={createData(10)} render={flexGridRenderer()} />
+    <Grid data={testData} headers={[unit]} render={flexGridRenderer()} />
   ))
   .add('Simple Scroll', () => (
     <Grid
