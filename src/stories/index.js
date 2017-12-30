@@ -22,6 +22,7 @@ import Grid, {
   defaultFlexCellRenderer,
   defaultFlexColHeaderRenderer,
 } from '../index'
+import FilterDemo from './FilterDemo'
 
 const createRow = _ => randomRow(headers)
 
@@ -93,15 +94,15 @@ const splitColHeaderRenderer = props => {
 }
 
 const commonProps = { headers, data }
+const debugHeaders = R.take(5, headers)
+const debugData = R.range(0, 13).map(_ => randomRow(debugHeaders))
 
-const [unit] = headers
-
-const testData = [randomRow([unit]), randomRow([unit]), randomRow([unit])]
-console.log(testData)
+const debugProps = { headers: debugHeaders, data: debugData }
 
 storiesOf('Flex Grid', module)
+  .add('debug', () => <Grid {...debugProps} render={flexGridRenderer()} />)
   .add('Broswer Scroll/No Scroll', () => (
-    <Grid data={testData} headers={[unit]} render={flexGridRenderer()} />
+    <Grid {...commonProps} render={flexGridRenderer()} />
   ))
   .add('Simple Scroll', () => (
     <Grid
@@ -147,4 +148,7 @@ storiesOf('Flex Grid', module)
         colHeaderRenderer: splitColHeaderRenderer,
       })}
     />
+  ))
+  .add('Fuzzy Filter', () => (
+    <FilterDemo {...commonProps} render={flexGridRenderer()} />
   ))

@@ -89,6 +89,7 @@ const defaultDataComparator = sortOptions => (a, b) => {
   }
   return 0
 }
+
 const computeSortOptions = (sortOptions, { ident, type }) => {
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
@@ -104,9 +105,34 @@ const computeSortOptions = (sortOptions, { ident, type }) => {
   }
 }
 
+const toFilterableString = (val, type) =>
+  R.isNil(val)
+    ? ''
+    : typeof val === 'string'
+      ? val
+      : moment.isDate(val)
+        ? moment(val).format('MM/DD/YYYY HH:mm:ss')
+        : moment.isMoment(val)
+          ? val.format('MM/DD/YYYY HH:mm:ss')
+          : val.toString()
+
+const matchData = (rowData, fuzzyFilter) => header =>
+  (header.dataGetter
+    ? toFilterableString(header.dataGetter({ rowData, header }), header.type)
+    : toFilterableString(rowData[header.ident], header.type)
+  )
+    .toLowerCase()
+    .includes(fuzzyFilter.toLowerCase())
+
 const filterData = (data, headers, fuzzyFilter) => {
-  //R.filter(row => headers. )
-  return data
+  const filteredHeaders = R.filter(
+    ({ isKey, isFiltered }) => isKey || isFiltered,
+    headers
+  )
+  return R.filter(
+    rowData => R.any(matchData(rowData, fuzzyFilter), filteredHeaders),
+    data
+  )
 }
 
 const computeView = ({
@@ -116,9 +142,9 @@ const computeView = ({
   fuzzyFilter,
   headers,
 }) => {
-  // TODO have to addd filter
+  // TODO have to add edited value
   const filteredData =
-    !R.isNil(fuzzyFilter) && R.isEmpty(fuzzyFilter)
+    !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
       ? filterData(data, headers, fuzzyFilter)
       : data
 
@@ -176,6 +202,8 @@ class Grid extends React.PureComponent {
     view: computeView({
       data: this.props.data,
       sortOptions: this.props.initialSortOptions || this.props.sortOptions,
+      fuzzyFilter: this.props.fuzzyFilter,
+      headers: this.props.headers,
     }),
     sortOptions: this.props.initialSortOptions,
   }
@@ -204,9 +232,23 @@ class Grid extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.data !== nextProps.data) this.generateView(nextProps.data)
-    if (this.props.sortOptions !== nextProps.sortOptions)
-      this.generateView(this.props.data)
+    const { data, sortOptions, fuzzyFilter } = this.props.data
+    if (
+      data !== nextProps.data ||
+      sortOptions !== nextProps.sortOptions ||
+      fuzzyFilter !== nextProps.fuzzyFilter
+    )
+      this.generateView({
+        data: data !== nextProps.data ? nextProps.data : data,
+        sortOptions:
+          sortOptions !== nextProps.sortOptions
+            ? nextProps.sortOptions
+            : sortOptions,
+        fuzzyFilter:
+          fuzzyFilter !== nextProps.fuzzyFilter
+            ? nextProps.fuzzyFilter
+            : fuzzyFilter,
+      })
   }
 
   /* sorting starts */
@@ -224,6 +266,8 @@ class Grid extends React.PureComponent {
         const view = computeView({
           data: this.props.data,
           sortOptions: newOptions,
+          fuzzyFilter: this.props.fuzzyFilter,
+          headers: this.props.headers,
         })
         return {
           sortOptions: newOptions,
@@ -241,10 +285,18 @@ class Grid extends React.PureComponent {
 
   /* sorting ends */
 
-  generateView(data) {
+  generateView({
+    data = this.props.data,
+    sortOptions = this.sortOptions(),
+    fuzzyFilter = this.props.fuzzyFilter,
+  }) {
     // TODO need to apply edit first
-    const sortOptions = this.sortOptions()
-    const view = computeView({ data, sortOptions })
+    const view = computeView({
+      data,
+      sortOptions,
+      fuzzyFilter,
+      headers: this.props.headers,
+    })
     this.setState(_ => ({ view }))
   }
 
@@ -375,6 +427,7 @@ class Grid extends React.PureComponent {
 
   render() {
     const { view } = this.state
+    console.log('render grid..')
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
       getRowProps: this.getRowProps,
