@@ -89,7 +89,7 @@ const defaultDataComparator = sortOptions => (a, b) => {
   }
   return 0
 }
-const computeSortOptions = (ident, type, sortOptions) => {
+const computeSortOptions = (sortOptions, { ident, type }) => {
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
       .map(
@@ -104,11 +104,27 @@ const computeSortOptions = (ident, type, sortOptions) => {
   }
 }
 
-const computeView = (data, sortOptions, comparator = defaultDataComparator) => {
+const filterData = (data, headers, fuzzyFilter) => {
+  //R.filter(row => headers. )
+  return data
+}
+
+const computeView = ({
+  data,
+  sortOptions,
+  comparator = defaultDataComparator,
+  fuzzyFilter,
+  headers,
+}) => {
   // TODO have to addd filter
+  const filteredData =
+    !R.isNil(fuzzyFilter) && R.isEmpty(fuzzyFilter)
+      ? filterData(data, headers, fuzzyFilter)
+      : data
+
   return R.isNil(sortOptions) || R.isEmpty(sortOptions)
-    ? data
-    : R.sort(comparator(sortOptions), data)
+    ? filteredData
+    : R.sort(comparator(sortOptions), filteredData)
 }
 
 const sortOrderOf = header => options => {
@@ -131,6 +147,7 @@ class Grid extends React.PureComponent {
     hoverType: PropTypes.oneOf(['row', 'cell']),
     sortOptions: PropTypes.array,
     onSort: PropTypes.func,
+    fuzzyFilter: PropTypes.string,
   }
 
   static defaultProps = {
@@ -156,10 +173,10 @@ class Grid extends React.PureComponent {
     x2: undefined,
     y1: undefined,
     y2: undefined,
-    view: computeView(
-      this.props.data,
-      this.props.initialSortOptions || this.props.sortOptions
-    ),
+    view: computeView({
+      data: this.props.data,
+      sortOptions: this.props.initialSortOptions || this.props.sortOptions,
+    }),
     sortOptions: this.props.initialSortOptions,
   }
 
@@ -198,13 +215,16 @@ class Grid extends React.PureComponent {
     return this.props.sortOptions !== undefined
   }
 
-  toggleSort({ ident, type }) {
+  toggleSort(header) {
     if (this.isSortControlled()) {
-      this.props.onSort({ ident, type })
+      this.props.onSort(header)
     } else {
       this.setState(({ sortOptions = [] }) => {
-        const newOptions = computeSortOptions(ident, type, sortOptions)
-        const view = computeView(this.props.data, newOptions)
+        const newOptions = computeSortOptions(sortOptions, header)
+        const view = computeView({
+          data: this.props.data,
+          sortOptions: newOptions,
+        })
         return {
           sortOptions: newOptions,
           view,
@@ -224,7 +244,7 @@ class Grid extends React.PureComponent {
   generateView(data) {
     // TODO need to apply edit first
     const sortOptions = this.sortOptions()
-    const view = computeView(data, sortOptions, defaultDataComparator)
+    const view = computeView({ data, sortOptions })
     this.setState(_ => ({ view }))
   }
 

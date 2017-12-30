@@ -4,6 +4,7 @@ import R from 'ramda'
 import Grid from './Grid'
 import { sumWidth } from './utils'
 import numeral from 'numeral'
+import moment from 'moment'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left'
@@ -108,12 +109,12 @@ class FlexGridRow extends React.PureComponent {
   }
 }
 
-const formatData = ({ displayMapper, type, numFormat, value }) =>
-  displayMapper
-    ? displayMapper(value)
-    : R.isNil(value)
-      ? ''
-      : type === 'num' && numFormat ? numeral(value).format(numFormat) : value
+const formatData = ({ type, numFormat, dateFormat, value }) =>
+  R.isNil(value)
+    ? ''
+    : type === 'num' && numFormat
+      ? numeral(value).format(numFormat)
+      : type === 'date' && dateFormat ? moment(value).format(dateFormat) : value
 
 export const defaultCellRenderer = ({
   rowIndex,
@@ -125,7 +126,10 @@ export const defaultCellRenderer = ({
   render,
   ...rest
 }) => {
-  const value = data[rowIndex][header.ident]
+  // dataGetter only works for row because it has already been sorted at this point
+  const value = header.dataGetter
+    ? header.dataGetter({ header, rowData: data[rowIndex] })
+    : data[rowIndex][header.ident]
   const display = formatData({ ...header, value })
   return (
     <Cell {...rest} width={width} height={height} title={value}>
@@ -136,7 +140,7 @@ export const defaultCellRenderer = ({
 
 class FlexGridCell extends React.PureComponent {
   render() {
-    //console.log('rendering cell..')
+    // console.log('rendering cell..')
     const { render = defaultCellRenderer } = this.props
     return render(this.props)
   }
@@ -211,7 +215,7 @@ const flexGridRenderer = ({
     numOfFixedCols > 0
       ? width - rowHeaderWidth + dataHeaders.length
       : scroll ? width + headers.length : sumWidth(headers) + headers.length
-  //console.log('rendering grid ...', scroll, width, dataScrollWidth)
+  // console.log('rendering grid ...', scroll, width, dataScrollWidth)
 
   return (
     <FlexGridContainer
