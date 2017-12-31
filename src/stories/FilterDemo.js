@@ -1,11 +1,5 @@
 import React from 'react'
-import Grid, {
-  flexGridRenderer,
-  FlexCell,
-  FlexColHeader,
-  defaultFlexCellRenderer,
-  defaultFlexColHeaderRenderer,
-} from '../index'
+import Grid from '../index'
 
 class FilterDemo extends React.Component {
   state = {
@@ -23,7 +17,11 @@ class FilterDemo extends React.Component {
     const { fuzzyFilter } = this.state
     return (
       <div>
-        <div>
+        <div
+          style={{
+            padding: '1em .5em',
+          }}
+        >
           <input
             type="text"
             value={fuzzyFilter}

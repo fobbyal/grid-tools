@@ -5,6 +5,7 @@ import Grid from './Grid'
 import { sumWidth } from './utils'
 import numeral from 'numeral'
 import moment from 'moment'
+import DefaultPager from './DefaultPager'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left'
@@ -28,6 +29,7 @@ export const ColHeader = styled.div`
   padding-left: 0.2em;
   padding-right: 0.2em;
 `
+/* prettier-ignore */
 export const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
@@ -40,11 +42,11 @@ export const Cell = styled.div`
   cursor: default;
   justify-content: ${props =>
     mapAlignmentToJustifyContent(props.alignment) || 'center'};
-  ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')};
+  ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')}
   ${props =>
     props.isSelected && !props.isHovered
       ? 'color: #efefef;'
-      : props.color ? 'color:' + props.color + ';' : ''};
+      : props.color ? 'color:' + props.color + ';' : ''}
   ${props =>
     props.isHovered
       ? 'background-color:#ddd;'
@@ -52,8 +54,10 @@ export const Cell = styled.div`
         ? 'background-color:#666;'
         : props.backgroundColor
           ? 'background-color:' + props.backgroundColor + ';'
-          : ''};
-  ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')};
+          : ''}
+  ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')}
+  padding-left: 0.2em;
+  padding-right: 0.2em;
 `
 
 /* prettier-ignore */
@@ -138,6 +142,8 @@ export const defaultCellRenderer = ({
   )
 }
 
+const defaultPagerRenderer = props => <DefaultPager {...props} />
+
 class FlexGridCell extends React.PureComponent {
   render() {
     // console.log('rendering cell..')
@@ -180,8 +186,11 @@ const splitFixedCols = (numOfFixedCols, headers) => ({
   dataHeaders: R.drop(numOfFixedCols, headers),
 })
 
+/* prettier-ignore */
 const FlexGridContainer = styled.div`
   position: relative;
+  ${({ width }) => (width ? 'width: ' + width + 'px;' : '')} 
+  ${({ height }) => (height ? 'height: ' + height + 'px;' : '')}
 `
 
 const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
@@ -197,14 +206,18 @@ const flexGridRenderer = ({
   autoFixColByKey,
   cellRenderer,
   colHeaderRenderer,
+  pagerRenderer = defaultPagerRenderer,
 } = {}) => ({
   getColumnHeaderProps,
   getRowProps,
   getCellProps,
   getContainerProps,
-  data,
+  getPagerProps,
   headers,
+  data,
+  hasPaging,
 }) => {
+  const pagerHeight = 35
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)
     : fixedColCount || 0
@@ -214,12 +227,29 @@ const flexGridRenderer = ({
   const dataScrollWidth =
     numOfFixedCols > 0
       ? width - rowHeaderWidth + dataHeaders.length
-      : scroll ? width + headers.length : sumWidth(headers) + headers.length
-  // console.log('rendering grid ...', scroll, width, dataScrollWidth)
+      : scroll ? width + headers.length : sumWidth(headers)
+  const containerWidth = R.isNil(width)
+    ? undefined
+    : width + headers.length + (scroll ? 17 : 0)
+
+  const containerHeight = R.isNil(height)
+    ? undefined
+    : height + (scroll ? 17 : 0) + (hasPaging ? pagerHeight : 0)
+
+  const pagerStyle = {
+    height: pagerHeight + 'px',
+    position: scroll ? 'absolute' : undefined,
+    left: scroll ? '0px' : undefined,
+    bottom: scroll ? '0px' : undefined,
+    width: scroll ? containerWidth + 'px' : '100vw',
+  }
 
   return (
     <FlexGridContainer
-      {...getContainerProps()}
+      {...getContainerProps({
+        width: containerWidth,
+        height: containerHeight,
+      })}
       style={style}
       className={className}
     >
@@ -328,6 +358,7 @@ const flexGridRenderer = ({
           </FlexGridRow>
         ))}
       </TableContent>
+      {hasPaging && pagerRenderer(getPagerProps({ style: pagerStyle }))}
     </FlexGridContainer>
   )
 }

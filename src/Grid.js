@@ -141,6 +141,8 @@ const computeView = ({
   comparator = defaultDataComparator,
   fuzzyFilter,
   headers,
+  rowsPerPage,
+  currentPage,
 }) => {
   // TODO have to add edited value
   const filteredData =
@@ -148,9 +150,21 @@ const computeView = ({
       ? filterData(data, headers, fuzzyFilter)
       : data
 
-  return R.isNil(sortOptions) || R.isEmpty(sortOptions)
-    ? filteredData
-    : R.sort(comparator(sortOptions), filteredData)
+  const sortredData =
+    R.isNil(sortOptions) || R.isEmpty(sortOptions)
+      ? filteredData
+      : R.sort(comparator(sortOptions), filteredData)
+
+  console.log('displaying', currentPage)
+
+  const pagedData = R.isNil(rowsPerPage)
+    ? sortredData
+    : R.compose(R.take(rowsPerPage), R.drop((currentPage - 1) * rowsPerPage))(
+        sortredData
+      )
+  console.log('paged data is ', pagedData)
+
+  return pagedData
 }
 
 const sortOrderOf = header => options => {
@@ -174,6 +188,10 @@ class Grid extends React.PureComponent {
     sortOptions: PropTypes.array,
     onSort: PropTypes.func,
     fuzzyFilter: PropTypes.string,
+    totalPages: PropTypes.number,
+    currentPage: PropTypes.number,
+    onPageChange: PropTypes.number,
+    rowsPerPage: PropTypes.number,
   }
 
   static defaultProps = {
@@ -204,8 +222,11 @@ class Grid extends React.PureComponent {
       sortOptions: this.props.initialSortOptions || this.props.sortOptions,
       fuzzyFilter: this.props.fuzzyFilter,
       headers: this.props.headers,
+      rowsPerPage: this.props.rowsPerPage,
+      currentPage: this.props.currentPage || 1,
     }),
     sortOptions: this.props.initialSortOptions,
+    currentPage: 1,
   }
 
   bodyMouseRelease = e => {
@@ -251,15 +272,124 @@ class Grid extends React.PureComponent {
       })
   }
 
-  /* sorting starts */
+  /* paging starts */
 
-  isSortControlled() {
-    return this.props.sortOptions !== undefined
+  hasPaging = () =>
+    this.props.rowsPerPage !== undefined &&
+    this.props.data.length > this.props.rowsPerPage
+
+  isPagingControlled = () =>
+    this.props.totalPages !== undefined &&
+    this.props.currentPage !== undefined &&
+    this.props.onPageChange !== undefined
+
+  currentPage = () =>
+    this.hasPaging()
+      ? this.props.currentPage || this.state.currentPage
+      : undefined
+
+  totalPages = () => {
+    return !this.hasPaging()
+      ? undefined
+      : R.isNil(this.props.totalPages)
+        ? Math.ceil(this.props.data.length / this.props.rowsPerPage)
+        : this.props.totalPages
   }
 
-  toggleSort(header) {
+  setCurrentPage = page => {
+    if (this.hasPaging()) {
+      const guardedPage = Math.max(Math.min(this.totalPages(), page), 1)
+      if (guardedPage !== this.currentPage()) {
+        const view = computeView({
+          data: this.props.data,
+          sortOptions: this.sortOptions(),
+          fuzzyFilter: this.props.fuzzyFilter,
+          headers: this.props.headers,
+          rowsPerPage: this.props.rowsPerPage,
+          currentPage: guardedPage,
+        })
+
+        if (this.isPagingControlled()) {
+          this.props.onPageChange(guardedPage)
+        } else {
+          this.setState(_ => ({ currentPage: guardedPage, view }))
+        }
+      }
+    }
+  }
+
+  incrementPage = () => {
+    if (this.hasPaging()) {
+      if (this.isPagingControlled()) {
+        this.props.onPageChange(
+          Math.max(Math.min(this.totalPages(), this.currentPage() + 1), 1)
+        )
+      } else {
+        this.setState(({ currentPage, view }) => {
+          const totalPages = Math.ceil(view.length / this.props.rowsPerPage)
+          const newPage = Math.max(Math.min(totalPages, currentPage + 1), 1)
+          if (newPage !== this.currentPage()) {
+            const view = computeView({
+              data: this.props.data,
+              sortOptions: this.sortOptions(),
+              fuzzyFilter: this.props.fuzzyFilter,
+              headers: this.props.headers,
+              rowsPerPage: this.props.rowsPerPage,
+              currentPage: newPage,
+            })
+
+            return {
+              currentPage: newPage,
+              view,
+            }
+          } else {
+            return null
+          }
+        })
+      }
+    }
+  }
+
+  decrementPage = () => {
+    if (this.hasPaging()) {
+      if (this.isPageControlled()) {
+        this.props.onPageChange(
+          Math.max(Math.min(this.totalPages(), this.currentPage() - 1), 1)
+        )
+      } else {
+        this.setState(({ currentPage, view }) => {
+          const totalPages = Math.ceil(view.length / this.props.rowsPerPage)
+          const newPage = Math.max(Math.min(totalPages, currentPage - 1), 1)
+          if (newPage !== this.currentPage()) {
+            const view = computeView({
+              data: this.props.data,
+              sortOptions: this.sortOptions(),
+              fuzzyFilter: this.props.fuzzyFilter,
+              headers: this.props.headers,
+              rowsPerPage: this.props.rowsPerPage,
+              currentPage: newPage,
+            })
+            return {
+              currentPage: newPage,
+              view,
+            }
+          } else {
+            return null
+          }
+        })
+      }
+    }
+  }
+  /* paging ends */
+
+  /* sorting starts */
+
+  isSortControlled = () =>
+    this.props.sortOptions !== undefined && this.props.onSort !== undefined
+
+  toggleSort = header => {
     if (this.isSortControlled()) {
-      this.props.onSort(header)
+      this.props.onSort(computeSortOptions(this.sortOptions(), header))
     } else {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(sortOptions, header)
@@ -268,6 +398,8 @@ class Grid extends React.PureComponent {
           sortOptions: newOptions,
           fuzzyFilter: this.props.fuzzyFilter,
           headers: this.props.headers,
+          rowsPerPage: this.props.rowsPerPage,
+          currentPage: this.currentPage(),
         })
         return {
           sortOptions: newOptions,
@@ -296,6 +428,8 @@ class Grid extends React.PureComponent {
       sortOptions,
       fuzzyFilter,
       headers: this.props.headers,
+      rowsPerPage: this.props.rowsPerPage,
+      currentPage: this.currentPage(),
     })
     this.setState(_ => ({ view }))
   }
@@ -414,7 +548,7 @@ class Grid extends React.PureComponent {
     }
   }
 
-  getGridContainerProps = () => ({})
+  getGridContainerProps = ({ width, height } = {}) => ({ width, height })
 
   getColumnHeaderProps = ({ key, index, header }) => ({
     key: key || header.ident,
@@ -425,6 +559,15 @@ class Grid extends React.PureComponent {
     sortOrder: sortOrderOf(header)(this.state.sortOptions),
   })
 
+  getPagerProps = props => ({
+    ...props,
+    totalPages: this.totalPages(),
+    currentPage: this.currentPage(),
+    setCurrentPage: this.setCurrentPage,
+    incrementPage: this.incrementPage,
+    decrementPage: this.decrementPage,
+  })
+
   render() {
     const { view } = this.state
     console.log('render grid..')
@@ -433,8 +576,10 @@ class Grid extends React.PureComponent {
       getRowProps: this.getRowProps,
       getCellProps: this.getCellProps,
       getContainerProps: this.getGridContainerProps,
+      getPagerProps: this.getPagerProps,
       headers: this.props.headers,
       data: view,
+      hasPaging: this.hasPaging(),
     })
   }
 }

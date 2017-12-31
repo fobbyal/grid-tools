@@ -152,3 +152,18 @@ storiesOf('Flex Grid', module)
   .add('Fuzzy Filter', () => (
     <FilterDemo {...commonProps} render={flexGridRenderer()} />
   ))
+  .add('Scrolled Fixed col with paging', () => (
+    <Grid
+      {...commonProps}
+      rowsPerPage={15}
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 800,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+    />
+  ))
+  .add('No Scroll with paging', () => (
+    <Grid {...commonProps} rowsPerPage={15} render={flexGridRenderer()} />
+  ))
