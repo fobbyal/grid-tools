@@ -326,7 +326,9 @@ class Grid extends React.PureComponent {
         )
       } else {
         this.setState(({ currentPage, view }) => {
-          const totalPages = Math.ceil(view.length / this.props.rowsPerPage)
+          const totalPages = Math.ceil(
+            this.props.data.length / this.props.rowsPerPage
+          )
           const newPage = Math.max(Math.min(totalPages, currentPage + 1), 1)
           if (newPage !== this.currentPage()) {
             const view = computeView({
@@ -352,13 +354,15 @@ class Grid extends React.PureComponent {
 
   decrementPage = () => {
     if (this.hasPaging()) {
-      if (this.isPageControlled()) {
+      if (this.isPagingControlled()) {
         this.props.onPageChange(
           Math.max(Math.min(this.totalPages(), this.currentPage() - 1), 1)
         )
       } else {
         this.setState(({ currentPage, view }) => {
-          const totalPages = Math.ceil(view.length / this.props.rowsPerPage)
+          const totalPages = Math.ceil(
+            this.props.data.length / this.props.rowsPerPage
+          )
           const newPage = Math.max(Math.min(totalPages, currentPage - 1), 1)
           if (newPage !== this.currentPage()) {
             const view = computeView({

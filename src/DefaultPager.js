@@ -35,7 +35,23 @@ const Pager = ({
             {page}
           </PageButton>
         ))
-      : null}
+      : [
+          <PageButton key="left" onClick={decrementPage}>
+            {'<'}
+          </PageButton>,
+          <input
+            key="cp"
+            type="text"
+            value={currentPage}
+            onChange={e => {
+              setCurrentPage(e.target.value)
+            }}
+          />,
+          <span key="tp">of {totalPages}</span>,
+          <PageButton key="right" onClick={incrementPage}>
+            {'>'}
+          </PageButton>,
+        ]}
   </div>
 )
 
