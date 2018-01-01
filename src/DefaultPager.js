@@ -25,7 +25,7 @@ const Pager = ({
     }}
     className={className}
   >
-    {totalPages <= 12
+    {totalPages <= 3
       ? R.range(1, totalPages + 1).map(page => (
           <PageButton
             disabled={page === currentPage}
@@ -39,14 +39,16 @@ const Pager = ({
           <PageButton key="left" onClick={decrementPage}>
             {'<'}
           </PageButton>,
-          <input
-            key="cp"
-            type="text"
+          <select
             value={currentPage}
-            onChange={e => {
-              setCurrentPage(e.target.value)
-            }}
-          />,
+            onChange={e => setCurrentPage(e.target.value)}
+          >
+            {R.range(1, totalPages + 1).map(page => (
+              <option key={page} value={page}>
+                {page}
+              </option>
+            ))}
+          </select>,
           <span key="tp">of {totalPages}</span>,
           <PageButton key="right" onClick={incrementPage}>
             {'>'}

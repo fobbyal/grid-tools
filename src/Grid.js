@@ -297,8 +297,13 @@ class Grid extends React.PureComponent {
   }
 
   setCurrentPage = page => {
+    if (isNaN(parseInt(page))) return
+
     if (this.hasPaging()) {
-      const guardedPage = Math.max(Math.min(this.totalPages(), page), 1)
+      const guardedPage = Math.max(
+        Math.min(this.totalPages(), parseInt(page)),
+        1
+      )
       if (guardedPage !== this.currentPage()) {
         const view = computeView({
           data: this.props.data,
