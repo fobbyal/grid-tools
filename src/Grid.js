@@ -143,26 +143,30 @@ const computeView = ({
   headers,
   rowsPerPage,
   currentPage,
+  editedMap,
 }) => {
   // TODO have to add edited value
+  //
+  const editedData =
+    R.isNil(editedMap) || editedMap.size === 0
+      ? data
+      : R.map(row => editedMap.get(row) || row)
+
   const filteredData =
     !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
-      ? filterData(data, headers, fuzzyFilter)
-      : data
+      ? filterData(editedData, headers, fuzzyFilter)
+      : editedData
 
   const sortredData =
     R.isNil(sortOptions) || R.isEmpty(sortOptions)
       ? filteredData
       : R.sort(comparator(sortOptions), filteredData)
 
-  console.log('displaying', currentPage)
-
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData
     : R.compose(R.take(rowsPerPage), R.drop((currentPage - 1) * rowsPerPage))(
         sortredData
       )
-  console.log('paged data is ', pagedData)
 
   return pagedData
 }
@@ -183,8 +187,12 @@ class Grid extends React.PureComponent {
     render: PropTypes.func.isRequired,
     data: PropTypes.array.isRequired,
     headers: PropTypes.array.isRequired,
-    selectionType: PropTypes.oneOf(['row', 'cell']),
-    hoverType: PropTypes.oneOf(['row', 'cell']),
+    selectionType: PropTypes.oneOf(['row', 'cell']).isRequired,
+    hoverType: PropTypes.oneOf(['row', 'cell']).isRequired,
+    sortEnabled: PropTypes.bool.isRequired,
+    isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func])
+      .isRequired,
+    /* optional stuff */
     sortOptions: PropTypes.array,
     onSortOptionsChanged: PropTypes.func,
     fuzzyFilter: PropTypes.string,
@@ -192,13 +200,13 @@ class Grid extends React.PureComponent {
     currentPage: PropTypes.number,
     onPageChange: PropTypes.number,
     rowsPerPage: PropTypes.number,
-    isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-    rowEditorRenderer: PropTypes.func,
   }
 
   static defaultProps = {
     selectionType: 'cell',
     hoverType: 'row',
+    sortEnabled: true,
+    isEditable: false,
   }
 
   static childContextTypes = {
@@ -211,6 +219,12 @@ class Grid extends React.PureComponent {
   }
 
   scrollSync = new ScrollSyncHelper()
+  /* 
+   * two way map is used here because the data can be filtered or sorted
+  /* orignal data to modified data or [data] -- for undo purpose */
+  editedMap = new Map()
+  /* modified data to original */
+  dirtyMap = new Map()
 
   state = {
     hoveredRow: undefined,
@@ -226,9 +240,12 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       rowsPerPage: this.props.rowsPerPage,
       currentPage: this.props.currentPage || 1,
+      editedMap: this.editedMap,
     }),
     sortOptions: this.props.initialSortOptions,
     currentPage: 1,
+    editingRow: undefined,
+    editingColumn: undefined,
   }
 
   bodyMouseRelease = e => {
@@ -314,6 +331,7 @@ class Grid extends React.PureComponent {
           headers: this.props.headers,
           rowsPerPage: this.props.rowsPerPage,
           currentPage: guardedPage,
+          editedMap: this.editedMap,
         })
 
         if (this.isPagingControlled()) {
@@ -345,6 +363,7 @@ class Grid extends React.PureComponent {
               headers: this.props.headers,
               rowsPerPage: this.props.rowsPerPage,
               currentPage: newPage,
+              editedMap: this.editedMap,
             })
 
             return {
@@ -379,6 +398,7 @@ class Grid extends React.PureComponent {
               headers: this.props.headers,
               rowsPerPage: this.props.rowsPerPage,
               currentPage: newPage,
+              editedMap: this.editedMap,
             })
             return {
               currentPage: newPage,
@@ -414,6 +434,7 @@ class Grid extends React.PureComponent {
           headers: this.props.headers,
           rowsPerPage: this.props.rowsPerPage,
           currentPage: this.currentPage(),
+          editedMap: this.editedMap,
         })
         return {
           sortOptions: newOptions,
@@ -435,8 +456,7 @@ class Grid extends React.PureComponent {
     data = this.props.data,
     sortOptions = this.sortOptions(),
     fuzzyFilter = this.props.fuzzyFilter,
-  }) {
-    // TODO need to apply edit first
+  } = {}) {
     const view = computeView({
       data,
       sortOptions,
@@ -444,6 +464,7 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       rowsPerPage: this.props.rowsPerPage,
       currentPage: this.currentPage(),
+      editedMap: this.editedMap,
     })
     this.setState(_ => ({ view }))
   }
@@ -470,6 +491,61 @@ class Grid extends React.PureComponent {
       : { hoveredRow: rowIndex }
   }
   /* hover ends */
+
+  /* editing starts */
+
+  edit(rowIndex, columnIndex) {
+    if (this.props.isEditable !== false) {
+      this.setState({ rowIndex, columnIndex })
+    }
+  }
+
+  isEditing() {
+    const { rowIndex } = this.state
+    return !R.isNil(rowIndex)
+  }
+
+  commitRowEdit({ currentRow, editedRow }) {
+    // TODO use immutable js here ? so we can implement undo easily?
+    if (currentRow !== editedRow) {
+      if (this.dirtyMap.has(currentRow)) {
+        const originalRow = this.dirtyMap.get(currentRow)
+        this.editedMap.set(originalRow, editedRow)
+        this.dirtyMap.set(editedRow, originalRow)
+        this.dirtyMap.delete(currentRow)
+      } else {
+        this.editedMap.set(currentRow, editedRow)
+        this.dirtyMap.set(editedRow, currentRow)
+      }
+      const view = computeView({
+        data: this.props.data,
+        sortOptions: this.sortOptions(),
+        fuzzyFilter: this.props.fuzzyFilter,
+        headers: this.props.headers,
+        rowsPerPage: this.props.rowsPerPage,
+        currentPage: this.currentPage(),
+        editedMap: this.editedMap,
+      })
+      this.setState({ view, rowIndex: undefined, columnIndex: undefined })
+    }
+  }
+
+  cancelEdit() {
+    this.setState({ rowIndex: undefined, columnIndex: undefined })
+  }
+
+  undoEdit() {
+    /* tobe implemented via short-cut key */
+  }
+
+  /* editing ends */
+
+  cellDoubleClick = e => {
+    const pos = extractPosition(e)
+    const { rowIndex, columnIndex } = pos
+    this.edit(rowIndex, columnIndex)
+    console.log('got here..')
+  }
 
   cellMouseDown = e => {
     const pos = extractPosition(e)
@@ -544,6 +620,7 @@ class Grid extends React.PureComponent {
       onMouseEnter: this.cellMouseEnter,
       onMouseUp: this.cellMouseUp,
       onMouseLeave: this.cellMouseLeave,
+      onDoubleClick: this.cellDoubleClick,
       isSelected:
         selectionType === 'cell'
           ? isCellSelected(rowIndex, columnIndex, this.state)
@@ -569,8 +646,10 @@ class Grid extends React.PureComponent {
     header,
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
-    onClick: this.columnHeaderClick,
-    sortOrder: sortOrderOf(header)(this.state.sortOptions),
+    onClick: this.props.sortEnabled ? this.columnHeaderClick : undefined,
+    sortOrder: this.props.sortEnabled
+      ? sortOrderOf(header)(this.state.sortOptions)
+      : undefined,
   })
 
   getPagerProps = props => ({
@@ -582,6 +661,15 @@ class Grid extends React.PureComponent {
     decrementPage: this.decrementPage,
   })
 
+  getRowEditorProps = _ => ({
+    onClose: this.cancelEdit,
+    commitEdit: this.commitRowEdit,
+    rowData: this.state.view[this.state.editingRow],
+    editingRow: this.state.editingRow,
+    headers: this.props.headers,
+    isEditing: this.isEditing(),
+  })
+
   render() {
     const { view } = this.state
     console.log('render grid..')
@@ -591,9 +679,11 @@ class Grid extends React.PureComponent {
       getCellProps: this.getCellProps,
       getContainerProps: this.getGridContainerProps,
       getPagerProps: this.getPagerProps,
+      getRowEditorProps: this.getRowEditorProps,
       headers: this.props.headers,
       data: view,
       hasPaging: this.hasPaging(),
+      isEditing: this.isEditing(),
     })
   }
 }

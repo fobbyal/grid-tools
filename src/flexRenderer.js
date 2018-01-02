@@ -6,6 +6,7 @@ import { sumWidth } from './utils'
 import numeral from 'numeral'
 import moment from 'moment'
 import DefaultPager from './DefaultPager'
+import RowEditor from './RowEditor'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left'
@@ -136,7 +137,12 @@ export const defaultCellRenderer = ({
 }) => {
   // dataGetter only works for row because it has already been sorted at this point
   const value = header.dataGetter
-    ? header.dataGetter({ header, rowData: data[rowIndex] })
+    ? header.dataGetter({
+        header,
+        rowData: data[rowIndex],
+        rowIndex,
+        columnIndex,
+      })
     : data[rowIndex][header.ident]
   const display = formatData({ ...header, value })
   return (
@@ -211,15 +217,20 @@ const flexGridRenderer = ({
   cellRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
+  rowEditorRenderer = () => <div>hello</div>,
+  editByRow = true,
+  editByCell = false,
 } = {}) => ({
   getColumnHeaderProps,
   getRowProps,
   getCellProps,
   getContainerProps,
   getPagerProps,
+  getRowEditorProps,
   headers,
   data,
   hasPaging,
+  isEditing,
 }) => {
   const pagerHeight = 35
   const numOfFixedCols = autoFixColByKey
@@ -363,6 +374,7 @@ const flexGridRenderer = ({
         ))}
       </TableContent>
       {hasPaging && pagerRenderer(getPagerProps({ style: pagerStyle }))}
+      <RowEditor render={rowEditorRenderer} {...getRowEditorProps()} />
     </FlexGridContainer>
   )
 }

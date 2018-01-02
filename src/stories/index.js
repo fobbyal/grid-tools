@@ -98,9 +98,12 @@ const debugHeaders = R.take(5, headers)
 const debugData = R.range(0, 13).map(_ => randomRow(debugHeaders))
 
 const debugProps = { headers: debugHeaders, data: debugData }
+const tenKData = createData(10000)
 
 storiesOf('Flex Grid', module)
-  .add('debug', () => <Grid {...debugProps} render={flexGridRenderer()} />)
+  .add('debug', () => (
+    <Grid {...debugProps} isEditable={true} render={flexGridRenderer()} />
+  ))
   .add('Broswer Scroll/No Scroll', () => (
     <Grid {...commonProps} render={flexGridRenderer()} />
   ))
@@ -155,7 +158,7 @@ storiesOf('Flex Grid', module)
   .add('Scrolled Fixed col with paging', () => (
     <Grid
       {...commonProps}
-      rowsPerPage={15}
+      rowsPerPage={18}
       render={flexGridRenderer({
         headerRowHeight: 60,
         width: 800,
@@ -166,4 +169,25 @@ storiesOf('Flex Grid', module)
   ))
   .add('No Scroll with paging', () => (
     <Grid {...commonProps} rowsPerPage={15} render={flexGridRenderer()} />
+  ))
+  .add('10k rows scroll paging', () => (
+    <Grid
+      headers={headers}
+      data={tenKData}
+      rowsPerPage={20}
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 800,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+    />
+  ))
+  .add('10k rows non Scroll paging', () => (
+    <Grid
+      headers={headers}
+      data={tenKData}
+      rowsPerPage={15}
+      render={flexGridRenderer()}
+    />
   ))
