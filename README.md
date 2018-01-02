@@ -19,6 +19,13 @@ This library contians a a setup of tools to help React developers to easily crea
 * DataGetter
 * Copy Helper
 
+## DataGetter
+currenlty data getter signature is `({rowData, header })`. Due to the fact that the data can be filtered and or sorted there is no way to identify the data using rowIndex. This results the lib to be less flexible as `({data,rowIndex,columnIndex})`. Data needs to be converted into simple array of objects format when using the libraray. Ways will be considered later to refactor so that a core version of Grid can be used for more flexible data shapes.
+
+
+Things to consider (transposing the data)
+
+
 ## Header Shape 
 ```javascript
 {
@@ -34,3 +41,4 @@ This library contians a a setup of tools to help React developers to easily crea
   //
 }
 ```
+

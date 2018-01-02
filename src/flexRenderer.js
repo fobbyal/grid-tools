@@ -44,10 +44,14 @@ export const Cell = styled.div`
     mapAlignmentToJustifyContent(props.alignment) || 'center'};
   ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')}
   ${props =>
+    props.isSelected && props.isHovered ?
+      'color:white;':
     props.isSelected && !props.isHovered
       ? 'color: #efefef;'
       : props.color ? 'color:' + props.color + ';' : ''}
   ${props =>
+    props.isHovered && props.isSelected ? 
+      'background-color:#333;':
     props.isHovered
       ? 'background-color:#ddd;'
       : props.isSelected

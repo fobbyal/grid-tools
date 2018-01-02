@@ -25,7 +25,7 @@ const Pager = ({
     }}
     className={className}
   >
-    {totalPages <= 3
+    {totalPages <= 12
       ? R.range(1, totalPages + 1).map(page => (
           <PageButton
             disabled={page === currentPage}

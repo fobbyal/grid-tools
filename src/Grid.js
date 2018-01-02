@@ -186,12 +186,14 @@ class Grid extends React.PureComponent {
     selectionType: PropTypes.oneOf(['row', 'cell']),
     hoverType: PropTypes.oneOf(['row', 'cell']),
     sortOptions: PropTypes.array,
-    onSort: PropTypes.func,
+    onSortOptionsChanged: PropTypes.func,
     fuzzyFilter: PropTypes.string,
     totalPages: PropTypes.number,
     currentPage: PropTypes.number,
     onPageChange: PropTypes.number,
     rowsPerPage: PropTypes.number,
+    isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+    rowEditorRenderer: PropTypes.func,
   }
 
   static defaultProps = {
@@ -394,11 +396,14 @@ class Grid extends React.PureComponent {
   /* sorting starts */
 
   isSortControlled = () =>
-    this.props.sortOptions !== undefined && this.props.onSort !== undefined
+    this.props.sortOptions !== undefined &&
+    this.props.onSortOptionsChanged !== undefined
 
   toggleSort = header => {
     if (this.isSortControlled()) {
-      this.props.onSort(computeSortOptions(this.sortOptions(), header))
+      this.props.onSortOptionsChanged(
+        computeSortOptions(this.sortOptions(), header)
+      )
     } else {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(sortOptions, header)
