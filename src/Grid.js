@@ -150,7 +150,7 @@ const computeView = ({
   const editedData =
     R.isNil(editedMap) || editedMap.size === 0
       ? data
-      : R.map(row => editedMap.get(row) || row)
+      : R.map(row => editedMap.get(row) || row, data)
 
   const filteredData =
     !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
@@ -496,16 +496,17 @@ class Grid extends React.PureComponent {
 
   edit(rowIndex, columnIndex) {
     if (this.props.isEditable !== false) {
-      this.setState({ rowIndex, columnIndex })
+      this.setState({ editingRow: rowIndex, editingColumn: columnIndex })
     }
   }
 
   isEditing() {
-    const { rowIndex } = this.state
-    return !R.isNil(rowIndex)
+    const { editingRow } = this.state
+    return !R.isNil(editingRow)
   }
 
-  commitRowEdit({ currentRow, editedRow }) {
+  commitRowEdit = ({ currentRow, editedRow }) => {
+    console.log('got here commiting changes', currentRow, editedRow)
     // TODO use immutable js here ? so we can implement undo easily?
     if (currentRow !== editedRow) {
       if (this.dirtyMap.has(currentRow)) {
@@ -517,6 +518,7 @@ class Grid extends React.PureComponent {
         this.editedMap.set(currentRow, editedRow)
         this.dirtyMap.set(editedRow, currentRow)
       }
+      console.log('editedMap', this.editedMap, 'dirtyMap', this.dirtyMap)
       const view = computeView({
         data: this.props.data,
         sortOptions: this.sortOptions(),
@@ -526,13 +528,13 @@ class Grid extends React.PureComponent {
         currentPage: this.currentPage(),
         editedMap: this.editedMap,
       })
-      this.setState({ view, rowIndex: undefined, columnIndex: undefined })
+      console.log('view is', view)
+      this.setState({ view, editingRow: undefined, editingColumn: undefined })
     }
   }
 
-  cancelEdit() {
-    this.setState({ rowIndex: undefined, columnIndex: undefined })
-  }
+  cancelEdit = () =>
+    this.setState({ editingRow: undefined, editingColumn: undefined })
 
   undoEdit() {
     /* tobe implemented via short-cut key */
@@ -544,7 +546,6 @@ class Grid extends React.PureComponent {
     const pos = extractPosition(e)
     const { rowIndex, columnIndex } = pos
     this.edit(rowIndex, columnIndex)
-    console.log('got here..')
   }
 
   cellMouseDown = e => {
@@ -665,7 +666,6 @@ class Grid extends React.PureComponent {
     onClose: this.cancelEdit,
     commitEdit: this.commitRowEdit,
     rowData: this.state.view[this.state.editingRow],
-    editingRow: this.state.editingRow,
     headers: this.props.headers,
     isEditing: this.isEditing(),
   })

@@ -6,10 +6,9 @@ class RowEditor extends React.Component {
     editedRow: this.props.rowData,
   }
 
-  valueChanged = e => {
-    // TODO has to parse value based on type
+  valueChanged = ({ ident, value }) => {
     this.setState(({ editedRow }) => ({
-      editedRow: { ...editedRow, [e.target.name]: e.target.value },
+      editedRow: { ...editedRow, [ident]: value },
     }))
   }
 
@@ -20,20 +19,24 @@ class RowEditor extends React.Component {
     })
   }
 
-  onCancel = e => {
-    this.props.onClose()
+  componentWillReceiveProps(nextProps) {
+    if (this.props.rowData !== nextProps.rowData) {
+      this.setState({ editedRow: nextProps.rowData })
+    }
   }
 
   render() {
     const { isEditing, onClose, render } = this.props
+    console.log('editor props', this.props)
     return (
       isEditing && (
         <Overlay onClose={onClose}>
           {render({
             ...this.props,
+            rowData: this.state.editedRow,
             valueChanged: this.valueChanged,
             onOk: this.onOk,
-            onCancel: this.onCancel,
+            onCancel: onClose,
           })}
         </Overlay>
       )

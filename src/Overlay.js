@@ -3,6 +3,15 @@ import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
+const CloseButton = styled.div`
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  color: ${props => (props.dart ? '#efefef' : '#444')};
+`
+
 // THIS requires react 16
 
 export class Overlay extends React.Component {
@@ -24,6 +33,7 @@ export class Overlay extends React.Component {
     return ReactDOM.createPortal(
       <div className={className} style={style}>
         {render ? render({ onClose }) : children}
+        <CloseButton onClick={this.props.onClose}>&#10006;</CloseButton>
       </div>,
       this.container
     )
