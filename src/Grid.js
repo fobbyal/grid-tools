@@ -518,7 +518,6 @@ class Grid extends React.PureComponent {
         this.editedMap.set(currentRow, editedRow)
         this.dirtyMap.set(editedRow, currentRow)
       }
-      console.log('editedMap', this.editedMap, 'dirtyMap', this.dirtyMap)
       const view = computeView({
         data: this.props.data,
         sortOptions: this.sortOptions(),
@@ -528,7 +527,6 @@ class Grid extends React.PureComponent {
         currentPage: this.currentPage(),
         editedMap: this.editedMap,
       })
-      console.log('view is', view)
       this.setState({ view, editingRow: undefined, editingColumn: undefined })
     }
   }
@@ -593,12 +591,14 @@ class Grid extends React.PureComponent {
     width,
     rowHeight,
     headerRowHeight,
+    yOffSet,
   }) => ({
     key: key || index,
     width: width === undefined || width === null ? sumWidth(headers) : width,
     height: isHeader ? headerRowHeight : rowHeightOf(index, rowHeight),
     colCount: headers.length,
     isHeader,
+    yOffSet,
   })
 
   getCellProps = ({

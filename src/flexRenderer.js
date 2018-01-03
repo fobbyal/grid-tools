@@ -76,7 +76,7 @@ const Row = styled.div`
 
 const ScrollingHeaderRow = Row.extend`
   position: absolute;
-  top: 0px;
+  top: ${props => props.yOffSet || '0'}px;
   left: ${props => props.xOffSet || '0'}px;
   overflow: hidden;
   /*
@@ -89,11 +89,11 @@ const ScrollingHeaderRow = Row.extend`
 const TableContentContainer = styled(Grid.SyncedScrollPane)`
   position: absolute;
   left: ${props => props.xOffSet || 0}px;
-  top: ${props => props.headerRowHeight}px;
+  top: ${props => props.yOffSet || 0}px;
   /*header.length is for the border box and 17 is for the scroll height = width */
   width: ${props => props.width + (props.showScroll ? 17 : 0)}px;
   height: ${props =>
-    props.height - props.headerRowHeight + (props.showScroll ? 17 : 0)}px;
+    props.height - props.yOffSet + (props.showScroll ? 17 : 0)}px;
   overflow: ${props => (props.showScroll ? 'scroll' : 'hidden')};
 `
 
@@ -218,7 +218,7 @@ const flexGridRenderer = ({
   cellRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
-  rowEditorRenderer =  defaultRowEditorRenderer,
+  rowEditorRenderer = defaultRowEditorRenderer(),
   editByRow = true,
   editByCell = false,
 } = {}) => ({
@@ -260,6 +260,8 @@ const flexGridRenderer = ({
     width: scroll ? containerWidth + 'px' : '100vw',
   }
 
+  const topOffSet = 0
+
   return (
     <FlexGridContainer
       {...getContainerProps({
@@ -276,6 +278,7 @@ const flexGridRenderer = ({
             isHeader: true,
             headers: rowHeaders,
             headerRowHeight,
+            yOffSet: topOffSet,
           })}
           scroll={scroll}
         >
@@ -294,6 +297,7 @@ const flexGridRenderer = ({
           headers: dataHeaders,
           width: dataScrollWidth,
           headerRowHeight,
+          yOffSet: topOffSet,
         })}
         xOffSet={rowHeaderWidth}
         scroll={scroll}
@@ -310,7 +314,7 @@ const flexGridRenderer = ({
         <TableContent
           height={height}
           width={rowHeaderWidth}
-          headerRowHeight={headerRowHeight}
+          yOffSet={headerRowHeight + topOffSet}
           headers={rowHeaders}
           scroll
           showScroll={false}
@@ -344,7 +348,7 @@ const flexGridRenderer = ({
       <TableContent
         height={height}
         width={dataScrollWidth}
-        headerRowHeight={headerRowHeight}
+        yOffSet={headerRowHeight + topOffSet}
         headers={dataHeaders}
         scroll={scroll}
         xOffSet={rowHeaderWidth}

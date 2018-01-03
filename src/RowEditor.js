@@ -19,6 +19,18 @@ class RowEditor extends React.Component {
     })
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevProps.isEditing && this.props.isEditing) {
+      console.log('popped', this.focusNode)
+      if (this.focusNode) {
+        if (this.focusNode) this.focusNode.focus()
+        if (this.focusNode.setSelectionRange) {
+          this.focusNode.setSelectionRange(0, this.focusNode.value.length)
+        }
+      }
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.rowData !== nextProps.rowData) {
       this.setState({ editedRow: nextProps.rowData })
@@ -27,7 +39,6 @@ class RowEditor extends React.Component {
 
   render() {
     const { isEditing, onClose, render } = this.props
-    console.log('editor props', this.props)
     return (
       isEditing && (
         <Overlay onClose={onClose}>
@@ -37,6 +48,7 @@ class RowEditor extends React.Component {
             valueChanged: this.valueChanged,
             onOk: this.onOk,
             onCancel: onClose,
+            initialFocusRef: n => (this.focusNode = n),
           })}
         </Overlay>
       )
