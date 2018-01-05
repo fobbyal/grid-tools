@@ -7,6 +7,8 @@ import flexGridRenderer, {
   defaultColHeaderRenderer as defaultFlexColHeaderRenderer,
 } from './flexRenderer'
 
+export * from './cols'
+
 export {
   Grid,
   flexGridRenderer,
