@@ -1,6 +1,6 @@
 import R from 'ramda'
 
-export const initialEditInfo = {
+export const generateInitialEditInfo = () => ({
   updated: [],
   added: [],
   removed: [],
@@ -9,7 +9,7 @@ export const initialEditInfo = {
   // editedRow => orignalRow
   dirtyMap: new Map(),
   history: [],
-}
+})
 
 const immutableOp = op => map => op(new Map(map))
 
@@ -19,7 +19,10 @@ const immutableSet = (key, value) =>
     return m
   })
 
-export const removeData = ({ editInfo = initialEditInfo, currentRow }) => {
+export const removeRow = ({
+  editInfo = generateInitialEditInfo(),
+  currentRow,
+}) => {
   const { removed, history, ...rest } = editInfo
   return {
     removed: [...removed, currentRow],
@@ -28,21 +31,16 @@ export const removeData = ({ editInfo = initialEditInfo, currentRow }) => {
   }
 }
 
-export const addData = ({ editInfo = initialEditInfo, editedRow }) => {
-  return updateData(editInfo, editedRow)
-}
+export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
+  updateRow({ editInfo, editedRow })
 
-export const updateData = ({
-  editInfo = initialEditInfo,
+export const updateRow = ({
+  editInfo = generateInitialEditInfo(),
   currentRow,
   editedRow,
 }) => {
-  if (
-    currentRow === undefined &&
-    editedRow !== undefined &&
-    editedRow !== null
-  ) {
-    const { /*dirtyMap,*/ added, history, ...rest } = editInfo
+  if (currentRow === undefined && !R.isNil(editedRow)) {
+    const { /* dirtyMap,*/ added, history, ...rest } = editInfo
     return {
       added: [...added, editedRow],
       // dirtyMap: immutableSet(editedRow, undefined)(dirtyMap),
@@ -96,11 +94,11 @@ export const updateData = ({
   return editInfo
 }
 
-export const undo = (editInfo = initialEditInfo) =>
-  editInfo.history[0] || initialEditInfo
+export const undo = (editInfo = generateInitialEditInfo()) =>
+  editInfo.history[0] || generateInitialEditInfo()
 
-export const isDirty = (editInfo = initialEditInfo) =>
-  (editInfo !== initialEditInfo && editInfo.added.length > 0) ||
+export const isDirty = (editInfo = generateInitialEditInfo()) =>
+  editInfo.added.length > 0 ||
   editInfo.removed.length > 0 ||
   editInfo.updated.length > 0
 

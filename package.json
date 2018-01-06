@@ -6,7 +6,10 @@
   "scripts": {
     "build": "webpack --env.dev",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cover": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,7 @@
     "@storybook/react": "^3.2.17",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
+    "babel-jest": "^22.0.4",
     "babel-loader": "^7.1.2",
     "babel-plugin-module-resolver": "^3.0.0",
     "babel-plugin-ramda": "^1.4.3",
