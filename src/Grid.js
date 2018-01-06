@@ -202,6 +202,7 @@ const sortOrderOf = header => options => {
   )(options)
 }
 
+
 class Grid extends React.PureComponent {
   /* compond components */
   static SyncedScrollPane = ScrollPane
@@ -223,6 +224,7 @@ class Grid extends React.PureComponent {
     currentPage: PropTypes.number,
     onPageChange: PropTypes.number,
     rowsPerPage: PropTypes.number,
+    editInfo: PropTypes.object,
   }
 
   static defaultProps = {
@@ -269,6 +271,7 @@ class Grid extends React.PureComponent {
     currentPage: 1,
     editingRow: undefined,
     editingColumn: undefined,
+    editInfo: {},
   }
 
   bodyMouseRelease = e => {
@@ -531,6 +534,7 @@ class Grid extends React.PureComponent {
   commitRowEdit = ({ currentRow, editedRow }) => {
     console.log('got here commiting changes', currentRow, editedRow)
     // TODO use immutable js here ? so we can implement undo easily?
+    // TODO currentRow == undefined for new rows
     if (currentRow !== editedRow) {
       if (this.dirtyMap.has(currentRow)) {
         const originalRow = this.dirtyMap.get(currentRow)

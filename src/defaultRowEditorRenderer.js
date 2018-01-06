@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { rawToValue } from './tools'
 
 const Buttons = styled.div`
   margin-top: 1em;
@@ -50,7 +51,6 @@ const defaultRowEditorRenderer = ({
   onCancel,
   initialFocusRef,
 }) => {
-  console.log(initialFocusRef)
   const calculatedWidth =
     parseFloat(stripPx(headerWidth)) + parseFloat(stripPx(inputWidth)) + 40
 
@@ -60,17 +60,25 @@ const defaultRowEditorRenderer = ({
         isNaN(calculatedWidth) ? containerMinWidth : calculatedWidth + 'px'
       }
     >
-      {headers.map(({ ident, type, display }, index) => (
-        <RowContainer key={ident}>
-          <Header width={headerWidth}>{display || ident}</Header>
-          <Input
-            width={inputWidth}
-            onChange={e => valueChanged({ ident, value: e.target.value })}
-            innerRef={index === 0 ? initialFocusRef : undefined}
-            value={rowData[ident]}
-          />
-        </RowContainer>
-      ))}
+      {headers.map((header, index) => {
+        const { ident, display } = header
+        return (
+          <RowContainer key={ident}>
+            <Header width={headerWidth}>{display || ident}</Header>
+            <Input
+              width={inputWidth}
+              onChange={e =>
+                valueChanged({
+                  ident,
+                  value: rawToValue({ value: e.target.value, header }),
+                })
+              }
+              innerRef={index === 0 ? initialFocusRef : undefined}
+              value={rowData[ident]}
+            />
+          </RowContainer>
+        )
+      })}
       <Buttons>
         <button onClick={onOk}>OK</button>
         <button onClick={onCancel}>Cancel</button>

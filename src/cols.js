@@ -59,6 +59,25 @@ export const yesNoCol = ({ ident, display, ...rest } = {}) => ({
   ...rest,
 })
 
+const dateProps = ({ ident, dataFormat, displayFormat }) => ({
+  dataGetter: ({ rowData }) =>
+    R.isNil(rowData[ident])
+      ? undefined
+      : moment.isDate(rowData[ident])
+        ? moment(rowData[ident]).format(displayFormat)
+        : moment.isMoment(rowData[ident])
+          ? rowData[ident].format()
+          : moment(rowData[ident], dataFormat).format(displayFormat),
+  sortIndexGetter: ({ rowData }) =>
+    R.isNil(rowData[ident])
+      ? undefined
+      : moment.isDate(rowData[ident]) || moment.isMoment(rowData[ident])
+        ? rowData[ident].valueOf()
+        : moment(rowData[ident], dataFormat).valueOf(),
+  dataFormat,
+  displayFormat,
+})
+
 export const dateCol = ({
   ident,
   display,
@@ -69,16 +88,7 @@ export const dateCol = ({
   ident,
   display: display || ident,
   type: 'date-time',
-  dataFormat,
-  displayFormat,
-  dataGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).format(displayFormat),
-  sortIndexGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).valueOf(),
+  ...dateProps({ ident, dataFormat, displayFormat }),
   ...defaultProps,
   ...rest,
 })
@@ -93,16 +103,7 @@ export const dateTimeCol = ({
   ident,
   display: display || ident,
   type: 'date-time',
-  dataFormat,
-  displayFormat,
-  dataGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).format(displayFormat),
-  sortIndexGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).valueOf(),
+  ...dateProps({ ident, dataFormat, displayFormat }),
   ...defaultProps,
   ...rest,
 })
@@ -117,16 +118,7 @@ export const tStampCol = ({
   ident,
   display: display || ident,
   type: 'date-time',
-  dataFormat,
-  displayFormat,
-  dataGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).format(displayFormat),
-  sortIndexGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment(rowData[ident], dataFormat).valueOf(),
+  ...dateProps({ ident, dataFormat, displayFormat }),
   ...defaultProps,
   ...rest,
 })

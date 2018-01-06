@@ -7,6 +7,7 @@ class RowEditor extends React.Component {
   }
 
   valueChanged = ({ ident, value }) => {
+    console.log('ident:',ident,'value',value)
     this.setState(({ editedRow }) => ({
       editedRow: { ...editedRow, [ident]: value },
     }))
@@ -21,7 +22,6 @@ class RowEditor extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.isEditing && this.props.isEditing) {
-      console.log('popped', this.focusNode)
       if (this.focusNode) {
         if (this.focusNode) this.focusNode.focus()
         if (this.focusNode.setSelectionRange) {
@@ -57,4 +57,3 @@ class RowEditor extends React.Component {
 }
 
 export default RowEditor
-//, }
