@@ -4,15 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 // import { linkTo } from '@storybook/addon-links'
 import R from 'ramda'
-import {
-  strCol,
-  numCol,
-  boolCol,
-  selCol,
-  intCol,
-  dollarCol,
-  pctCol,
-} from '../cols'
+import { strCol, numCol, intCol, dollarCol, pctCol, dateCol } from '../cols'
 import { randomRow } from './data'
 
 import Grid, {
@@ -28,9 +20,20 @@ const createRow = _ => randomRow(headers)
 
 const createData = R.compose(R.map(createRow), R.range(0))
 
+const unitMap = {
+  u1: 'Unit4',
+  u2: 'Unit1',
+  u3: 'Unit2',
+  u4: 'Unit3',
+}
+
+const unitDataGetter = ({ header, rowData }) =>
+  unitMap[rowData[header.ident]] || rowData[header.ident]
+
 /* prettier-ignore */
 const headers = [
-  strCol({ ident: 'unitId', display: 'Unit', width:180,isKey:true, }),
+  dateCol({ ident: 'transDate', display: 'Trans-Date', width:120, isKey:true, }),
+  strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataGetter:unitDataGetter }),
   intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
   numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', }),

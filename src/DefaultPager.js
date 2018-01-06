@@ -40,6 +40,7 @@ const Pager = ({
             {'<'}
           </PageButton>,
           <select
+            key="select"
             value={currentPage}
             onChange={e => setCurrentPage(e.target.value)}
           >

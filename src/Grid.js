@@ -56,52 +56,75 @@ const normalizeValue = (val, type) =>
       ? val.valueOf()
       : type === 'date' && typeof val === 'string' ? moment(val).valueOf() : val
 
-const defaultDataComparator = sortOptions => (a, b) => {
-  for (let i = 0; i < sortOptions.length; i++) {
-    const { ident, type, sortOrder } = sortOptions[i]
-    // TODO may need to look into getting custom data for example date
-    const aVal = normalizeValue(a[ident], type)
-    const bVal = normalizeValue(b[ident], type)
-    const greaterThanResult = sortOrder === 'asc' ? 1 : -1
-    const lessThanResult = sortOrder === 'asc' ? -1 : 1
+const compare = ({ aVal, bVal, sortOrder }) => {
+  const greaterThanResult = sortOrder === 'asc' ? 1 : -1
+  const lessThanResult = sortOrder === 'asc' ? -1 : 1
 
-    if (!R.isNil(aVal) || !R.isNil(bVal)) {
-      if (R.isNil(aVal)) return greaterThanResult
-      if (R.isNil(bVal)) return lessThanResult
-      if (
-        typeof aVal === 'string' &&
-        typeof bVal === 'string' &&
-        aVal.toLowerCase().localeCompare(bVal.toLowerCase()) === 1
-      )
-        return greaterThanResult
-      if (
-        typeof aVal === 'string' &&
-        typeof bVal === 'string' &&
-        bVal.toLowerCase().localeCompare(aVal.toLowerCase()) === 1
-      )
-        return lessThanResult
+  if (!R.isNil(aVal) || !R.isNil(bVal)) {
+    if (R.isNil(aVal)) return greaterThanResult
+    if (R.isNil(bVal)) return lessThanResult
+    if (
+      typeof aVal === 'string' &&
+      typeof bVal === 'string' &&
+      aVal.toLowerCase().localeCompare(bVal.toLowerCase()) === 1
+    )
+      return greaterThanResult
+    if (
+      typeof aVal === 'string' &&
+      typeof bVal === 'string' &&
+      bVal.toLowerCase().localeCompare(aVal.toLowerCase()) === 1
+    )
+      return lessThanResult
 
-      if (typeof aVal === 'number' && typeof bVal === 'number' && aVal > bVal)
-        return greaterThanResult
-      if (typeof aVal === 'number' && typeof bVal === 'number' && bVal > aVal)
-        return lessThanResult
-    }
+    if (typeof aVal === 'number' && typeof bVal === 'number' && aVal > bVal)
+      return greaterThanResult
+    if (typeof aVal === 'number' && typeof bVal === 'number' && bVal > aVal)
+      return lessThanResult
   }
   return 0
 }
 
-const computeSortOptions = (sortOptions, { ident, type }) => {
+const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
+  const headerMap = R.compose(
+    R.fromPairs,
+    R.map(header => [header.ident, header])
+  )(headers)
+
+  for (let i = 0; i < sortOptions.length; i++) {
+    const { ident, sortOrder } = sortOptions[i]
+    const header = headerMap[ident]
+    const { type, dataGetter, sortIndexGetter } = header
+    // TODO may need to look into getting custom data for example date
+    const aVal = normalizeValue(
+      sortIndexGetter
+        ? sortIndexGetter({ rowData: a, header })
+        : dataGetter ? dataGetter({ rowData: a, header }) : a[ident],
+      type
+    )
+    const bVal = normalizeValue(
+      sortIndexGetter
+        ? sortIndexGetter({ rowData: b, header })
+        : dataGetter ? dataGetter({ rowData: b, header }) : b[ident],
+      type
+    )
+    const res = compare({ aVal, bVal, sortOrder })
+    if (res !== 0) return res
+  }
+  return 0
+}
+
+const computeSortOptions = (sortOptions, { ident }) => {
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
       .map(
         opt =>
           opt.ident === ident
-            ? { ident, type, sortOrder: toggleSortOrder(opt.sortOrder) }
+            ? { ident, sortOrder: toggleSortOrder(opt.sortOrder) }
             : opt
       )
       .filter(opt => opt.sortOrder !== undefined)
   } else {
-    return [...sortOptions, { ident, type, sortOrder: 'asc' }]
+    return [...sortOptions, { ident, sortOrder: 'asc' }]
   }
 }
 
@@ -160,7 +183,7 @@ const computeView = ({
   const sortredData =
     R.isNil(sortOptions) || R.isEmpty(sortOptions)
       ? filteredData
-      : R.sort(comparator(sortOptions), filteredData)
+      : R.sort(comparator({ sortOptions, headers }), filteredData)
 
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData

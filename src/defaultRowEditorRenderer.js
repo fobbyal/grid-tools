@@ -66,7 +66,7 @@ const defaultRowEditorRenderer = ({
           <Input
             width={inputWidth}
             onChange={e => valueChanged({ ident, value: e.target.value })}
-            innerRef={index === 0 && initialFocusRef}
+            innerRef={index === 0 ? initialFocusRef : undefined}
             value={rowData[ident]}
           />
         </RowContainer>

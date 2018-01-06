@@ -4,7 +4,7 @@
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "scripts": {
-    "build": "webpack --env.dev -p",
+    "build": "webpack --env.dev",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

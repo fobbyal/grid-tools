@@ -45,6 +45,7 @@ class ScrollPane extends React.Component {
       isHeader,
       scroll,
       xOffSet,
+      yOffSet,
       headerRowHeight,
       showScroll,
       selectionType,
