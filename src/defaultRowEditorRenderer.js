@@ -9,6 +9,7 @@ const Buttons = styled.div`
   justify-content: center;
 `
 const Container = styled.div`
+  flex: 0 1 auto;
   background-color: white;
   padding: 1.5em 20px;
   border: solid #ccc 1px;
@@ -53,7 +54,7 @@ const defaultRowEditorRenderer = ({
 }) => {
   const calculatedWidth =
     parseFloat(stripPx(headerWidth)) + parseFloat(stripPx(inputWidth)) + 40
-
+  console.log('got row data',rowData)
   return (
     <Container
       minWidth={

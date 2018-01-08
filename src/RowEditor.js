@@ -3,11 +3,10 @@ import Overlay from './Overlay'
 
 class RowEditor extends React.Component {
   state = {
-    editedRow: this.props.rowData,
+    editedRow: this.props.rowData || {},
   }
 
   valueChanged = ({ ident, value }) => {
-    console.log('ident:',ident,'value',value)
     this.setState(({ editedRow }) => ({
       editedRow: { ...editedRow, [ident]: value },
     }))
@@ -33,7 +32,7 @@ class RowEditor extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.rowData !== nextProps.rowData) {
-      this.setState({ editedRow: nextProps.rowData })
+      this.setState({ editedRow: nextProps.rowData || {} })
     }
   }
 

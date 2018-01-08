@@ -6,6 +6,7 @@ import { action } from '@storybook/addon-actions'
 import R from 'ramda'
 import { strCol, numCol, intCol, dollarCol, pctCol, dateCol } from '../cols'
 import { randomRow } from './data'
+import ControlledEditDemo from './ControlledEditDemo'
 
 import Grid, {
   flexGridRenderer,
@@ -194,3 +195,4 @@ storiesOf('Flex Grid', module)
       render={flexGridRenderer()}
     />
   ))
+  .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)

@@ -72,6 +72,7 @@ const Row = styled.div`
   width: ${props => props.width}px;
   ${props => props.height ? 'height: '+ props.height + 'px;' : ''} 
   border-bottom: 1px solid #ccc;
+  min-height: 23px;
 `
 
 const ScrollingHeaderRow = Row.extend`
@@ -178,12 +179,15 @@ export const defaultColHeaderRenderer = ({
   <ColHeader width={width} {...rest} sortable={header.sortable}>
     {header.display}
     {sortOrder === 'asc' ? (
-      <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
+      <SortIndicator>&#x25b2;</SortIndicator>
     ) : sortOrder === 'desc' ? (
-      <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
+      <SortIndicator>&#x25bc;</SortIndicator>
     ) : null}
   </ColHeader>
 )
+
+//<SortIndicator className="fa fa-caret-up" aria-hidden="true" />
+// <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
 
 class FlexGridColHeader extends React.PureComponent {
   render() {

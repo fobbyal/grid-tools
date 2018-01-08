@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 
 const CloseButton = styled.div`
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   cursor: pointer;
   font-size: 24px;
   color: ${props => (props.dart ? '#efefef' : '#444')};
@@ -47,10 +47,13 @@ const DefaultOverlay = styled(Overlay)`
     props.dark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.8)'};
   width: 100vw;
   height: 100vh;
+  max-height: 100vh;
+  max-width: 100vw;
   left: 0px;
   top: 0px;
   align-items: center;
   justify-content: center;
+  overflow: auto;
 `
 
 export default DefaultOverlay

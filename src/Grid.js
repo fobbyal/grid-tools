@@ -202,7 +202,6 @@ const sortOrderOf = header => options => {
   )(options)
 }
 
-
 class Grid extends React.PureComponent {
   /* compond components */
   static SyncedScrollPane = ScrollPane
@@ -224,7 +223,9 @@ class Grid extends React.PureComponent {
     currentPage: PropTypes.number,
     onPageChange: PropTypes.number,
     rowsPerPage: PropTypes.number,
-    editInfo: PropTypes.object,
+    onEdit: PropTypes.func,
+    showAdd: PropTypes.bool,
+    onSelectionChanged: PropTypes.func,
   }
 
   static defaultProps = {
@@ -232,6 +233,7 @@ class Grid extends React.PureComponent {
     hoverType: 'row',
     sortEnabled: true,
     isEditable: false,
+    showAdd: false,
   }
 
   static childContextTypes = {
@@ -268,7 +270,7 @@ class Grid extends React.PureComponent {
       editedMap: this.editedMap,
     }),
     sortOptions: this.props.initialSortOptions,
-    currentPage: 1,
+    currentPage: this.props.currentPage || 1,
     editingRow: undefined,
     editingColumn: undefined,
     editInfo: {},
@@ -298,23 +300,34 @@ class Grid extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { data, sortOptions, fuzzyFilter } = this.props.data
+    const { data, sortOptions, fuzzyFilter, currentPage } = this.props
     if (
       data !== nextProps.data ||
       sortOptions !== nextProps.sortOptions ||
-      fuzzyFilter !== nextProps.fuzzyFilter
-    )
-      this.generateView({
-        data: data !== nextProps.data ? nextProps.data : data,
-        sortOptions:
-          sortOptions !== nextProps.sortOptions
-            ? nextProps.sortOptions
-            : sortOptions,
-        fuzzyFilter:
-          fuzzyFilter !== nextProps.fuzzyFilter
-            ? nextProps.fuzzyFilter
-            : fuzzyFilter,
-      })
+      fuzzyFilter !== nextProps.fuzzyFilter ||
+      currentPage !== nextProps.currentPage
+    ) {
+      //set state for possible view change
+      this.setState(({ editingRow, editingColumn }) => ({
+        view: this.generateView({
+          data: data !== nextProps.data ? nextProps.data : data,
+          sortOptions:
+            sortOptions !== nextProps.sortOptions
+              ? nextProps.sortOptions
+              : undefined,
+          fuzzyFilter:
+            fuzzyFilter !== nextProps.fuzzyFilter
+              ? nextProps.fuzzyFilter
+              : fuzzyFilter,
+          currentPage:
+            currentPage !== nextProps.currentPage
+              ? nextProps.currentPage
+              : undefined,
+        }),
+        editingRow: data !== nextProps.data ? undefined : editingRow,
+        editingColumn: data !== nextProps.data ? undefined : editingColumn,
+      }))
+    }
   }
 
   /* paging starts */
@@ -350,20 +363,13 @@ class Grid extends React.PureComponent {
         1
       )
       if (guardedPage !== this.currentPage()) {
-        const view = computeView({
-          data: this.props.data,
-          sortOptions: this.sortOptions(),
-          fuzzyFilter: this.props.fuzzyFilter,
-          headers: this.props.headers,
-          rowsPerPage: this.props.rowsPerPage,
-          currentPage: guardedPage,
-          editedMap: this.editedMap,
-        })
-
         if (this.isPagingControlled()) {
           this.props.onPageChange(guardedPage)
         } else {
-          this.setState(_ => ({ currentPage: guardedPage, view }))
+          this.setState(_ => ({
+            currentPage: guardedPage,
+            view: this.generateView({ currentPage: guardedPage }),
+          }))
         }
       }
     }
@@ -381,20 +387,10 @@ class Grid extends React.PureComponent {
             this.props.data.length / this.props.rowsPerPage
           )
           const newPage = Math.max(Math.min(totalPages, currentPage + 1), 1)
-          if (newPage !== this.currentPage()) {
-            const view = computeView({
-              data: this.props.data,
-              sortOptions: this.sortOptions(),
-              fuzzyFilter: this.props.fuzzyFilter,
-              headers: this.props.headers,
-              rowsPerPage: this.props.rowsPerPage,
-              currentPage: newPage,
-              editedMap: this.editedMap,
-            })
-
+          if (newPage !== currentPage) {
             return {
               currentPage: newPage,
-              view,
+              view: this.generateView({ currentPage: newPage }),
             }
           } else {
             return null
@@ -416,19 +412,10 @@ class Grid extends React.PureComponent {
             this.props.data.length / this.props.rowsPerPage
           )
           const newPage = Math.max(Math.min(totalPages, currentPage - 1), 1)
-          if (newPage !== this.currentPage()) {
-            const view = computeView({
-              data: this.props.data,
-              sortOptions: this.sortOptions(),
-              fuzzyFilter: this.props.fuzzyFilter,
-              headers: this.props.headers,
-              rowsPerPage: this.props.rowsPerPage,
-              currentPage: newPage,
-              editedMap: this.editedMap,
-            })
+          if (newPage !== currentPage) {
             return {
               currentPage: newPage,
-              view,
+              view: this.generateView({ currentPage: newPage }),
             }
           } else {
             return null
@@ -453,18 +440,9 @@ class Grid extends React.PureComponent {
     } else {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(sortOptions, header)
-        const view = computeView({
-          data: this.props.data,
-          sortOptions: newOptions,
-          fuzzyFilter: this.props.fuzzyFilter,
-          headers: this.props.headers,
-          rowsPerPage: this.props.rowsPerPage,
-          currentPage: this.currentPage(),
-          editedMap: this.editedMap,
-        })
         return {
           sortOptions: newOptions,
-          view,
+          view: this.generateView({ sortOptions: newOptions }),
         }
       })
     }
@@ -478,22 +456,21 @@ class Grid extends React.PureComponent {
 
   /* sorting ends */
 
-  generateView({
+  generateView = ({
     data = this.props.data,
     sortOptions = this.sortOptions(),
     fuzzyFilter = this.props.fuzzyFilter,
-  } = {}) {
-    const view = computeView({
+    currentPage = this.currentPage(),
+  } = {}) =>
+    computeView({
       data,
       sortOptions,
       fuzzyFilter,
       headers: this.props.headers,
       rowsPerPage: this.props.rowsPerPage,
-      currentPage: this.currentPage(),
+      currentPage,
       editedMap: this.editedMap,
     })
-    this.setState(_ => ({ view }))
-  }
 
   /*  selection starts */
   startSelectionState(rowIndex, columnIndex) {
@@ -507,6 +484,25 @@ class Grid extends React.PureComponent {
       return { y2: rowIndex, x2: columnIndex }
     }
   }
+
+  selectionChanged = _ => {
+    const { headers, onSelectionChanged } = this.props
+    if (onSelectionChanged) {
+      const { x1, x2, y1, y2 } = normalizeBounds(this.state)
+      const selectedRows = []
+      const selectedHeaders = []
+      const { view } = this.state
+
+      for (let r = y1; r <= y2; r++) {
+        selectedRows.push(view[r])
+      }
+      for (let c = x1; c <= x2; c++) {
+        selectedHeaders.push(headers[c])
+      }
+      onSelectionChanged({ selectedRows, selectedHeaders })
+    }
+  }
+
   /* selection ends */
 
   /* hover starts */
@@ -528,7 +524,8 @@ class Grid extends React.PureComponent {
 
   isEditing() {
     const { editingRow } = this.state
-    return !R.isNil(editingRow)
+    const { showAdd } = this.props
+    return showAdd || !R.isNil(editingRow)
   }
 
   commitRowEdit = ({ currentRow, editedRow }) => {
@@ -536,30 +533,32 @@ class Grid extends React.PureComponent {
     // TODO use immutable js here ? so we can implement undo easily?
     // TODO currentRow == undefined for new rows
     if (currentRow !== editedRow) {
-      if (this.dirtyMap.has(currentRow)) {
-        const originalRow = this.dirtyMap.get(currentRow)
-        this.editedMap.set(originalRow, editedRow)
-        this.dirtyMap.set(editedRow, originalRow)
-        this.dirtyMap.delete(currentRow)
+      if (this.props.onEdit) {
+        this.props.onEdit({ originalRow: currentRow, editedRow })
       } else {
-        this.editedMap.set(currentRow, editedRow)
-        this.dirtyMap.set(editedRow, currentRow)
+        if (this.dirtyMap.has(currentRow)) {
+          const originalRow = this.dirtyMap.get(currentRow)
+          this.editedMap.set(originalRow, editedRow)
+          this.dirtyMap.set(editedRow, originalRow)
+          this.dirtyMap.delete(currentRow)
+        } else {
+          this.editedMap.set(currentRow, editedRow)
+          this.dirtyMap.set(editedRow, currentRow)
+        }
+        this.setState({
+          view: this.generateView(),
+          editingRow: undefined,
+          editingColumn: undefined,
+        })
       }
-      const view = computeView({
-        data: this.props.data,
-        sortOptions: this.sortOptions(),
-        fuzzyFilter: this.props.fuzzyFilter,
-        headers: this.props.headers,
-        rowsPerPage: this.props.rowsPerPage,
-        currentPage: this.currentPage(),
-        editedMap: this.editedMap,
-      })
-      this.setState({ view, editingRow: undefined, editingColumn: undefined })
     }
   }
 
   cancelEdit = () =>
-    this.setState({ editingRow: undefined, editingColumn: undefined })
+    this.setState(
+      _ => ({ editingRow: undefined, editingColumn: undefined }),
+      this.props.onEditCancel
+    )
 
   undoEdit() {
     /* tobe implemented via short-cut key */
@@ -578,22 +577,33 @@ class Grid extends React.PureComponent {
     const { rowIndex, columnIndex } = pos
     if (e.button === 2 && isCellSelected(rowIndex, columnIndex, this.state))
       return
-    this.setState(_ => this.startSelectionState(rowIndex, columnIndex))
+    this.setState(
+      _ => this.startSelectionState(rowIndex, columnIndex),
+      this.selectionChanged
+    )
   }
 
   cellMouseUp = e => {
     const pos = extractPosition(e)
     const { rowIndex, columnIndex } = pos
-    this.setState(_ => this.expandSelectionState(rowIndex, columnIndex, true))
+    const isSelecting = this.selecting
+    this.setState(
+      _ => this.expandSelectionState(rowIndex, columnIndex, true),
+      isSelecting ? this.selectionChanged : undefined
+    )
   }
 
   cellMouseEnter = e => {
     const pos = extractPosition(e)
     const { rowIndex, columnIndex } = pos
-    this.setState(_ => ({
-      ...this.hoverState(rowIndex, columnIndex),
-      ...this.expandSelectionState(rowIndex, columnIndex),
-    }))
+    const isSelecting = this.selecting
+    this.setState(
+      _ => ({
+        ...this.hoverState(rowIndex, columnIndex),
+        ...this.expandSelectionState(rowIndex, columnIndex),
+      }),
+      isSelecting ? this.selectionChanged : undefined
+    )
   }
 
   cellMouseLeave = e => {
@@ -692,14 +702,15 @@ class Grid extends React.PureComponent {
   getRowEditorProps = _ => ({
     onClose: this.cancelEdit,
     commitEdit: this.commitRowEdit,
+    // TODO: add feature to pop up editor based on some row for add featrues
     rowData: this.state.view[this.state.editingRow],
     headers: this.props.headers,
     isEditing: this.isEditing(),
   })
 
   render() {
+    console.log('grid renderer')
     const { view } = this.state
-    console.log('render grid..')
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
       getRowProps: this.getRowProps,
