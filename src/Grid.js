@@ -308,7 +308,13 @@ class Grid extends React.PureComponent {
       currentPage !== nextProps.currentPage
     ) {
       //set state for possible view change
-      this.setState(({ editingRow, editingColumn }) => ({
+      //conso
+      console.log('on data update ..')
+      this.setState(({ editingRow, editingColumn, x1, x2, y1, y2 }) => ({
+        // x1: data !== nextProps.data ? undefined : x1,
+        // x2: data !== nextProps.data ? undefined : x2,
+        // y1: data !== nextProps.data ? undefined : y1,
+        // y2: data !== nextProps.data ? undefined : y2,
         view: this.generateView({
           data: data !== nextProps.data ? nextProps.data : data,
           sortOptions:
@@ -326,7 +332,7 @@ class Grid extends React.PureComponent {
         }),
         editingRow: data !== nextProps.data ? undefined : editingRow,
         editingColumn: data !== nextProps.data ? undefined : editingColumn,
-      }))
+      }),this.selectionChanged)
     }
   }
 
@@ -456,12 +462,14 @@ class Grid extends React.PureComponent {
 
   /* sorting ends */
 
-  generateView = ({
-    data = this.props.data,
-    sortOptions = this.sortOptions(),
-    fuzzyFilter = this.props.fuzzyFilter,
-    currentPage = this.currentPage(),
-  } = {}) =>
+  generateView = (
+    {
+      data = this.props.data,
+      sortOptions = this.sortOptions(),
+      fuzzyFilter = this.props.fuzzyFilter,
+      currentPage = this.currentPage(),
+    } = {}
+  ) =>
     computeView({
       data,
       sortOptions,
