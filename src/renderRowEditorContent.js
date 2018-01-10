@@ -15,10 +15,11 @@ const Container = styled.div`
   border: solid #ccc 1px;
   border-radius: 3px;
   box-shadow: 6px 1px 12px 1px rgba(0, 0, 0, 0.5);
-  min-width: 80vw;
+  width: ${props => props.width || '45vw'};
+  min-width: 45vw;
   max-width: 80vw;
   max-height: 80vh;
-  overflow: scroll;
+  overflow: auto;
 `
 const RowContainer = styled.div`
   display: flex;
@@ -63,6 +64,11 @@ const defaultControlsRender = ({ onOk, onCancel }) => (
   </Buttons>
 )
 
+const stripPx = val =>
+  val && val.endsWith('px')
+    ? parseFloat(val.substring(0, val.length - 2))
+    : parseFloat(val)
+
 const rendeRowEditorContent = ({
   headerWidth,
   dataWidth,
@@ -77,9 +83,14 @@ const rendeRowEditorContent = ({
   initialFocusRef,
 }) => {
   const width = getMaxWidth(headers) + 'px'
+  const containerWidth =
+    (stripPx(headerWidth) || getMaxWidth(headers)) +
+    (stripPx(dataWidth) || getMaxWidth(headers)) +
+    80 +
+    'px'
 
   return (
-    <Container>
+    <Container width={containerWidth}>
       {headers.map((header, index) => {
         const { ident, display } = header
         return (

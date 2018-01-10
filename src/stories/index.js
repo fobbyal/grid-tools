@@ -99,14 +99,23 @@ const splitColHeaderRenderer = props => {
 
 const commonProps = { headers, data }
 const debugHeaders = R.take(5, headers)
-const debugData = R.range(0, 13).map(_ => randomRow(debugHeaders))
+const debugData = R.range(0, 300).map(_ => randomRow(debugHeaders))
 
 const debugProps = { headers: debugHeaders, data: debugData }
 const tenKData = createData(10000)
 
 storiesOf('Flex Grid', module)
   .add('debug', () => (
-    <Grid {...debugProps} isEditable={true} render={flexGridRenderer()} />
+    <Grid
+      {...debugProps}
+      isEditable
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 1100,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+    />
   ))
   .add('Broswer Scroll/No Scroll', () => (
     <Grid {...commonProps} render={flexGridRenderer()} />

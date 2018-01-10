@@ -185,13 +185,20 @@ const computeView = ({
       ? filteredData
       : R.sort(comparator({ sortOptions, headers }), filteredData)
 
+  const normalizedCurrentPage = Math.min(filteredData.length, currentPage)
+
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData
-    : R.compose(R.take(rowsPerPage), R.drop((currentPage - 1) * rowsPerPage))(
-        sortredData
-      )
+    : R.compose(
+        R.take(rowsPerPage),
+        R.drop((normalizedCurrentPage - 1) * rowsPerPage)
+      )(sortredData)
 
-  return pagedData
+  return {
+    view: pagedData,
+    filteredDataLength: filteredData.length,
+    currentPage: normalizedCurrentPage,
+  }
 }
 
 const sortOrderOf = header => options => {
@@ -260,7 +267,7 @@ class Grid extends React.PureComponent {
     x2: undefined,
     y1: undefined,
     y2: undefined,
-    view: computeView({
+    ...computeView({
       data: this.props.data,
       sortOptions: this.props.initialSortOptions || this.props.sortOptions,
       fuzzyFilter: this.props.fuzzyFilter,
@@ -310,29 +317,32 @@ class Grid extends React.PureComponent {
       //set state for possible view change
       //conso
       console.log('on data update ..')
-      this.setState(({ editingRow, editingColumn, x1, x2, y1, y2 }) => ({
-        // x1: data !== nextProps.data ? undefined : x1,
-        // x2: data !== nextProps.data ? undefined : x2,
-        // y1: data !== nextProps.data ? undefined : y1,
-        // y2: data !== nextProps.data ? undefined : y2,
-        view: this.generateView({
-          data: data !== nextProps.data ? nextProps.data : data,
-          sortOptions:
-            sortOptions !== nextProps.sortOptions
-              ? nextProps.sortOptions
-              : undefined,
-          fuzzyFilter:
-            fuzzyFilter !== nextProps.fuzzyFilter
-              ? nextProps.fuzzyFilter
-              : fuzzyFilter,
-          currentPage:
-            currentPage !== nextProps.currentPage
-              ? nextProps.currentPage
-              : undefined,
+      this.setState(
+        ({ editingRow, editingColumn, x1, x2, y1, y2 }) => ({
+          // x1: data !== nextProps.data ? undefined : x1,
+          // x2: data !== nextProps.data ? undefined : x2,
+          // y1: data !== nextProps.data ? undefined : y1,
+          // y2: data !== nextProps.data ? undefined : y2,
+          ...this.generateViewProps({
+            data: data !== nextProps.data ? nextProps.data : data,
+            sortOptions:
+              sortOptions !== nextProps.sortOptions
+                ? nextProps.sortOptions
+                : undefined,
+            fuzzyFilter:
+              fuzzyFilter !== nextProps.fuzzyFilter
+                ? nextProps.fuzzyFilter
+                : fuzzyFilter,
+            currentPage:
+              currentPage !== nextProps.currentPage
+                ? nextProps.currentPage
+                : undefined,
+          }),
+          editingRow: data !== nextProps.data ? undefined : editingRow,
+          editingColumn: data !== nextProps.data ? undefined : editingColumn,
         }),
-        editingRow: data !== nextProps.data ? undefined : editingRow,
-        editingColumn: data !== nextProps.data ? undefined : editingColumn,
-      }),this.selectionChanged)
+        this.selectionChanged
+      )
     }
   }
 
@@ -356,7 +366,7 @@ class Grid extends React.PureComponent {
     return !this.hasPaging()
       ? undefined
       : R.isNil(this.props.totalPages)
-        ? Math.ceil(this.props.data.length / this.props.rowsPerPage)
+        ? Math.ceil(this.state.filteredDataLength / this.props.rowsPerPage)
         : this.props.totalPages
   }
 
@@ -374,7 +384,7 @@ class Grid extends React.PureComponent {
         } else {
           this.setState(_ => ({
             currentPage: guardedPage,
-            view: this.generateView({ currentPage: guardedPage }),
+            ...this.generateViewProps({ currentPage: guardedPage }),
           }))
         }
       }
@@ -396,7 +406,7 @@ class Grid extends React.PureComponent {
           if (newPage !== currentPage) {
             return {
               currentPage: newPage,
-              view: this.generateView({ currentPage: newPage }),
+              ...this.generateViewProps({ currentPage: newPage }),
             }
           } else {
             return null
@@ -421,7 +431,7 @@ class Grid extends React.PureComponent {
           if (newPage !== currentPage) {
             return {
               currentPage: newPage,
-              view: this.generateView({ currentPage: newPage }),
+              ...this.generateViewProps({ currentPage: newPage }),
             }
           } else {
             return null
@@ -448,7 +458,7 @@ class Grid extends React.PureComponent {
         const newOptions = computeSortOptions(sortOptions, header)
         return {
           sortOptions: newOptions,
-          view: this.generateView({ sortOptions: newOptions }),
+          ...this.generateViewProps({ sortOptions: newOptions }),
         }
       })
     }
@@ -462,14 +472,12 @@ class Grid extends React.PureComponent {
 
   /* sorting ends */
 
-  generateView = (
-    {
-      data = this.props.data,
-      sortOptions = this.sortOptions(),
-      fuzzyFilter = this.props.fuzzyFilter,
-      currentPage = this.currentPage(),
-    } = {}
-  ) =>
+  generateViewProps = ({
+    data = this.props.data,
+    sortOptions = this.sortOptions(),
+    fuzzyFilter = this.props.fuzzyFilter,
+    currentPage = this.currentPage(),
+  } = {}) =>
     computeView({
       data,
       sortOptions,
@@ -524,8 +532,15 @@ class Grid extends React.PureComponent {
 
   /* editing starts */
 
+  isEditable = props => {
+    const { isEditable } = this.props
+    return typeof isEditable === 'function' ? isEditable(props) : isEditable
+  }
+
   edit(rowIndex, columnIndex) {
-    if (this.props.isEditable !== false) {
+    const header = this.props.headers[columnIndex]
+    const rowData = this.state.view[rowIndex]
+    if (this.isEditable({ header, rowData })) {
       this.setState({ editingRow: rowIndex, editingColumn: columnIndex })
     }
   }
@@ -554,7 +569,7 @@ class Grid extends React.PureComponent {
           this.dirtyMap.set(editedRow, currentRow)
         }
         this.setState({
-          view: this.generateView(),
+          ...this.generateViewProps(),
           editingRow: undefined,
           editingColumn: undefined,
         })

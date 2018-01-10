@@ -238,6 +238,7 @@ const flexGridRenderer = ({
   isEditing,
 }) => {
   const pagerHeight = 35
+  const normalizedWidth = R.min(width, sumWidth(headers))
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)
     : fixedColCount || 0
@@ -246,11 +247,12 @@ const flexGridRenderer = ({
   const rowHeaderWidth = sumWidth(rowHeaders)
   const dataScrollWidth =
     numOfFixedCols > 0
-      ? width - rowHeaderWidth + dataHeaders.length
-      : scroll ? width + headers.length : sumWidth(headers)
+      ? normalizedWidth - rowHeaderWidth + dataHeaders.length
+      : scroll ? normalizedWidth + headers.length : sumWidth(headers)
+
   const containerWidth = R.isNil(width)
     ? undefined
-    : width + headers.length + (scroll ? 17 : 0)
+    : normalizedWidth + headers.length + (scroll ? 17 : 0)
 
   const containerHeight = R.isNil(height)
     ? undefined
@@ -265,6 +267,14 @@ const flexGridRenderer = ({
   }
 
   const topOffSet = 0
+
+  //TODO: fix width issue for all browsers chrome/safari/firefox
+  console.log('provided width', width)
+  console.log('sumWidth', sumWidth(headers))
+  console.log('rowHeaderWidth', rowHeaderWidth)
+  console.log('containerWidth', containerWidth)
+  console.log('dataScrollWidth', dataScrollWidth)
+  console.log('normalizedWidth', normalizedWidth)
 
   return (
     <FlexGridContainer

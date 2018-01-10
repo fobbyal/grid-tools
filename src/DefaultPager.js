@@ -37,7 +37,7 @@ const Pager = ({
         ))
       : [
           <PageButton key="left" onClick={decrementPage}>
-            {'<'}
+            &#x25c0;
           </PageButton>,
           <select
             key="select"
@@ -52,7 +52,7 @@ const Pager = ({
           </select>,
           <span key="tp">of {totalPages}</span>,
           <PageButton key="right" onClick={incrementPage}>
-            {'>'}
+            &#x25b6;
           </PageButton>,
         ]}
   </div>
