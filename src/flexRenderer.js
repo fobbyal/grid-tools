@@ -7,7 +7,7 @@ import numeral from 'numeral'
 import moment from 'moment'
 import DefaultPager from './DefaultPager'
 import RowEditor from './RowEditor'
-import defaultRowEditorRenderer from './defaultRowEditorRenderer'
+import rowEditorContentRenderer from './renderRowEditorContent'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left'
@@ -222,7 +222,7 @@ const flexGridRenderer = ({
   cellRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
-  rowEditorRenderer = defaultRowEditorRenderer(),
+  renderRowEditorContent = rowEditorContentRenderer(),
   editByRow = true,
   editByCell = false,
 } = {}) => ({
@@ -383,7 +383,7 @@ const flexGridRenderer = ({
         ))}
       </TableContent>
       {hasPaging && pagerRenderer(getPagerProps({ style: pagerStyle }))}
-      <RowEditor render={rowEditorRenderer} {...getRowEditorProps()} />
+      <RowEditor render={renderRowEditorContent} {...getRowEditorProps()} />
     </FlexGridContainer>
   )
 }

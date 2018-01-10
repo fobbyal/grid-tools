@@ -1,7 +1,7 @@
 import React from 'react'
 import R from 'ramda'
 
-import Grid, { flexGridRenderer, defaultRowEditorRenderer } from '../index'
+import Grid, { flexGridRenderer, renderRowEditorContent } from '../index'
 
 class ControlledEditDemo extends React.Component {
   state = { data: this.props.data, showAdd: false }
@@ -48,8 +48,8 @@ class ControlledEditDemo extends React.Component {
           headers={headers}
           rowsPerPage={15}
           render={flexGridRenderer({
-            rowEditorRenderer: defaultRowEditorRenderer({
-              headerWidth: '150px',
+            renderRowEditorContent: renderRowEditorContent({
+              headerWidth: '130px',
             }),
           })}
           onEdit={this.onEdit}

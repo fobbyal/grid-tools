@@ -6,7 +6,7 @@ import flexGridRenderer, {
   defaultCellRenderer as defaultFlexCellRenderer,
   defaultColHeaderRenderer as defaultFlexColHeaderRenderer,
 } from './flexRenderer'
-import defaultRowEditorRenderer from './defaultRowEditorRenderer'
+import renderRowEditorContent from './renderRowEditorContent'
 
 export * from './cols'
 
@@ -17,6 +17,6 @@ export {
   FlexColHeader,
   defaultFlexCellRenderer,
   defaultFlexColHeaderRenderer,
-  defaultRowEditorRenderer,
+  renderRowEditorContent,
 }
 export default Grid
