@@ -31,13 +31,14 @@ const Header = styled.div`
   flex: 0 0 ${props => props.width || '80px'};
   font-size: 0.75em;
   font-weight: bold;
+  align-items: center;
 `
 const Input = styled.input`
   flex: 0 0 ${props => props.width || '80px'};
   width: ${props => props.width || '80px'};
 `
 
-const defaultInputRenderer = ({
+export const defaultInputRowEditRender = ({
   width,
   ref,
   rowData,
@@ -72,7 +73,7 @@ const stripPx = val =>
 const rendeRowEditorContent = ({
   headerWidth,
   dataWidth,
-  renderEditor = defaultInputRenderer,
+  renderEditor = defaultInputRowEditRender,
   renderControls = defaultControlsRender,
 } = {}) => ({
   rowData,
@@ -92,20 +93,22 @@ const rendeRowEditorContent = ({
   return (
     <Container width={containerWidth}>
       {headers.map((header, index) => {
-        const { ident, display } = header
-        return (
-          <RowContainer key={ident}>
-            <Header width={headerWidth || width}>{display || ident}</Header>
-            {renderEditor({
-              width: dataWidth || width,
-              valueChanged,
-              ref: index === 0 ? initialFocusRef : undefined,
-              rowData,
-              header,
-              index,
-            })}
-          </RowContainer>
-        )
+        if (header.showInRowEditor) {
+          const { ident, display } = header
+          return (
+            <RowContainer key={ident || '-editor'}>
+              <Header width={headerWidth || width}>{display || ident}</Header>
+              {renderEditor({
+                width: dataWidth || width,
+                valueChanged,
+                ref: index === 0 ? initialFocusRef : undefined,
+                rowData,
+                header,
+                index,
+              })}
+            </RowContainer>
+          )
+        } else return null
       })}
       {renderControls({ onOk, onCancel })}
     </Container>

@@ -7,6 +7,7 @@ class RowEditor extends React.Component {
   }
 
   valueChanged = ({ ident, value }) => {
+    console.log('updating row widther with',ident,value)
     this.setState(({ editedRow }) => ({
       editedRow: { ...editedRow, [ident]: value },
     }))

@@ -6,6 +6,7 @@ const defaultProps = {
   alignment: 'center',
   width: 100,
   sortable: true,
+  showInRowEditor: true,
 }
 
 // numearls display is here

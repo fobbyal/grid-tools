@@ -5,7 +5,8 @@
   "main": "dist/integ-grid-tools.js",
   "scripts": {
     "build": "webpack --env.dev",
-    "build:build": "webpack --env.dev",
+    "build:watch": "webpack --watch --env.dev",
+    "build:prod": "webpack -p --env.prod",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "jest",
