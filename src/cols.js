@@ -11,29 +11,31 @@ const defaultProps = {
 
 // numearls display is here
 export const numCol = (
-  { ident, display, numFormat = '0.00', ...rest } = { numFormat: '0.00' }
+  { ident, display, displayFormat = '0.00', ...rest } = {
+    displayFormat: '0.00',
+  }
 ) => ({
   ident,
   display: display || ident,
   type: 'num',
-  numFormat,
+  displayFormat,
   ...defaultProps,
   ...rest,
 })
 
 export const intCol = props => ({
   ...numCol(props),
-  numFormat: '0',
+  displayFormat: '0',
 })
 
 export const dollarCol = props => ({
   ...numCol(props),
-  numFormat: '$0,0.00',
+  displayFormat: '$0,0.00',
 })
 
 export const pctCol = props => ({
   ...numCol(props),
-  numFormat: '0.00%',
+  displayFormat: '0.00%',
 })
 
 export const strCol = ({ ident, display, ...rest } = {}) => ({
@@ -61,14 +63,6 @@ export const yesNoCol = ({ ident, display, ...rest } = {}) => ({
 })
 
 const dateProps = ({ ident, dataFormat, displayFormat }) => ({
-  dataGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
-      ? undefined
-      : moment.isDate(rowData[ident])
-        ? moment(rowData[ident]).format(displayFormat)
-        : moment.isMoment(rowData[ident])
-          ? rowData[ident].format()
-          : moment(rowData[ident], dataFormat).format(displayFormat),
   sortIndexGetter: ({ rowData }) =>
     R.isNil(rowData[ident])
       ? undefined

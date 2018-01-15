@@ -5,6 +5,8 @@ import {
   COLUMN_INDEX_ATTRIBUTE,
   COL_IDENT_ATTRIBUTE,
 } from './constants.js'
+import moment from 'moment'
+import numeral from 'numeral'
 
 export const fromEmpty = d =>
   fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
@@ -40,3 +42,54 @@ export const isPositionValid = pos =>
 
 export const eventBroadcaster = listeners => e =>
   listeners.filter(l => !R.isNil(l)).forEach(l => l(e))
+
+export const extractData = ({ header, rowData, dataFormat }) => {
+  const { dataGetter, type, ident } = header
+  const rawData = rowData[ident]
+  return dataGetter
+    ? dataGetter({ header, rowData })
+    : type === 'date-time'
+      ? R.isNil(rowData)
+        ? undefined
+        : moment.isDate(rowData)
+          ? moment(rawData).format(dataFormat)
+          : moment.isMoment(rowData) ? rowData.formatData(dataFormat) : rawData
+      : rawData
+}
+
+export const formatData = ({ header, value }) => {
+  const { type, dataFormat, displayFormat, dataFormatter } = header
+  return dataFormatter
+    ? dataFormatter({ header, value })
+    : R.isNil(value)
+      ? ''
+      : type === 'num' && displayFormat
+        ? numeral(value).format(displayFormat)
+        : type === 'date-time' && displayFormat
+          ? moment(value, dataFormat).format(displayFormat)
+          : value + ''
+}
+
+export const extractAndFormatData = ({ header, rowData }) =>
+  formatData({ header, value: extractData({ header, rowData }) })
+
+export const toSelectionColProps = keyValues => {
+  if (keyValues instanceof Map) {
+    const choices = []
+    keyValues.forEach((value, key) => choices.push({ text: value, value: key }))
+    return {
+      choices,
+      dataFormatter: ({ header, value }) =>
+        keyValues.has(value) ? keyValues.get(value) : value,
+    }
+  } else {
+    return {
+      choices: R.compose(
+        R.map(([value, text]) => ({ value, text })),
+        R.toPairs
+      )(keyValues),
+      dataFormatter: ({ header, value }) =>
+        R.isNil(keyValues[value]) ? value : keyValues[value],
+    }
+  }
+}

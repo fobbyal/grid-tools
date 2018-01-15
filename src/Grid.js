@@ -4,6 +4,7 @@ import {
   isPositionValid,
   extractPosition,
   extractColIdent,
+  extractAndFormatData,
 } from './utils'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
@@ -93,18 +94,18 @@ const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
   for (let i = 0; i < sortOptions.length; i++) {
     const { ident, sortOrder } = sortOptions[i]
     const header = headerMap[ident]
-    const { type, dataGetter, sortIndexGetter } = header
+    const { type, sortIndexGetter } = header
     // TODO may need to look into getting custom data for example date
     const aVal = normalizeValue(
       sortIndexGetter
         ? sortIndexGetter({ rowData: a, header })
-        : dataGetter ? dataGetter({ rowData: a, header }) : a[ident],
+        : extractData({ rowData: a, header }),
       type
     )
     const bVal = normalizeValue(
       sortIndexGetter
         ? sortIndexGetter({ rowData: b, header })
-        : dataGetter ? dataGetter({ rowData: b, header }) : b[ident],
+        : extractData({ rowData: b, header }),
       type
     )
     const res = compare({ aVal, bVal, sortOrder })
@@ -128,22 +129,8 @@ const computeSortOptions = (sortOptions, { ident }) => {
   }
 }
 
-const toFilterableString = (val, type) =>
-  R.isNil(val)
-    ? ''
-    : typeof val === 'string'
-      ? val
-      : moment.isDate(val)
-        ? moment(val).format('MM/DD/YYYY HH:mm:ss')
-        : moment.isMoment(val)
-          ? val.format('MM/DD/YYYY HH:mm:ss')
-          : val.toString()
-
 const matchData = (rowData, fuzzyFilter) => header =>
-  (header.dataGetter
-    ? toFilterableString(header.dataGetter({ rowData, header }), header.type)
-    : toFilterableString(rowData[header.ident], header.type)
-  )
+  extractAndFormatData({ rowData, header })
     .toLowerCase()
     .includes(fuzzyFilter.toLowerCase())
 

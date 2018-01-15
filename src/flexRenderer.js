@@ -2,9 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import R from 'ramda'
 import Grid from './Grid'
-import { sumWidth } from './utils'
-import numeral from 'numeral'
-import moment from 'moment'
+import { sumWidth, formatData, extractData } from './utils'
 import DefaultPager from './DefaultPager'
 import RowEditor from './RowEditor'
 import rowEditorContentRenderer from './renderRowEditorContent'
@@ -120,13 +118,6 @@ class FlexGridRow extends React.PureComponent {
   }
 }
 
-const formatData = ({ type, numFormat, dateFormat, value }) =>
-  R.isNil(value)
-    ? ''
-    : type === 'num' && numFormat
-      ? numeral(value).format(numFormat)
-      : type === 'date' && dateFormat ? moment(value).format(dateFormat) : value
-
 export const defaultCellRenderer = ({
   rowIndex,
   columnIndex,
@@ -137,16 +128,8 @@ export const defaultCellRenderer = ({
   render,
   ...rest
 }) => {
-  // dataGetter only works for row because it has already been sorted at this point
-  const value = header.dataGetter
-    ? header.dataGetter({
-        header,
-        rowData: data[rowIndex],
-        rowIndex,
-        columnIndex,
-      })
-    : data[rowIndex][header.ident]
-  const display = formatData({ ...header, value })
+  const value = extractData({ header, rowData: data[rowIndex] })
+  const display = formatData({ header, value })
   return (
     <Cell {...rest} width={width} height={height} title={value}>
       {display}
