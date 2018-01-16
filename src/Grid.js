@@ -5,6 +5,7 @@ import {
   extractPosition,
   extractColIdent,
   extractAndFormatData,
+  extractData,
 } from './utils'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
