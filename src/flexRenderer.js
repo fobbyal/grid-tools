@@ -26,8 +26,10 @@ export const ColHeader = styled.div`
   color: ${props => props.color || 'white'};
   font-weight: ${props => props.fontWeight || 'bold'};
   font-size: ${props => props.fontSize || '0.85em'};
-  padding-left: 0.2em;
-  padding-right: 0.2em;
+  &:first-child {
+    border-left: 1px solid steelblue;
+    border-top-left-radius: 3px;
+  }
 `
 /* prettier-ignore */
 export const Cell = styled.div`
@@ -35,7 +37,7 @@ export const Cell = styled.div`
   width: ${props => props.width}px;
   text-overflow: ellipsis;
   overflow: hidden;
-  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
   display: flex;
   align-items: center;
   user-select: none;
@@ -62,6 +64,9 @@ export const Cell = styled.div`
   ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')}
   padding-left: 0.2em;
   padding-right: 0.2em;
+  &:last-child {
+    border-right: 1px solid #ccc;
+  }
 `
 
 /* prettier-ignore */
@@ -193,6 +198,17 @@ const FlexGridContainer = styled.div`
 
 const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
 
+const UpperRight = styled.div`
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: steelblue;
+  border-left: 1px solid #ccc;
+  border-top-right-radius: 3px;
+  width: 17px;
+  height: ${props => props.headerRowHeight}px;
+`
+
 const flexGridRenderer = ({
   style,
   className,
@@ -225,7 +241,7 @@ const flexGridRenderer = ({
   const numOfFixedCols = autoFixColByKey
     ? countKeyCols(headers)
     : fixedColCount || 0
-  const scroll = width && height && headerRowHeight && true
+  const scroll = width && height && headerRowHeight
   const { rowHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
   const rowHeaderWidth = sumWidth(rowHeaders)
   const dataScrollWidth =
@@ -251,7 +267,7 @@ const flexGridRenderer = ({
 
   const topOffSet = 0
 
-  //TODO: fix width issue for all browsers chrome/safari/firefox
+  // TODO: fix width issue for all browsers chrome/safari/firefox
   console.log('provided width', width)
   console.log('sumWidth', sumWidth(headers))
   console.log('rowHeaderWidth', rowHeaderWidth)
@@ -306,6 +322,7 @@ const flexGridRenderer = ({
           />
         ))}
       </FlexGridRow>
+      <UpperRight headerRowHeight={headerRowHeight} />
       {/* table body fixed columns */}
       {numOfFixedCols > 0 && (
         <TableContent

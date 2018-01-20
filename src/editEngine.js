@@ -23,9 +23,36 @@ export const removeRow = ({
   editInfo = generateInitialEditInfo(),
   currentRow,
 }) => {
-  const { removed, history, ...rest } = editInfo
+  const {
+    added,
+    updated,
+    dirtyMap,
+    updatedMap,
+    removed,
+    history,
+    ...rest
+  } = editInfo
+  const originalRow = dirtyMap.get(currentRow)
+  const isUpdated = dirtyMap.has(currentRow)
+  const isAdded = added.includes(currentRow)
   return {
-    removed: [...removed, currentRow],
+    removed: isAdded
+      ? removed
+      : [...removed, isUpdated ? originalRow : currentRow],
+    added: isAdded ? added.filter(row => row !== currentRow) : added,
+    updated: isUpdated ? updated.filter(row => row !== currentRow) : updated,
+    dirtyMap: isUpdated
+      ? immutableOp(m => {
+          m.delete(currentRow)
+          return m
+        })(dirtyMap)
+      : dirtyMap,
+    updatedMap: isUpdated
+      ? immutableOp(m => {
+          m.delete(originalRow)
+          return m
+        })(updatedMap)
+      : updatedMap,
     history: [...history, editInfo],
     ...rest,
   }
@@ -40,7 +67,7 @@ export const updateRow = ({
   editedRow,
 }) => {
   if (currentRow === undefined && !R.isNil(editedRow)) {
-    const { /* dirtyMap,*/ added, history, ...rest } = editInfo
+    const { /* dirtyMap, */ added, history, ...rest } = editInfo
     return {
       added: [...added, editedRow],
       // dirtyMap: immutableSet(editedRow, undefined)(dirtyMap),
@@ -49,9 +76,10 @@ export const updateRow = ({
     }
   } else if (currentRow !== editedRow) {
     const { added, dirtyMap, updatedMap, updated, history, ...rest } = editInfo
-    if (added.includes(editedRow)) {
+    if (added.includes(currentRow)) {
       return {
         added: [...added.filter(row => row !== currentRow), editedRow],
+        dirtyMap,
         // dirtyMap: immutableOp(m => {
         //   // remove  transitive row
         //   m.delete(currentRow)
@@ -76,7 +104,7 @@ export const updateRow = ({
           m.set(editedRow, originalRow)
           return m
         })(dirtyMap),
-        updatedMap: immutableSet(originalRow, editedRow),
+        updatedMap: immutableSet(originalRow, editedRow)(updatedMap),
         updated: [...R.filter(row => row !== currentRow, updated), editedRow],
         history: [editInfo, ...history],
         ...rest,
@@ -84,10 +112,11 @@ export const updateRow = ({
     } else {
       return {
         added,
-        dirtyMap: immutableSet(editedRow, currentRow),
-        updatedMap: immutableSet(currentRow, editedRow),
+        dirtyMap: immutableSet(editedRow, currentRow)(dirtyMap),
+        updatedMap: immutableSet(currentRow, editedRow)(updatedMap),
         updated: [...updated, editedRow],
         history: [editInfo, ...history],
+        ...rest,
       }
     }
   }

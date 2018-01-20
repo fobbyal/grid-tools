@@ -3,4 +3,5 @@
 /dist
 stats.json
 docker-app/node_modules
+/coverage
 
