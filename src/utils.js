@@ -94,11 +94,16 @@ export const toSelectionColProps = keyValues => {
   }
 }
 
+const isIntermediateNumber = value =>
+  value.endsWith('.') &&
+  value.lastIndexOf('.') === value.indexOf('.') &&
+  !R.isNil(numeral(value.replace('.', '')))
+
 export const rawToValue = ({
   value,
   header: { type, numFormat, dataFormat },
 }) => {
-  console.log('value is ', value)
+  console.log('raw value is ', value)
   // TODO: timezone issue
   if (moment.isMoment(value)) {
     return value.format(dataFormat)
@@ -107,7 +112,13 @@ export const rawToValue = ({
     return moment(value).format(dataFormat)
   }
   if (type === 'num' && typeof value === 'string') {
-    return numeral(value).value()
+    if (value.trim().length === 0) return ''
+    if (isIntermediateNumber(value)) return value
+
+    const parsedValue = numeral(value).value()
+    console.log('parsed value is ', parsedValue)
+    if (isNaN(parsedValue) || R.isNil(parsedValue)) return undefined
+    return parsedValue
   }
   if (type === 'bool' && typeof value === 'string') {
     return [value.toLowerCase()].map(

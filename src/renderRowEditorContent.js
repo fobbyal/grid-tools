@@ -44,6 +44,8 @@ export const defaultInputRowEditRender = ({
   rowData,
   header,
   valueChanged,
+  onOk,
+  onCancel,
 }) => (
   <Input
     width={width}
@@ -53,6 +55,10 @@ export const defaultInputRowEditRender = ({
         value: e.target.value,
       })
     }
+    onKeyDown={e => {
+      if (e.keyCode == 13) onOk()
+      if (e.keyCode == 17) onCancel()
+    }}
     innerRef={ref}
     value={extractData({ header, rowData })}
   />
@@ -105,6 +111,8 @@ const rendeRowEditorContent = ({
                 rowData,
                 header,
                 index,
+                onOk,
+                onCancel,
               })}
             </RowContainer>
           )

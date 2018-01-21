@@ -1,6 +1,7 @@
 import React from 'react'
 import Overlay from './Overlay'
-import { rawToValue } from './utils'
+import { rawToValue, extractData } from './utils'
+import R from 'ramda'
 
 class RowEditor extends React.Component {
   state = {
@@ -8,20 +9,61 @@ class RowEditor extends React.Component {
   }
 
   valueChanged = ({ header, value }) => {
-    console.log('updating row widther with', header, value)
+    console.log('editing row with raw info', header, value)
     const parsedValue = rawToValue({ value, header })
-    this.setState(({ editedRow }) => ({
-      editedRow: header.dataSetter
-        ? header.dataSetter({ rowData: editedRow, header, value: parsedValue })
-        : { ...editedRow, [header.ident]: value },
-    }))
+    console.log('row editor parsed ', parsedValue)
+    if (parsedValue !== undefined) {
+      this.setState(({ editedRow }) => ({
+        editedRow: header.dataSetter
+          ? header.dataSetter({
+              rowData: editedRow,
+              header,
+              value: parsedValue,
+            })
+          : { ...editedRow, [header.ident]: parsedValue },
+      }))
+    }
   }
 
   onOk = e => {
-    this.props.commitEdit({
-      currentRow: this.props.rowData,
-      editedRow: this.state.editedRow,
-    })
+    const { rowData, headers } = this.props
+    const { editedRow } = this.state
+
+    if (rowData !== editedRow) {
+      const removeDotsOnEditedNums = R.compose(
+        R.reduce((a, b) => ({ ...a, ...b }), editedRow),
+        R.map(([header, value]) => {
+          const val = rawToValue({
+            header,
+            value: value.substr(0, value.length - 1),
+          })
+          return header.dataSetter
+            ? header.dataSetter({ rowData: editedRow, header, value: val })
+            : { [header.ident]: val }
+        }),
+        R.filter(
+          ([_, value]) => typeof value === 'string' && value.endsWith('.')
+        ),
+        R.map(header => [header, extractData({ rowData: editedRow, header })]),
+        R.filter(
+          header =>
+            extractData({ rowData, header }) !==
+            extractData({ rowData: editedRow, header })
+        ),
+        R.filter(h => h.type === 'num')
+      )
+      const data = removeDotsOnEditedNums(headers)
+      console.log('normalized data is ', data)
+      this.props.commitEdit({
+        currentRow: this.props.rowData,
+        editedRow: data,
+      })
+    } else {
+      this.props.commitEdit({
+        currentRow: this.props.rowData,
+        editedRow: this.state.editedRow,
+      })
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
