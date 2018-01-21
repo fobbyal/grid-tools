@@ -1,12 +1,12 @@
 import R from 'ramda'
 import { fromNullable, Just, Nothing } from 'data.maybe'
+import moment from 'moment'
+import numeral from 'numeral'
 import {
   ROW_INDEX_ATTRIBUTE,
   COLUMN_INDEX_ATTRIBUTE,
   COL_IDENT_ATTRIBUTE,
 } from './constants.js'
-import moment from 'moment'
-import numeral from 'numeral'
 
 export const fromEmpty = d =>
   fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
@@ -92,4 +92,27 @@ export const toSelectionColProps = keyValues => {
         R.isNil(keyValues[value]) ? value : keyValues[value],
     }
   }
+}
+
+export const rawToValue = ({
+  value,
+  header: { type, numFormat, dataFormat },
+}) => {
+  console.log('value is ', value)
+  // TODO: timezone issue
+  if (moment.isMoment(value)) {
+    return value.format(dataFormat)
+  }
+  if (moment.isDate(value)) {
+    return moment(value).format(dataFormat)
+  }
+  if (type === 'num' && typeof value === 'string') {
+    return numeral(value).value()
+  }
+  if (type === 'bool' && typeof value === 'string') {
+    return [value.toLowerCase()].map(
+      v => v === 'y' || v === 'yes' || v === 'true'
+    )[0]
+  }
+  return value
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { rawToValue } from './tools'
 import R from 'ramda'
+import { extractData } from './utils'
 
 const Buttons = styled.div`
   margin-top: 1em;
@@ -49,12 +49,12 @@ export const defaultInputRowEditRender = ({
     width={width}
     onChange={e =>
       valueChanged({
-        ident: header.ident,
-        value: rawToValue({ value: e.target.value, header }),
+        header,
+        value: e.target.value,
       })
     }
     innerRef={ref}
-    value={rowData[header.ident]}
+    value={extractData({ header, rowData })}
   />
 )
 const getMaxWidth = R.compose(R.reduce(R.max, 100), R.map(h => h.width))

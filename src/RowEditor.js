@@ -1,15 +1,19 @@
 import React from 'react'
 import Overlay from './Overlay'
+import { rawToValue } from './utils'
 
 class RowEditor extends React.Component {
   state = {
     editedRow: this.props.rowData || {},
   }
 
-  valueChanged = ({ ident, value }) => {
-    console.log('updating row widther with', ident, value)
+  valueChanged = ({ header, value }) => {
+    console.log('updating row widther with', header, value)
+    const parsedValue = rawToValue({ value, header })
     this.setState(({ editedRow }) => ({
-      editedRow: { ...editedRow, [ident]: value },
+      editedRow: header.dataSetter
+        ? header.dataSetter({ rowData: editedRow, header, value: parsedValue })
+        : { ...editedRow, [header.ident]: value },
     }))
   }
 
