@@ -302,9 +302,6 @@ class Grid extends React.PureComponent {
       fuzzyFilter !== nextProps.fuzzyFilter ||
       currentPage !== nextProps.currentPage
     ) {
-      //set state for possible view change
-      //conso
-      console.log('on data update ..')
       this.setState(
         ({ editingRow, editingColumn, x1, x2, y1, y2 }) => ({
           // x1: data !== nextProps.data ? undefined : x1,

@@ -1,5 +1,6 @@
 import moment from 'moment'
 import R from 'ramda'
+import { extractData } from './utils'
 const defaultProps = {
   editable: true,
   isKey: false,
@@ -63,12 +64,14 @@ export const yesNoCol = ({ ident, display, ...rest } = {}) => ({
 })
 
 const dateProps = ({ ident, dataFormat, displayFormat }) => ({
-  sortIndexGetter: ({ rowData }) =>
-    R.isNil(rowData[ident])
+  sortIndexGetter: ({ rowData, header }) => {
+    const data = extractData({ rowData, header, dataFormat })
+    return R.isNil(data)
       ? undefined
-      : moment.isDate(rowData[ident]) || moment.isMoment(rowData[ident])
-        ? rowData[ident].valueOf()
-        : moment(rowData[ident], dataFormat).valueOf(),
+      : moment.isDate(data) || moment.isMoment(data)
+        ? data.valueOf()
+        : moment(data, dataFormat).valueOf()
+  },
   dataFormat,
   displayFormat,
 })

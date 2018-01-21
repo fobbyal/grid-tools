@@ -134,7 +134,7 @@ export const defaultCellRenderer = ({
   ...rest
 }) => {
   const value = extractData({ header, rowData: data[rowIndex] })
-  const display = formatData({ header, value })
+  const display = formatData({ header, value, rowData: data[rowIndex] })
   return (
     <Cell {...rest} width={width} height={height} title={value}>
       {display}
@@ -174,7 +174,7 @@ export const defaultColHeaderRenderer = ({
   </ColHeader>
 )
 
-//<SortIndicator className="fa fa-caret-up" aria-hidden="true" />
+// <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
 // <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
 
 class FlexGridColHeader extends React.PureComponent {

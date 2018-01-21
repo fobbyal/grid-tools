@@ -53,14 +53,14 @@ export const extractData = ({ header, rowData, dataFormat }) => {
         ? undefined
         : moment.isDate(rowData)
           ? moment(rawData).format(dataFormat)
-          : moment.isMoment(rowData) ? rowData.formatData(dataFormat) : rawData
+          : moment.isMoment(rawData) ? rawData.formatData(dataFormat) : rawData
       : rawData
 }
 
-export const formatData = ({ header, value }) => {
+export const formatData = ({ header, value, rowData }) => {
   const { type, dataFormat, displayFormat, dataFormatter } = header
   return dataFormatter
-    ? dataFormatter({ header, value })
+    ? dataFormatter({ header, value, rowData })
     : R.isNil(value)
       ? ''
       : type === 'num' && displayFormat
@@ -71,7 +71,7 @@ export const formatData = ({ header, value }) => {
 }
 
 export const extractAndFormatData = ({ header, rowData }) =>
-  formatData({ header, value: extractData({ header, rowData }) })
+  formatData({ header, value: extractData({ header, rowData }), rowData })
 
 export const toSelectionColProps = keyValues => {
   if (keyValues instanceof Map) {

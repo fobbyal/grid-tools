@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { action } from '@storybook/addon-actions'
+// import { action } from '@storybook/addon-actions'
 // import { linkTo } from '@storybook/addon-links'
 import R from 'ramda'
 import { strCol, numCol, intCol, dollarCol, pctCol, dateCol } from '../cols'
@@ -28,13 +28,30 @@ const unitMap = {
   u4: 'Unit3',
 }
 
-const unitDataGetter = ({ header, rowData }) =>
-  unitMap[rowData[header.ident]] || rowData[header.ident]
+/**
+ * The following are example of what choices and dataFormatter should be
+ * They are not normally created this way
+ * the toSelectionColProps function in utils.js
+ * should be used to create these 2 objects.
+ * They are coded this way here to demostrate what their strcutrues should be
+ */
+// TODO add documentation
+/** choices */
+const unitChoices = [
+  { value: 'u1', text: 'Unit 4' },
+  { value: 'u2', text: 'Unit 1' },
+  { value: 'u3', text: 'Unit 2' },
+  { value: 'u4', text: 'Unit 3' },
+]
+
+// TODO add documentation
+/** data-formatter */
+const unitDataFormatter = ({ value, header }) => unitMap[value] || value
 
 /* prettier-ignore */
 const headers = [
   dateCol({ ident: 'transDate', display: 'Trans-Date', width:120, isKey:true, }),
-  strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataGetter:unitDataGetter }),
+  strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataFormatter:unitDataFormatter,choices:unitChoices }),
   intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
   numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', }),
