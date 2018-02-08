@@ -707,14 +707,18 @@ class Grid extends React.PureComponent {
     decrementPage: this.decrementPage,
   })
 
-  getRowEditorProps = _ => ({
-    onClose: this.cancelEdit,
-    commitEdit: this.commitRowEdit,
-    // TODO: add feature to pop up editor based on some row for add featrues
-    rowData: this.state.view[this.state.editingRow],
-    headers: this.props.headers,
-    isEditing: this.isEditing(),
-  })
+  getRowEditorProps = _ => {
+    const { y1 } = normalizeBounds(this.state)
+    return {
+      onClose: this.cancelEdit,
+      commitEdit: this.commitRowEdit,
+      // TODO: add feature to pop up editor based on some row for add featrues
+      showAdd: this.props.showAdd,
+      rowData: this.props.showAdd ? this.state.view[y1] : this.state.view[this.state.editingRow],
+      headers: this.props.headers,
+      isEditing: this.isEditing(),
+    }
+  }
 
   render() {
     console.log('grid renderer')

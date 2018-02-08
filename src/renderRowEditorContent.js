@@ -46,6 +46,8 @@ export const defaultInputRowEditRender = ({
   valueChanged,
   onOk,
   onCancel,
+  showAdd,
+  isKey
 }) => (
   <Input
     width={width}
@@ -60,7 +62,7 @@ export const defaultInputRowEditRender = ({
       if (e.keyCode == 17) onCancel()
     }}
     innerRef={ref}
-    value={extractData({ header, rowData })}
+    value={showAdd && isKey ? '' : extractData({ header, rowData })}
   />
 )
 const getMaxWidth = R.compose(R.reduce(R.max, 100), R.map(h => h.width))
@@ -88,6 +90,7 @@ const rendeRowEditorContent = ({
   onOk,
   onCancel,
   initialFocusRef,
+  showAdd,
 }) => {
   const width = getMaxWidth(headers) + 'px'
   const containerWidth =
@@ -95,12 +98,11 @@ const rendeRowEditorContent = ({
     (stripPx(dataWidth) || getMaxWidth(headers)) +
     80 +
     'px'
-
   return (
     <Container width={containerWidth}>
       {headers.map((header, index) => {
         if (header.showInRowEditor) {
-          const { ident, display } = header
+          const { ident, display, isKey } = header
           return (
             <RowContainer key={ident || '-editor'}>
               <Header width={headerWidth || width}>{display || ident}</Header>
@@ -113,6 +115,8 @@ const rendeRowEditorContent = ({
                 index,
                 onOk,
                 onCancel,
+                showAdd,
+                isKey,
               })}
             </RowContainer>
           )
