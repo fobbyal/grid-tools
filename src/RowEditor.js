@@ -3,9 +3,21 @@ import Overlay from './Overlay'
 import { rawToValue, extractData } from './utils'
 import R from 'ramda'
 
+const createEditRow = ({ showAdd, headers, rowData }) => {
+  console.log('props', showAdd);
+  if(!rowData) return {};
+  if(!showAdd) return rowData;
+  const newData = {...rowData};
+  headers
+  .filter(h => h.isKey) 
+  .forEach(h => newData[h.ident]=null)
+  return newData;
+}
+
 class RowEditor extends React.Component {
+  
   state = {
-    editedRow: this.props.rowData || {},
+    editedRow: createEditRow(this.props) || {},
   }
 
   valueChanged = ({ header, value }) => {
@@ -79,7 +91,7 @@ class RowEditor extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.rowData !== nextProps.rowData) {
-      this.setState({ editedRow: nextProps.rowData || {} })
+      this.setState({ editedRow: createEditRow(nextProps) || {} })
     }
   }
 
