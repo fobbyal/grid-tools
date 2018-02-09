@@ -95,12 +95,11 @@ const rendeRowEditorContent = ({
     (stripPx(dataWidth) || getMaxWidth(headers)) +
     80 +
     'px'
-
   return (
     <Container width={containerWidth}>
       {headers.map((header, index) => {
         if (header.showInRowEditor) {
-          const { ident, display } = header
+          const { ident, display, isKey } = header
           return (
             <RowContainer key={ident || '-editor'}>
               <Header width={headerWidth || width}>{display || ident}</Header>
