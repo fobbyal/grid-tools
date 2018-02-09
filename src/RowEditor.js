@@ -4,20 +4,16 @@ import { rawToValue, extractData } from './utils'
 import R from 'ramda'
 
 const createEditRow = ({ showAdd, headers, rowData }) => {
-  console.log('props', showAdd);
-  if(!rowData) return {};
-  if(!showAdd) return rowData;
-  const newData = {...rowData};
-  headers
-  .filter(h => h.isKey) 
-  .forEach(h => newData[h.ident]=null)
-  return newData;
+  if (!rowData) return {}
+  if (!showAdd) return rowData
+  const newData = { ...rowData }
+  headers.filter(h => h.isKey).forEach(h => (newData[h.ident] = null))
+  return newData
 }
 
 class RowEditor extends React.Component {
-  
   state = {
-    editedRow: createEditRow(this.props) || {},
+    editedRow: createEditRow(this.props),
   }
 
   valueChanged = ({ header, value }) => {
@@ -53,14 +49,10 @@ class RowEditor extends React.Component {
             ? header.dataSetter({ rowData: editedRow, header, value: val })
             : { [header.ident]: val }
         }),
-        R.filter(
-          ([_, value]) => typeof value === 'string' && value.endsWith('.')
-        ),
+        R.filter(([_, value]) => typeof value === 'string' && value.endsWith('.')),
         R.map(header => [header, extractData({ rowData: editedRow, header })]),
         R.filter(
-          header =>
-            extractData({ rowData, header }) !==
-            extractData({ rowData: editedRow, header })
+          header => extractData({ rowData, header }) !== extractData({ rowData: editedRow, header })
         ),
         R.filter(h => h.type === 'num')
       )

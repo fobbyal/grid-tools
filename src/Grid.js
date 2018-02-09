@@ -37,9 +37,7 @@ const normalizeBounds = selection => {
 }
 const isCellSelected = (rowIndex, columnIndex, selection) => {
   const { x1, x2, y1, y2 } = normalizeBounds(selection)
-  return (
-    rowIndex <= y2 && rowIndex >= y1 && columnIndex <= x2 && columnIndex >= x1
-  )
+  return rowIndex <= y2 && rowIndex >= y1 && columnIndex <= x2 && columnIndex >= x1
 }
 
 const isRowSelected = (rowIndex, selection) => {
@@ -48,8 +46,7 @@ const isRowSelected = (rowIndex, selection) => {
   return selectionType === 'cell' && rowIndex <= y2 && rowIndex >= y1
 }
 
-const toggleSortOrder = order =>
-  order === 'asc' ? 'desc' : order === 'desc' ? undefined : 'asc'
+const toggleSortOrder = order => (order === 'asc' ? 'desc' : order === 'desc' ? undefined : 'asc')
 
 const normalizeValue = (val, type) =>
   type === 'num' && typeof val === 'string'
@@ -80,17 +77,13 @@ const compare = ({ aVal, bVal, sortOrder }) => {
 
     if (typeof aVal === 'number' && typeof bVal === 'number' && aVal > bVal)
       return greaterThanResult
-    if (typeof aVal === 'number' && typeof bVal === 'number' && bVal > aVal)
-      return lessThanResult
+    if (typeof aVal === 'number' && typeof bVal === 'number' && bVal > aVal) return lessThanResult
   }
   return 0
 }
 
 const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
-  const headerMap = R.compose(
-    R.fromPairs,
-    R.map(header => [header.ident, header])
-  )(headers)
+  const headerMap = R.compose(R.fromPairs, R.map(header => [header.ident, header]))(headers)
 
   for (let i = 0; i < sortOptions.length; i++) {
     const { ident, sortOrder } = sortOptions[i]
@@ -119,10 +112,7 @@ const computeSortOptions = (sortOptions, { ident }) => {
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
       .map(
-        opt =>
-          opt.ident === ident
-            ? { ident, sortOrder: toggleSortOrder(opt.sortOrder) }
-            : opt
+        opt => (opt.ident === ident ? { ident, sortOrder: toggleSortOrder(opt.sortOrder) } : opt)
       )
       .filter(opt => opt.sortOrder !== undefined)
   } else {
@@ -136,14 +126,8 @@ const matchData = (rowData, fuzzyFilter) => header =>
     .includes(fuzzyFilter.toLowerCase())
 
 const filterData = (data, headers, fuzzyFilter) => {
-  const filteredHeaders = R.filter(
-    ({ isKey, isFiltered }) => isKey || isFiltered,
-    headers
-  )
-  return R.filter(
-    rowData => R.any(matchData(rowData, fuzzyFilter), filteredHeaders),
-    data
-  )
+  const filteredHeaders = R.filter(({ isKey, isFiltered }) => isKey || isFiltered, headers)
+  return R.filter(rowData => R.any(matchData(rowData, fuzzyFilter), filteredHeaders), data)
 }
 
 const computeView = ({
@@ -177,10 +161,7 @@ const computeView = ({
 
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData
-    : R.compose(
-        R.take(rowsPerPage),
-        R.drop((normalizedCurrentPage - 1) * rowsPerPage)
-      )(sortredData)
+    : R.compose(R.take(rowsPerPage), R.drop((normalizedCurrentPage - 1) * rowsPerPage))(sortredData)
 
   return {
     view: pagedData,
@@ -208,8 +189,7 @@ class Grid extends React.PureComponent {
     selectionType: PropTypes.oneOf(['row', 'cell']).isRequired,
     hoverType: PropTypes.oneOf(['row', 'cell']).isRequired,
     sortEnabled: PropTypes.bool.isRequired,
-    isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func])
-      .isRequired,
+    isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]).isRequired,
     /* optional stuff */
     sortOptions: PropTypes.array,
     onSortOptionsChanged: PropTypes.func,
@@ -287,10 +267,7 @@ class Grid extends React.PureComponent {
     window.document.body.addEventListener('mouseleave', this.bodyMouseRelease)
   }
   componentWillUnmount() {
-    window.document.body.removeEventListener(
-      'mouseleave',
-      this.bodyMouseRelease
-    )
+    window.document.body.removeEventListener('mouseleave', this.bodyMouseRelease)
     window.document.body.removeEventListener('mouseup', this.bodyMouseRelease)
   }
 
@@ -310,18 +287,10 @@ class Grid extends React.PureComponent {
           // y2: data !== nextProps.data ? undefined : y2,
           ...this.generateViewProps({
             data: data !== nextProps.data ? nextProps.data : data,
-            sortOptions:
-              sortOptions !== nextProps.sortOptions
-                ? nextProps.sortOptions
-                : undefined,
+            sortOptions: sortOptions !== nextProps.sortOptions ? nextProps.sortOptions : undefined,
             fuzzyFilter:
-              fuzzyFilter !== nextProps.fuzzyFilter
-                ? nextProps.fuzzyFilter
-                : fuzzyFilter,
-            currentPage:
-              currentPage !== nextProps.currentPage
-                ? nextProps.currentPage
-                : undefined,
+              fuzzyFilter !== nextProps.fuzzyFilter ? nextProps.fuzzyFilter : fuzzyFilter,
+            currentPage: currentPage !== nextProps.currentPage ? nextProps.currentPage : undefined,
           }),
           editingRow: data !== nextProps.data ? undefined : editingRow,
           editingColumn: data !== nextProps.data ? undefined : editingColumn,
@@ -334,8 +303,7 @@ class Grid extends React.PureComponent {
   /* paging starts */
 
   hasPaging = () =>
-    this.props.rowsPerPage !== undefined &&
-    this.props.data.length > this.props.rowsPerPage
+    this.props.rowsPerPage !== undefined && this.props.data.length > this.props.rowsPerPage
 
   isPagingControlled = () =>
     this.props.totalPages !== undefined &&
@@ -343,9 +311,7 @@ class Grid extends React.PureComponent {
     this.props.onPageChange !== undefined
 
   currentPage = () =>
-    this.hasPaging()
-      ? this.props.currentPage || this.state.currentPage
-      : undefined
+    this.hasPaging() ? this.props.currentPage || this.state.currentPage : undefined
 
   totalPages = () => {
     return !this.hasPaging()
@@ -359,10 +325,7 @@ class Grid extends React.PureComponent {
     if (isNaN(parseInt(page))) return
 
     if (this.hasPaging()) {
-      const guardedPage = Math.max(
-        Math.min(this.totalPages(), parseInt(page)),
-        1
-      )
+      const guardedPage = Math.max(Math.min(this.totalPages(), parseInt(page)), 1)
       if (guardedPage !== this.currentPage()) {
         if (this.isPagingControlled()) {
           this.props.onPageChange(guardedPage)
@@ -379,14 +342,10 @@ class Grid extends React.PureComponent {
   incrementPage = () => {
     if (this.hasPaging()) {
       if (this.isPagingControlled()) {
-        this.props.onPageChange(
-          Math.max(Math.min(this.totalPages(), this.currentPage() + 1), 1)
-        )
+        this.props.onPageChange(Math.max(Math.min(this.totalPages(), this.currentPage() + 1), 1))
       } else {
         this.setState(({ currentPage, view }) => {
-          const totalPages = Math.ceil(
-            this.props.data.length / this.props.rowsPerPage
-          )
+          const totalPages = Math.ceil(this.props.data.length / this.props.rowsPerPage)
           const newPage = Math.max(Math.min(totalPages, currentPage + 1), 1)
           if (newPage !== currentPage) {
             return {
@@ -404,14 +363,10 @@ class Grid extends React.PureComponent {
   decrementPage = () => {
     if (this.hasPaging()) {
       if (this.isPagingControlled()) {
-        this.props.onPageChange(
-          Math.max(Math.min(this.totalPages(), this.currentPage() - 1), 1)
-        )
+        this.props.onPageChange(Math.max(Math.min(this.totalPages(), this.currentPage() - 1), 1))
       } else {
         this.setState(({ currentPage, view }) => {
-          const totalPages = Math.ceil(
-            this.props.data.length / this.props.rowsPerPage
-          )
+          const totalPages = Math.ceil(this.props.data.length / this.props.rowsPerPage)
           const newPage = Math.max(Math.min(totalPages, currentPage - 1), 1)
           if (newPage !== currentPage) {
             return {
@@ -430,14 +385,11 @@ class Grid extends React.PureComponent {
   /* sorting starts */
 
   isSortControlled = () =>
-    this.props.sortOptions !== undefined &&
-    this.props.onSortOptionsChanged !== undefined
+    this.props.sortOptions !== undefined && this.props.onSortOptionsChanged !== undefined
 
   toggleSort = header => {
     if (this.isSortControlled()) {
-      this.props.onSortOptionsChanged(
-        computeSortOptions(this.sortOptions(), header)
-      )
+      this.props.onSortOptionsChanged(computeSortOptions(this.sortOptions(), header))
     } else {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(sortOptions, header)
@@ -450,9 +402,7 @@ class Grid extends React.PureComponent {
   }
 
   sortOptions() {
-    return this.isSortControlled()
-      ? this.props.sortOptions
-      : this.state.sortOptions
+    return this.isSortControlled() ? this.props.sortOptions : this.state.sortOptions
   }
 
   /* sorting ends */
@@ -583,12 +533,8 @@ class Grid extends React.PureComponent {
   cellMouseDown = e => {
     const pos = extractPosition(e)
     const { rowIndex, columnIndex } = pos
-    if (e.button === 2 && isCellSelected(rowIndex, columnIndex, this.state))
-      return
-    this.setState(
-      _ => this.startSelectionState(rowIndex, columnIndex),
-      this.selectionChanged
-    )
+    if (e.button === 2 && isCellSelected(rowIndex, columnIndex, this.state)) return
+    this.setState(_ => this.startSelectionState(rowIndex, columnIndex), this.selectionChanged)
   }
 
   cellMouseUp = e => {
@@ -646,16 +592,7 @@ class Grid extends React.PureComponent {
     yOffSet,
   })
 
-  getCellProps = ({
-    key,
-    rowIndex,
-    columnIndex,
-    header,
-    data,
-    rowData,
-    rowHeight,
-    ...rest
-  }) => {
+  getCellProps = ({ key, rowIndex, columnIndex, header, data, rowData, rowHeight, ...rest }) => {
     const { selectionType, hoverType } = this.props
     return {
       [ROW_INDEX_ATTRIBUTE]: rowIndex,
@@ -673,8 +610,7 @@ class Grid extends React.PureComponent {
           : isRowSelected(rowIndex, this.state),
       isHovered:
         hoverType === 'cell'
-          ? this.state.hoveredRow === rowIndex &&
-            this.state.hoveredColumn === columnIndex
+          ? this.state.hoveredRow === rowIndex && this.state.hoveredColumn === columnIndex
           : this.state.hoveredRow === rowIndex,
       data,
       rowIndex,
@@ -693,9 +629,7 @@ class Grid extends React.PureComponent {
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
     onClick: this.props.sortEnabled ? this.columnHeaderClick : undefined,
-    sortOrder: this.props.sortEnabled
-      ? sortOrderOf(header)(this.state.sortOptions)
-      : undefined,
+    sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.state.sortOptions) : undefined,
   })
 
   getPagerProps = props => ({
