@@ -42,8 +42,7 @@ const isCellSelected = (rowIndex, columnIndex, selection) => {
 
 const isRowSelected = (rowIndex, selection) => {
   const { y1, y2 } = normalizeBounds(selection)
-  const { selectionType } = this.props
-  return selectionType === 'cell' && rowIndex <= y2 && rowIndex >= y1
+  return rowIndex <= y2 && rowIndex >= y1
 }
 
 const toggleSortOrder = order => (order === 'asc' ? 'desc' : order === 'desc' ? undefined : 'asc')
@@ -186,13 +185,14 @@ class Grid extends React.PureComponent {
     render: PropTypes.func.isRequired,
     data: PropTypes.array.isRequired,
     headers: PropTypes.array.isRequired,
+    selectionMode: PropTypes.oneOf(['single', 'multi']).isRequired,
     selectionType: PropTypes.oneOf(['row', 'cell']).isRequired,
     hoverType: PropTypes.oneOf(['row', 'cell']).isRequired,
     sortEnabled: PropTypes.bool.isRequired,
     isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]).isRequired,
     /* optional stuff */
     sortOptions: PropTypes.array,
-    onSortOptionsChanged: PropTypes.func,
+    onSortOptionsChange: PropTypes.func,
     fuzzyFilter: PropTypes.string,
     totalPages: PropTypes.number,
     currentPage: PropTypes.number,
@@ -200,11 +200,12 @@ class Grid extends React.PureComponent {
     rowsPerPage: PropTypes.number,
     onEdit: PropTypes.func,
     showAdd: PropTypes.bool,
-    onSelectionChanged: PropTypes.func,
+    onSelectionChange: PropTypes.func,
   }
 
   static defaultProps = {
     selectionType: 'cell',
+    selectionMode: 'multi',
     hoverType: 'row',
     sortEnabled: true,
     isEditable: false,
@@ -385,11 +386,11 @@ class Grid extends React.PureComponent {
   /* sorting starts */
 
   isSortControlled = () =>
-    this.props.sortOptions !== undefined && this.props.onSortOptionsChanged !== undefined
+    this.props.sortOptions !== undefined && this.props.onSortOptionsChange !== undefined
 
   toggleSort = header => {
     if (this.isSortControlled()) {
-      this.props.onSortOptionsChanged(computeSortOptions(this.sortOptions(), header))
+      this.props.onSortOptionsChange(computeSortOptions(this.sortOptions(), header))
     } else {
       this.setState(({ sortOptions = [] }) => {
         const newOptions = computeSortOptions(sortOptions, header)
@@ -425,20 +426,20 @@ class Grid extends React.PureComponent {
 
   /*  selection starts */
   startSelectionState(rowIndex, columnIndex) {
-    this.selecting = true
+    this.selecting = this.props.selectionMode === 'multi' && true
     return { x1: columnIndex, y1: rowIndex, x2: columnIndex, y2: rowIndex }
   }
 
   expandSelectionState(rowIndex, columnIndex, ended) {
-    if (this.selecting) {
+    if (this.selecting && this.props.selectionMode === 'multi') {
       this.selecting = ended ? false : this.selecting
       return { y2: rowIndex, x2: columnIndex }
     }
   }
 
   selectionChanged = _ => {
-    const { headers, onSelectionChanged } = this.props
-    if (onSelectionChanged) {
+    const { headers, onSelectionChange } = this.props
+    if (onSelectionChange) {
       const { x1, x2, y1, y2 } = normalizeBounds(this.state)
       const selectedRows = []
       const selectedHeaders = []
@@ -450,7 +451,7 @@ class Grid extends React.PureComponent {
       for (let c = x1; c <= x2; c++) {
         selectedHeaders.push(headers[c])
       }
-      onSelectionChanged({ selectedRows, selectedHeaders })
+      onSelectionChange({ selectedRows, selectedHeaders })
     }
   }
 

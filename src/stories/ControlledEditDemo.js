@@ -25,12 +25,10 @@ class ControlledEditDemo extends React.Component {
 
   removeRow = _ =>
     this.setState(({ data }) => ({
-      data: data.filter(
-        row => R.isNil(this.selectedRows) || !this.selectedRows.includes(row)
-      ),
+      data: data.filter(row => R.isNil(this.selectedRows) || !this.selectedRows.includes(row)),
     }))
 
-  selectionChanged = ({ selectedRows, selectedHeaders }) => {
+  selectionChange = ({ selectedRows, selectedHeaders }) => {
     this.selectedRows = selectedRows
   }
 
@@ -53,7 +51,7 @@ class ControlledEditDemo extends React.Component {
             }),
           })}
           onEdit={this.onEdit}
-          onSelectionChanged={this.selectionChanged}
+          onSelectionChange={this.selectionChange}
           isEditable
           showAdd={showAdd}
           onEditCancel={this.onEditCancel}
