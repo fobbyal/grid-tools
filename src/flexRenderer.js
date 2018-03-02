@@ -8,9 +8,7 @@ import RowEditor from './RowEditor'
 import rowEditorContentRenderer from './renderRowEditorContent'
 
 const mapAlignmentToJustifyContent = alignment =>
-  alignment === 'left'
-    ? 'flex-start'
-    : alignment === 'right' ? 'flex-end' : alignment
+  alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : alignment
 
 export const ColHeader = styled.div`
   flex: 0 0 ${props => props.width}px;
@@ -31,14 +29,18 @@ export const ColHeader = styled.div`
     border-top-left-radius: 3px;
   }
 `
+export const CellContent = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+`
 /* prettier-ignore */
 export const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  border-left: 1px solid #ccc;
   display: flex;
+  border-left: 1px solid #ccc;
   align-items: center;
   user-select: none;
   cursor: default;
@@ -96,8 +98,7 @@ const TableContentContainer = styled(Grid.SyncedScrollPane)`
   top: ${props => props.yOffSet || 0}px;
   /*header.length is for the border box and 17 is for the scroll height = width */
   width: ${props => props.width + (props.showScroll ? 17 : 0)}px;
-  height: ${props =>
-    props.height - props.yOffSet + (props.showScroll ? 17 : 0)}px;
+  height: ${props => props.height - props.yOffSet + (props.showScroll ? 17 : 0)}px;
   overflow: ${props => (props.showScroll ? 'scroll' : 'hidden')};
 `
 
@@ -137,7 +138,7 @@ export const defaultCellRenderer = ({
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return (
     <Cell {...rest} width={width} height={height} title={value}>
-      {display}
+      <CellContent> {display} </CellContent>
     </Cell>
   )
 }
@@ -157,13 +158,7 @@ const SortIndicator = styled.i`
   margin-left: 0.2em;
 `
 
-export const defaultColHeaderRenderer = ({
-  header,
-  sortOrder,
-  width,
-  render,
-  ...rest
-}) => (
+export const defaultColHeaderRenderer = ({ header, sortOrder, width, render, ...rest }) => (
   <ColHeader width={width} {...rest} sortable={header.sortable}>
     {header.display}
     {sortOrder === 'asc' ? (
@@ -238,9 +233,7 @@ const flexGridRenderer = ({
 }) => {
   const pagerHeight = 35
   const normalizedWidth = R.min(width, sumWidth(headers))
-  const numOfFixedCols = autoFixColByKey
-    ? countKeyCols(headers)
-    : fixedColCount || 0
+  const numOfFixedCols = autoFixColByKey ? countKeyCols(headers) : fixedColCount || 0
   const scroll = width && height && headerRowHeight
   const { rowHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
   const rowHeaderWidth = sumWidth(rowHeaders)
@@ -268,12 +261,15 @@ const flexGridRenderer = ({
   const topOffSet = 0
 
   // TODO: fix width issue for all browsers chrome/safari/firefox
+  //
+  /*
   console.log('provided width', width)
   console.log('sumWidth', sumWidth(headers))
   console.log('rowHeaderWidth', rowHeaderWidth)
   console.log('containerWidth', containerWidth)
   console.log('dataScrollWidth', dataScrollWidth)
   console.log('normalizedWidth', normalizedWidth)
+  */
 
   return (
     <FlexGridContainer

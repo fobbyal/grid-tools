@@ -437,6 +437,7 @@ class Grid extends React.PureComponent {
     }
   }
 
+  /** this is for external listeners only*/
   selectionChanged = _ => {
     const { headers, onSelectionChange } = this.props
     if (onSelectionChange) {
@@ -488,7 +489,6 @@ class Grid extends React.PureComponent {
   }
 
   commitRowEdit = ({ currentRow, editedRow }) => {
-    console.log('got here commiting changes', currentRow, editedRow)
     // TODO use immutable js here ? so we can implement undo easily?
     // TODO currentRow == undefined for new rows
     if (currentRow !== editedRow) {
