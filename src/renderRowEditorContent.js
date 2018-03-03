@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import R from 'ramda'
-import { extractData } from './utils'
+import { extractData, extractAndFormatData } from './utils'
 
 const Buttons = styled.div`
   margin-top: 1em;
@@ -39,6 +39,11 @@ const Input = styled.input`
   width: ${props => props.width || '80px'};
 `
 
+const RO = styled.div`
+  flex: 0 0 ${props => props.width || '80px'};
+  width: ${props => props.width || '80px'};
+`
+
 export const defaultInputRowEditRender = ({
   width,
   ref,
@@ -47,23 +52,28 @@ export const defaultInputRowEditRender = ({
   valueChanged,
   onOk,
   onCancel,
-}) => (
-  <Input
-    width={width}
-    onChange={e =>
-      valueChanged({
-        header,
-        value: e.target.value,
-      })
-    }
-    onKeyDown={e => {
-      if (e.keyCode == 13) onOk()
-      if (e.keyCode == 17) onCancel()
-    }}
-    innerRef={ref}
-    value={extractData({ header, rowData })}
-  />
-)
+  isKey,
+  showAdd,
+}) =>
+  !showAdd && isKey ? (
+    <RO width={width}> {extractAndFormatData({ header, rowData })} </RO>
+  ) : (
+    <Input
+      width={width}
+      onChange={e =>
+        valueChanged({
+          header,
+          value: e.target.value,
+        })
+      }
+      onKeyDown={e => {
+        if (e.keyCode == 13) onOk()
+        if (e.keyCode == 17) onCancel()
+      }}
+      innerRef={ref}
+      value={extractData({ header, rowData }) || ''}
+    />
+  )
 const getMaxWidth = R.compose(R.reduce(R.max, 100), R.map(h => h.width))
 const defaultControlsRender = ({ onOk, onCancel }) => (
   <Buttons>
@@ -82,7 +92,7 @@ const rendeRowEditorContent = ({
   dataWidth,
   renderEditor = defaultInputRowEditRender,
   renderControls = defaultControlsRender,
-} = {}) => ({ rowData, headers, valueChanged, onOk, onCancel, initialFocusRef }) => {
+} = {}) => ({ showAdd, rowData, headers, valueChanged, onOk, onCancel, initialFocusRef }) => {
   const width = getMaxWidth(headers) + 'px'
   const containerWidth =
     (stripPx(headerWidth) || getMaxWidth(headers)) +
@@ -109,6 +119,7 @@ const rendeRowEditorContent = ({
                 onOk,
                 onCancel,
                 isKey,
+                showAdd,
               })}
             </RowContainer>
           )
