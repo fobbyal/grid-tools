@@ -31,6 +31,7 @@ const Header = styled.div`
   flex: 0 0 ${props => props.width || '80px'};
   font-size: 0.75em;
   font-weight: bold;
+  display: flex;
   align-items: center;
 `
 const Input = styled.input`
@@ -72,7 +73,7 @@ const defaultControlsRender = ({ onOk, onCancel }) => (
 )
 
 const stripPx = val =>
-  val && val.endsWith('px')
+  val && val.endsWith && val.endsWith('px')
     ? parseFloat(val.substring(0, val.length - 2))
     : parseFloat(val)
 
@@ -81,14 +82,7 @@ const rendeRowEditorContent = ({
   dataWidth,
   renderEditor = defaultInputRowEditRender,
   renderControls = defaultControlsRender,
-} = {}) => ({
-  rowData,
-  headers,
-  valueChanged,
-  onOk,
-  onCancel,
-  initialFocusRef,
-}) => {
+} = {}) => ({ rowData, headers, valueChanged, onOk, onCancel, initialFocusRef }) => {
   const width = getMaxWidth(headers) + 'px'
   const containerWidth =
     (stripPx(headerWidth) || getMaxWidth(headers)) +
@@ -102,7 +96,9 @@ const rendeRowEditorContent = ({
           const { ident, display, isKey } = header
           return (
             <RowContainer key={ident || '-editor'}>
-              <Header width={headerWidth || width}>{display || ident}</Header>
+              <Header isKey={isKey} width={headerWidth || width}>
+                {display || ident}
+              </Header>
               {renderEditor({
                 width: dataWidth || width,
                 valueChanged,
@@ -112,6 +108,7 @@ const rendeRowEditorContent = ({
                 index,
                 onOk,
                 onCancel,
+                isKey,
               })}
             </RowContainer>
           )

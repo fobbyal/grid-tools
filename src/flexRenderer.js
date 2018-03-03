@@ -270,6 +270,7 @@ const flexGridRenderer = ({
   console.log('dataScrollWidth', dataScrollWidth)
   console.log('normalizedWidth', normalizedWidth)
   */
+  console.log('rendring flex grid...')
 
   return (
     <FlexGridContainer

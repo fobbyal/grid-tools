@@ -89,6 +89,7 @@ class RowEditor extends React.Component {
 
   render() {
     const { isEditing, onClose, render } = this.props
+    console.log('firing editing  iii', isEditing)
     return (
       isEditing && (
         <Overlay onClose={onClose}>

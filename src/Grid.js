@@ -656,7 +656,7 @@ class Grid extends React.PureComponent {
   }
 
   render() {
-    console.log('grid renderer')
+    console.log('grid renderer.... ')
     const { view } = this.state
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,

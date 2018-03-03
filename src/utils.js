@@ -2,14 +2,9 @@ import R from 'ramda'
 import { fromNullable, Just, Nothing } from 'data.maybe'
 import moment from 'moment'
 import numeral from 'numeral'
-import {
-  ROW_INDEX_ATTRIBUTE,
-  COLUMN_INDEX_ATTRIBUTE,
-  COL_IDENT_ATTRIBUTE,
-} from './constants.js'
+import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE, COL_IDENT_ATTRIBUTE } from './constants.js'
 
-export const fromEmpty = d =>
-  fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
+export const fromEmpty = d => fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
 
 export const normalizeBounds = selection => {
   if (R.isEmpty(selection)) return selection
@@ -34,8 +29,7 @@ export const extractPosition = evt => ({
     .getOrElse(undefined),
 })
 
-export const extractColIdent = evt =>
-  evt.target.getAttribute(COL_IDENT_ATTRIBUTE)
+export const extractColIdent = evt => evt.target.getAttribute(COL_IDENT_ATTRIBUTE)
 
 export const isPositionValid = pos =>
   !R.isNil(pos) && !R.isNil(pos.rowIndex) && !R.isNil(pos.columnIndex)
@@ -43,7 +37,7 @@ export const isPositionValid = pos =>
 export const eventBroadcaster = listeners => e =>
   listeners.filter(l => !R.isNil(l)).forEach(l => l(e))
 
-export const extractData = ({ header, rowData, dataFormat }) => {
+export const extractData = ({ header, rowData = [], dataFormat }) => {
   const { dataGetter, type, ident } = header
   const rawData = rowData[ident]
   return dataGetter
@@ -74,22 +68,21 @@ export const extractAndFormatData = ({ header, rowData }) =>
   formatData({ header, value: extractData({ header, rowData }), rowData })
 
 export const toSelectionColProps = keyValues => {
+  if (!keyValues) {
+    console.warn('called select Colprops with null or undefined')
+    return {}
+  }
   if (keyValues instanceof Map) {
     const choices = []
     keyValues.forEach((value, key) => choices.push({ text: value, value: key }))
     return {
       choices,
-      dataFormatter: ({ header, value }) =>
-        keyValues.has(value) ? keyValues.get(value) : value,
+      dataFormatter: ({ header, value }) => (keyValues.has(value) ? keyValues.get(value) : value),
     }
   } else {
     return {
-      choices: R.compose(
-        R.map(([value, text]) => ({ value, text })),
-        R.toPairs
-      )(keyValues),
-      dataFormatter: ({ header, value }) =>
-        R.isNil(keyValues[value]) ? value : keyValues[value],
+      choices: R.compose(R.map(([value, text]) => ({ value, text })), R.toPairs)(keyValues),
+      dataFormatter: ({ header, value }) => (R.isNil(keyValues[value]) ? value : keyValues[value]),
     }
   }
 }
@@ -99,10 +92,7 @@ const isIntermediateNumber = value =>
   value.lastIndexOf('.') === value.indexOf('.') &&
   !R.isNil(numeral(value.replace('.', '')))
 
-export const rawToValue = ({
-  value,
-  header: { type, numFormat, dataFormat },
-}) => {
+export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) => {
   console.log('raw value is ', value)
   // TODO: timezone issue
   if (moment.isMoment(value)) {
@@ -121,9 +111,7 @@ export const rawToValue = ({
     return parsedValue
   }
   if (type === 'bool' && typeof value === 'string') {
-    return [value.toLowerCase()].map(
-      v => v === 'y' || v === 'yes' || v === 'true'
-    )[0]
+    return [value.toLowerCase()].map(v => v === 'y' || v === 'yes' || v === 'true')[0]
   }
   return value
 }
