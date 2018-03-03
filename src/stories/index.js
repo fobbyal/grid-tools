@@ -54,7 +54,7 @@ const headers = [
   strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataFormatter:unitDataFormatter,choices:unitChoices }),
   intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
-  numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', }),
+  numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', displayFormat: null }),
   numCol({ ident: 'ecoMinOvr', display: 'Eco Min', }),
   numCol({ ident: 'ecoMaxOvr', display: 'Eco Max', }),
   numCol({ ident: 'emerMaxOvr', display: 'Emer Max', }),
@@ -87,13 +87,7 @@ const redOn3X3Renderer = props => {
   const { rowIndex, columnIndex, width, height, data, header } = props
   if (rowIndex === 3 && columnIndex === 3) {
     return (
-      <FlexCell
-        color="red"
-        fontSize=".8em"
-        fontWeight="bold"
-        width={width}
-        height={height}
-      >
+      <FlexCell color="red" fontSize=".8em" fontWeight="bold" width={width} height={height}>
         ${data[rowIndex][header.ident]}
       </FlexCell>
     )
@@ -134,9 +128,7 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
-  .add('Broswer Scroll/No Scroll', () => (
-    <Grid {...commonProps} render={flexGridRenderer()} />
-  ))
+  .add('Broswer Scroll/No Scroll', () => <Grid {...commonProps} render={flexGridRenderer()} />)
   .add('Simple Scroll', () => (
     <Grid
       {...commonProps}
@@ -182,9 +174,7 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
-  .add('Fuzzy Filter', () => (
-    <FilterDemo {...commonProps} render={flexGridRenderer()} />
-  ))
+  .add('Fuzzy Filter', () => <FilterDemo {...commonProps} render={flexGridRenderer()} />)
   .add('Scrolled Fixed col with paging', () => (
     <Grid
       {...commonProps}
@@ -214,11 +204,6 @@ storiesOf('Flex Grid', module)
     />
   ))
   .add('10k rows non Scroll paging', () => (
-    <Grid
-      headers={headers}
-      data={tenKData}
-      rowsPerPage={15}
-      render={flexGridRenderer()}
-    />
+    <Grid headers={headers} data={tenKData} rowsPerPage={15} render={flexGridRenderer()} />
   ))
   .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)
