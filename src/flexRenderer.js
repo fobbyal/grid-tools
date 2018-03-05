@@ -276,7 +276,6 @@ const flexGridRenderer = ({
   hasPaging,
   isEditing,
 }) => {
-  console.log('rowHeight', rowHeight)
   const pagerHeight = 35
   const rawDataWidth = sumWidth(headers)
   const rawDataHeight = sumHeight({ data, rowHeight })
@@ -311,28 +310,12 @@ const flexGridRenderer = ({
   })
   const fixedWidth = computeFixedGridWidths({ rowHeaders, borderSize })
 
-  console.log('provided width', width)
-  console.log('rawDataWidth', rawDataWidth)
-  console.log('rawDataHeight', rawDataHeight)
-  console.log('conatinerWidth', containerWidth)
-  console.log('fixedWidth', fixedWidth)
-  console.log('scrollWidth', scrollWidth)
-
-  /*
-  console.log('rowHeaderWidth', rowHeaderWidth)
-  console.log('containerWidth', containerWidth)
-  console.log('visibleDataWidth', visibleDataWidth)
-  console.log('normalizedWidth', normalizedWidth)
-  */
-
-  // const rowHeaderWidth = sumWidth(rowHeaders)
-  // const totalBorderWidth = headers.length - 1
-  // const fixedBorderWidth = fixedColCount // maybe minus 1
-  // const nonFixedBorderWidth = headers.length - fixedColCount - 1
-  // const visibleHeaderWidth = normalizedWidth - (hasFixedCol ? rowHeaderWidth : 0) + totalBorderWidth
-  // const containerWidth = normalizedWidth + totalBorderWidth + (scrollY ? scrollSize : 0)
-  // // couting scrollbar
-  // const visibleDataWidth = visibleDataWidth + (scrollY && scrollX ? scrollSize : 0)
+  // console.log('provided width', width)
+  // console.log('rawDataWidth', rawDataWidth)
+  // console.log('rawDataHeight', rawDataHeight)
+  // console.log('conatinerWidth', containerWidth)
+  // console.log('fixedWidth', fixedWidth)
+  // console.log('scrollWidth', scrollWidth)
 
   const containerHeight = R.isNil(height)
     ? undefined
