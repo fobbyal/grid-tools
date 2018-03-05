@@ -7,7 +7,7 @@
     "build": "webpack --env.dev",
     "build:watch": "webpack --watch --env.dev",
     "build:prod": "webpack -p --env.prod",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -h 0.0.0.0 -p 6006",
     "build-storybook": "build-storybook",
     "test": "jest",
     "test:watch": "jest --watch",

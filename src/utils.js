@@ -115,3 +115,12 @@ export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) =
   }
   return value
 }
+
+export const sumHeight = ({ data = [], rowHeight }) => {
+  if (typeof rowHeight === 'function') {
+    return R.range(0, data.length)
+      .map(rowHeight)
+      .reduce(R.add)
+  }
+  return rowHeight * data.length
+}
