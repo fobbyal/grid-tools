@@ -39,11 +39,7 @@ const Pager = ({
           <PageButton key="left" onClick={decrementPage}>
             &#x25c0;
           </PageButton>,
-          <select
-            key="select"
-            value={currentPage}
-            onChange={e => setCurrentPage(e.target.value)}
-          >
+          <select key="select" value={currentPage} onChange={e => setCurrentPage(e.target.value)}>
             {R.range(1, totalPages + 1).map(page => (
               <option key={page} value={page}>
                 {page}

@@ -279,7 +279,7 @@ const flexGridRenderer = ({
   const pagerHeight = 35
   const rawDataWidth = sumWidth(headers)
   const rawDataHeight = sumHeight({ data, rowHeight })
-  const normalizedWidth = R.min(width, rawDataWidth)
+  const normalizedWidth = R.isNil(width) ? rawDataWidth : R.min(width, rawDataWidth)
 
   /* do not scroll when we can fit everything */
   const scroll =
@@ -326,7 +326,7 @@ const flexGridRenderer = ({
     position: scroll ? 'absolute' : undefined,
     left: scroll ? '0px' : undefined,
     bottom: scroll ? '0px' : undefined,
-    width: scroll ? containerWidth + 'px' : '100vw',
+    width: scroll ? containerWidth + 'px' : undefined,
   }
 
   const topOffSet = 0

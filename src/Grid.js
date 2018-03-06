@@ -273,15 +273,15 @@ class Grid extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { data, sortOptions, fuzzyFilter, currentPage } = this.props
+    const { data, sortOptions, fuzzyFilter } = this.props
     if (
       data !== nextProps.data ||
       sortOptions !== nextProps.sortOptions ||
       fuzzyFilter !== nextProps.fuzzyFilter ||
-      currentPage !== nextProps.currentPage
+      this.props.currentPage !== nextProps.currentPage
     ) {
       this.setState(
-        ({ editingRow, editingColumn, x1, x2, y1, y2 }) => ({
+        ({ editingRow, editingColumn, x1, x2, y1, y2, currentPage }) => ({
           // x1: data !== nextProps.data ? undefined : x1,
           // x2: data !== nextProps.data ? undefined : x2,
           // y1: data !== nextProps.data ? undefined : y1,
@@ -291,7 +291,10 @@ class Grid extends React.PureComponent {
             sortOptions: sortOptions !== nextProps.sortOptions ? nextProps.sortOptions : undefined,
             fuzzyFilter:
               fuzzyFilter !== nextProps.fuzzyFilter ? nextProps.fuzzyFilter : fuzzyFilter,
-            currentPage: currentPage !== nextProps.currentPage ? nextProps.currentPage : undefined,
+            currentPage:
+              this.isPagingControlled() && this.props.currentPage !== nextProps.currentPage
+                ? nextProps.currentPage
+                : currentPage,
           }),
           editingRow: data !== nextProps.data ? undefined : editingRow,
           editingColumn: data !== nextProps.data ? undefined : editingColumn,
@@ -303,8 +306,8 @@ class Grid extends React.PureComponent {
 
   /* paging starts */
 
-  hasPaging = () =>
-    this.props.rowsPerPage !== undefined && this.props.data.length > this.props.rowsPerPage
+  hasPaging = ({ data = this.props.data } = {}) =>
+    this.props.rowsPerPage !== undefined && data.length > this.props.rowsPerPage
 
   isPagingControlled = () =>
     this.props.totalPages !== undefined &&
@@ -656,7 +659,7 @@ class Grid extends React.PureComponent {
   }
 
   render() {
-    console.log('grid renderer.... ')
+    console.log('grid renderer.... ', this.state.currentPage)
     const { view } = this.state
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
