@@ -26,7 +26,6 @@ class ScrollPane extends React.Component {
     if (vertical) {
       scrollSync.registerPane(node, ScrollSyncHelper.VERTICAL)
     }
-    console.log(scrollSync)
   }
 
   componentWillUnmount() {
@@ -49,6 +48,10 @@ class ScrollPane extends React.Component {
       headerRowHeight,
       showScroll,
       selectionType,
+      fixed,
+      fixedScrollHeightAdjustment,
+      scrollX,
+      scrollY,
       ...props
     } = this.props
     return (
