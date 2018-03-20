@@ -3,6 +3,35 @@ import Overlay from './Overlay'
 import { rawToValue, extractData } from './utils'
 import R from 'ramda'
 
+import renderContent from './renderRowEditorContent'
+import { validate, isTypeValid, emptyValidations } from './validation-util'
+
+const renderEditor = ({
+  rowData,
+  valueChanged,
+  onOk,
+  onCancel,
+  initialFocusRef,
+  isEditing,
+  onClose,
+  ...props
+}) => {
+  return (
+    isEditing && (
+      <Overlay onClose={onClose}>
+        {renderContent()({
+          ...props,
+          rowData,
+          valueChanged,
+          onOk,
+          onCancel,
+          initialFocusRef,
+        })}
+      </Overlay>
+    )
+  )
+}
+
 const createEditRow = ({ showAdd, headers, rowData }) => {
   if (!rowData) return {}
   if (!showAdd) return rowData
@@ -11,31 +40,53 @@ const createEditRow = ({ showAdd, headers, rowData }) => {
   return newData
 }
 
+const modifyRow = ({ header, value, rowData }) => {
+  console.log('editing row with raw info', header, value)
+  const parsedValue = rawToValue({ value, header })
+  console.log('row editor parsed ', parsedValue)
+  if (parsedValue !== undefined) {
+    return header.dataSetter
+      ? header.dataSetter({
+          rowData,
+          header,
+          value: parsedValue,
+        })
+      : { ...rowData, [header.ident]: parsedValue }
+  }
+  return rowData
+}
+
 class RowEditor extends React.Component {
   state = {
     editedRow: createEditRow(this.props),
+    validations: emptyValidations,
   }
 
-  valueChanged = ({ header, value }) => {
-    console.log('editing row with raw info', header, value)
-    const parsedValue = rawToValue({ value, header })
-    console.log('row editor parsed ', parsedValue)
-    if (parsedValue !== undefined) {
-      this.setState(({ editedRow }) => ({
-        editedRow: header.dataSetter
-          ? header.dataSetter({
-              rowData: editedRow,
-              header,
-              value: parsedValue,
-            })
-          : { ...editedRow, [header.ident]: parsedValue },
-      }))
-    }
-  }
+  valueChanged = editInfo =>
+    this.setState(({ editedRow }) => {
+      const rowData = modifyRow({ ...this.props, ...editInfo, rowData: editedRow })
+      if (rowData !== editedRow) {
+        const { validationSpec } = this.props
+        const validations = validate({
+          spec: validationSpec,
+          data: rowData,
+          editorProps: { ...this.props, extractData },
+        })
+        return { editedRow: rowData, validations }
+      }
+    })
 
   onOk = e => {
-    const { rowData, headers } = this.props
+    const { rowData, headers, validationSpec } = this.props
     const { editedRow } = this.state
+    const validations = validate({
+      spec: validationSpec,
+      data: rowData,
+      editorProps: { ...this.props, extractData },
+    })
+    this.setState({ validations })
+    // has validations
+    if (validations.length > 0) return
 
     if (rowData !== editedRow) {
       const removeDotsOnEditedNums = R.compose(
@@ -88,21 +139,18 @@ class RowEditor extends React.Component {
   }
 
   render() {
-    const { isEditing, onClose, render } = this.props
-    return (
-      isEditing && (
-        <Overlay onClose={onClose}>
-          {render({
-            ...this.props,
-            rowData: this.state.editedRow,
-            valueChanged: this.valueChanged,
-            onOk: this.onOk,
-            onCancel: onClose,
-            initialFocusRef: n => (this.focusNode = n),
-          })}
-        </Overlay>
-      )
-    )
+    const { render = renderEditor } = this.props
+    const { validations } = this.state
+    return render({
+      ...this.props,
+      rowData: this.state.editedRow,
+      valueChanged: this.valueChanged,
+      onOk: this.onOk,
+      onCancel: this.props.onClose,
+      initialFocusRef: n => (this.focusNode = n),
+      isTypeValid,
+      validations,
+    })
   }
 }
 

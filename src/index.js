@@ -6,15 +6,9 @@ import flexGridRenderer, {
   defaultCellRenderer as defaultFlexCellRenderer,
   defaultColHeaderRenderer as defaultFlexColHeaderRenderer,
 } from './flexRenderer'
-import renderRowEditorContent, {
-  defaultInputRowEditRender,
-} from './renderRowEditorContent'
-import {
-  extractData,
-  formatData,
-  extractAndFormatDataData,
-  toSelectionColProps,
-} from './utils'
+import renderRowEditorContent, { defaultInputRowEditRender } from './renderRowEditorContent'
+import { extractData, formatData, extractAndFormatDataData, toSelectionColProps } from './utils'
+import RowEditor from './RowEditor'
 
 export * from './cols'
 
@@ -31,5 +25,6 @@ export {
   formatData,
   extractAndFormatDataData,
   toSelectionColProps,
+  RowEditor,
 }
 export default Grid

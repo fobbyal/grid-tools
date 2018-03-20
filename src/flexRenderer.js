@@ -4,8 +4,6 @@ import R from 'ramda'
 import Grid from './Grid'
 import { sumWidth, formatData, extractData, sumHeight } from './utils'
 import DefaultPager from './DefaultPager'
-import RowEditor from './RowEditor'
-import rowEditorContentRenderer from './renderRowEditorContent'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : alignment
@@ -259,7 +257,6 @@ const flexGridRenderer = ({
   cellRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
-  renderRowEditorContent = rowEditorContentRenderer(),
   editByRow = true,
   editByCell = false,
   // TODO: have to get css expert
@@ -275,6 +272,7 @@ const flexGridRenderer = ({
   data,
   hasPaging,
   isEditing,
+  renderRowEditor,
 }) => {
   const pagerHeight = 35
   const rawDataWidth = sumWidth(headers)
@@ -454,7 +452,7 @@ const flexGridRenderer = ({
         ))}
       </TableContent>
       {hasPaging && pagerRenderer(getPagerProps({ style: pagerStyle }))}
-      <RowEditor render={renderRowEditorContent} {...getRowEditorProps()} />
+      {renderRowEditor(getRowEditorProps())}
     </FlexGridContainer>
   )
 }
