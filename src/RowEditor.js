@@ -141,6 +141,8 @@ class RowEditor extends React.Component {
   render() {
     const { render = renderEditor } = this.props
     const { validations } = this.state
+    // console.log('passing down to row editor renderer',this.state.editedRow,this.state)
+    //
     return render({
       ...this.props,
       rowData: this.state.editedRow,
@@ -150,6 +152,7 @@ class RowEditor extends React.Component {
       initialFocusRef: n => (this.focusNode = n),
       isTypeValid,
       validations,
+      extractData,
     })
   }
 }
