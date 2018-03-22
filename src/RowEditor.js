@@ -76,17 +76,37 @@ class RowEditor extends React.Component {
       }
     })
 
-  onOk = e => {
-    const { rowData, headers, validationSpec } = this.props
+  runValidation = () => {
+    const { validationSpec } = this.props
     const { editedRow } = this.state
     const validations = validate({
       spec: validationSpec,
-      data: rowData,
+      data: editedRow,
       editorProps: { ...this.props, extractData },
     })
     this.setState({ validations })
+
+    return validations.length === 0
+  }
+
+  // componentDidMount() {
+  //   this.runValidation()
+  // }
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.props !== prevProps) this.runValidation()
+  // }
+
+  onOk = e => {
+    const { rowData, headers } = this.props
+    const { editedRow } = this.state
+    // const validations = validate({
+    //   spec: validationSpec,
+    //   data: rowData,
+    //   editorProps: { ...this.props, extractData },
+    // })
+    // this.setState({ validations })
     // has validations
-    if (validations.length > 0) return
+    if (!this.runValidation()) return
 
     if (rowData !== editedRow) {
       const removeDotsOnEditedNums = R.compose(
