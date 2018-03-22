@@ -5,6 +5,16 @@ import styled from 'styled-components'
 const PageButton = styled.button`
   font-weight: ${props => (props.disabled ? 'bold' : 'normal')};
   color: ${props => (props.disabled ? 'brown' : 'black')};
+  height: 25px;
+`
+
+const Select = styled.select`
+  height: 25px;
+  margin-left: 5px;
+`
+const TotalPages = styled.span`
+  margin-left: 5px;
+  margin-right: 5px;
 `
 
 const Pager = ({
@@ -39,14 +49,14 @@ const Pager = ({
           <PageButton key="left" onClick={decrementPage}>
             &#x25c0;
           </PageButton>,
-          <select key="select" value={currentPage} onChange={e => setCurrentPage(e.target.value)}>
+          <Select key="select" value={currentPage} onChange={e => setCurrentPage(e.target.value)}>
             {R.range(1, totalPages + 1).map(page => (
               <option key={page} value={page}>
                 {page}
               </option>
             ))}
-          </select>,
-          <span key="tp">of {totalPages}</span>,
+          </Select>,
+          <TotalPages key="tp">of {totalPages}</TotalPages>,
           <PageButton key="right" onClick={incrementPage}>
             &#x25b6;
           </PageButton>,

@@ -12,6 +12,7 @@ import ScrollSyncHelper from './ScrollSyncHelper'
 import R from 'ramda'
 import ScrollPane from './ScrollPane'
 import moment from 'moment'
+import RowEditor from './RowEditor'
 
 import {
   ROW_INDEX_ATTRIBUTE,
@@ -201,6 +202,7 @@ class Grid extends React.PureComponent {
     onEdit: PropTypes.func,
     showAdd: PropTypes.bool,
     onSelectionChange: PropTypes.func,
+    renderRowEditor: PropTypes.func,
   }
 
   static defaultProps = {
@@ -210,6 +212,7 @@ class Grid extends React.PureComponent {
     sortEnabled: true,
     isEditable: false,
     showAdd: false,
+    renderRowEditor: props => <RowEditor {...props} />,
   }
 
   static childContextTypes = {
@@ -659,7 +662,7 @@ class Grid extends React.PureComponent {
   }
 
   render() {
-    console.log('grid renderer.... ', this.state.currentPage)
+    console.log('grid renderer.... ')
     const { view } = this.state
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,
@@ -672,6 +675,7 @@ class Grid extends React.PureComponent {
       data: view,
       hasPaging: this.hasPaging(),
       isEditing: this.isEditing(),
+      renderRowEditor: this.props.renderRowEditor,
     })
   }
 }
