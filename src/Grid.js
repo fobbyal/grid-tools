@@ -201,6 +201,7 @@ class Grid extends React.PureComponent {
     rowsPerPage: PropTypes.number,
     onEdit: PropTypes.func,
     showAdd: PropTypes.bool,
+    addWithSelected: PropTypes.bool,
     onSelectionChange: PropTypes.func,
     renderRowEditor: PropTypes.func,
   }
@@ -212,6 +213,7 @@ class Grid extends React.PureComponent {
     sortEnabled: true,
     isEditable: false,
     showAdd: false,
+    addWithSelected: false,
     renderRowEditor: props => <RowEditor {...props} />,
   }
 
@@ -650,12 +652,15 @@ class Grid extends React.PureComponent {
 
   getRowEditorProps = _ => {
     const { y1 } = normalizeBounds(this.state)
+    const { addWithSelected } = this.props
     return {
       onClose: this.cancelEdit,
       commitEdit: this.commitRowEdit,
       // TODO: add feature to pop up editor based on some row for add featrues
       showAdd: this.props.showAdd,
-      rowData: this.props.showAdd ? this.state.view[y1] : this.state.view[this.state.editingRow],
+      rowData: this.props.showAdd
+        ? addWithSelected ? this.state.view[y1] : {}
+        : this.state.view[this.state.editingRow],
       headers: this.props.headers,
       isEditing: this.isEditing(),
     }
