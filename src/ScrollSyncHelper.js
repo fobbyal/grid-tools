@@ -22,16 +22,10 @@ class ScrollSyncHelper {
 
   registerPane(pane, MODE) {
     this.addEvents(pane)
-    if (
-      MODE === ScrollSyncHelper.HORIZONTAL &&
-      !this.horizonalPanes.includes(pane)
-    ) {
+    if (MODE === ScrollSyncHelper.HORIZONTAL && !this.horizonalPanes.includes(pane)) {
       this.horizonalPanes = [...this.horizonalPanes, pane]
     }
-    if (
-      MODE === ScrollSyncHelper.VERTICAL &&
-      !this.verticalPanes.includes(pane)
-    ) {
+    if (MODE === ScrollSyncHelper.VERTICAL && !this.verticalPanes.includes(pane)) {
       this.verticalPanes = [...this.verticalPanes, pane]
     }
   }
@@ -65,11 +59,7 @@ class ScrollSyncHelper {
       )
     }
     if (this.isVerticallySynced(scrolledPane)) {
-      this.setTargetScrolls(
-        scrolledPane,
-        this.verticalPanes,
-        pane => (pane.scrollTop = scrollTop)
-      )
+      this.setTargetScrolls(scrolledPane, this.verticalPanes, pane => (pane.scrollTop = scrollTop))
     }
   }
   setTargetScrolls(pane, syncedTargets, setter) {

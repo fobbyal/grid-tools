@@ -43,8 +43,7 @@ export class Overlay extends React.Component {
 const DefaultOverlay = styled(Overlay)`
   position: fixed;
   display: flex;
-  background-color: ${props =>
-    props.dark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.8)'};
+  background-color: ${props => (props.dark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.8)')};
   width: 100vw;
   height: 100vh;
   max-height: 100vh;

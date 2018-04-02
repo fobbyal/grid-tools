@@ -19,26 +19,13 @@ const immutableSet = (key, value) =>
     return m
   })
 
-export const removeRow = ({
-  editInfo = generateInitialEditInfo(),
-  currentRow,
-}) => {
-  const {
-    added,
-    updated,
-    dirtyMap,
-    updatedMap,
-    removed,
-    history,
-    ...rest
-  } = editInfo
+export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }) => {
+  const { added, updated, dirtyMap, updatedMap, removed, history, ...rest } = editInfo
   const originalRow = dirtyMap.get(currentRow)
   const isUpdated = dirtyMap.has(currentRow)
   const isAdded = added.includes(currentRow)
   return {
-    removed: isAdded
-      ? removed
-      : [...removed, isUpdated ? originalRow : currentRow],
+    removed: isAdded ? removed : [...removed, isUpdated ? originalRow : currentRow],
     added: isAdded ? added.filter(row => row !== currentRow) : added,
     updated: isUpdated ? updated.filter(row => row !== currentRow) : updated,
     dirtyMap: isUpdated
@@ -61,11 +48,7 @@ export const removeRow = ({
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })
 
-export const updateRow = ({
-  editInfo = generateInitialEditInfo(),
-  currentRow,
-  editedRow,
-}) => {
+export const updateRow = ({ editInfo = generateInitialEditInfo(), currentRow, editedRow }) => {
   if (currentRow === undefined && !R.isNil(editedRow)) {
     const { /* dirtyMap, */ added, history, ...rest } = editInfo
     return {
@@ -127,9 +110,7 @@ export const undo = (editInfo = generateInitialEditInfo()) =>
   editInfo.history[0] || generateInitialEditInfo()
 
 export const isDirty = (editInfo = generateInitialEditInfo()) =>
-  editInfo.added.length > 0 ||
-  editInfo.removed.length > 0 ||
-  editInfo.updated.length > 0
+  editInfo.added.length > 0 || editInfo.removed.length > 0 || editInfo.updated.length > 0
 
 export const apply = editInfo =>
   R.compose(

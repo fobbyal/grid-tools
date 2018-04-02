@@ -5,11 +5,7 @@ import R from 'ramda'
 import styled from 'styled-components'
 import shallowEqual from 'fbjs/lib/shallowEqual'
 import { normalizeBounds } from '../utils.js'
-import {
-  toClipboardData,
-  fromPasteEvent,
-  expandDataToSelection,
-} from '../clipboard-utils'
+import { toClipboardData, fromPasteEvent, expandDataToSelection } from '../clipboard-utils'
 import { fromEmpty } from '../utils'
 import HiddenClipboardHelper from '../HiddenClipboardHelper'
 
@@ -183,12 +179,7 @@ class GenericEditableGrid extends React.Component {
         })
       } else {
         const { x1, y1, x2, y2 } = selectionBounds
-        if (
-          rowIndex < y1 ||
-          rowIndex > y2 ||
-          columnIndex < x1 ||
-          columnIndex > x2
-        ) {
+        if (rowIndex < y1 || rowIndex > y2 || columnIndex < x1 || columnIndex > x2) {
           this.setState({
             selection: {
               x1: columnIndex,
@@ -250,9 +241,7 @@ class GenericEditableGrid extends React.Component {
         .ap(selectedData)
     } else {
       /* eslint-disable no-console */
-      console.log(
-        'Prop getDataInRange not on GenericEditableGrid. Copy function is disabled'
-      )
+      console.log('Prop getDataInRange not on GenericEditableGrid. Copy function is disabled')
       /* eslint-enable no-console */
     }
   }
@@ -274,9 +263,7 @@ class GenericEditableGrid extends React.Component {
         .ap(clipboardData)
     } else {
       /* eslint-disable no-console */
-      console.log(
-        'Prop pasteData not on GenericEditableGrid. Paste function is disabled'
-      )
+      console.log('Prop pasteData not on GenericEditableGrid. Paste function is disabled')
       /* eslint-enable no-console */
     }
   }
@@ -342,11 +329,7 @@ class GenericEditableGrid extends React.Component {
 
     const isDelete = e.keyCode == 46
     const isEditAttempt =
-      !e.metaKey &&
-      !e.ctrlKey &&
-      e.keyCode >= 32 &&
-      e.keyCode <= 126 &&
-      e.key.length === 1
+      !e.metaKey && !e.ctrlKey && e.keyCode >= 32 && e.keyCode <= 126 && e.key.length === 1
 
     if (!editing) {
       /* arrow keys */
@@ -379,15 +362,7 @@ class GenericEditableGrid extends React.Component {
         console.log('cell editable', isCellEditable)
         if (!isCellEditable || isCellEditable(editingCell)) {
           this.setState({ editingCell })
-          console.log(
-            'trying to edit... with ',
-            e.key,
-            '@ [',
-            rowIndex,
-            ':',
-            columnIndex,
-            ']'
-          )
+          console.log('trying to edit... with ', e.key, '@ [', rowIndex, ':', columnIndex, ']')
         }
       }
     }
@@ -410,9 +385,7 @@ class GenericEditableGrid extends React.Component {
       commitEdit(editInfo)
     } else {
       /* eslint-disable no-console */
-      console.log(
-        'Prop commitEdit not on GenericEditableGrid. edit function is disabled'
-      )
+      console.log('Prop commitEdit not on GenericEditableGrid. edit function is disabled')
       /* eslint-enable no-console */
     }
 
@@ -450,12 +423,7 @@ class GenericEditableGrid extends React.Component {
       gridProps: this.gridProps,
       editWithValue,
       className,
-      copyAndPasteFix: (
-        <HiddenClipboardHelper
-          innerRef={r => (this.hiddenInput = r)}
-          type="text"
-        />
-      ),
+      copyAndPasteFix: <HiddenClipboardHelper innerRef={r => (this.hiddenInput = r)} type="text" />,
     }
 
     return children(props)
