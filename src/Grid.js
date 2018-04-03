@@ -191,6 +191,7 @@ class Grid extends React.PureComponent {
     hoverType: PropTypes.oneOf(['row', 'cell']).isRequired,
     sortEnabled: PropTypes.bool.isRequired,
     isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]).isRequired,
+    editMode: PropTypes.oneOf(['row', 'cell']).isRequired,
     /* optional stuff */
     sortOptions: PropTypes.array,
     onSortOptionsChange: PropTypes.func,
@@ -210,6 +211,7 @@ class Grid extends React.PureComponent {
     selectionType: 'cell',
     selectionMode: 'multi',
     hoverType: 'row',
+    editMode: 'row',
     sortEnabled: true,
     isEditable: false,
     showAdd: false,
@@ -501,6 +503,7 @@ class Grid extends React.PureComponent {
     // TODO currentRow == undefined for new rows
     if (currentRow !== editedRow) {
       if (this.props.onEdit) {
+        // expect new data to be passed down via props
         this.props.onEdit({ originalRow: currentRow, editedRow })
       } else {
         if (this.dirtyMap.has(currentRow)) {
@@ -679,7 +682,7 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       data: view,
       hasPaging: this.hasPaging(),
-      isEditing: this.isEditing(),
+      //isEditing: this.isEditing(),
       renderRowEditor: this.props.renderRowEditor,
     })
   }

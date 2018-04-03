@@ -216,7 +216,6 @@ const flexGridRenderer = ({
   headers,
   data,
   hasPaging,
-  isEditing,
   renderRowEditor,
 }) => {
   const pagerHeight = 35
