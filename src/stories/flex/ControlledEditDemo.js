@@ -1,7 +1,7 @@
 import React from 'react'
 import R from 'ramda'
 
-import Grid, { flexGridRenderer, renderRowEditorContent } from '../index'
+import Grid, { flexGridRenderer, renderRowEditorContent } from '../../index'
 
 class ControlledEditDemo extends React.Component {
   state = { data: this.props.data, showAdd: false }

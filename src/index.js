@@ -10,6 +10,8 @@ import renderRowEditorContent, { defaultInputRowEditRender } from './renderRowEd
 import { extractData, formatData, extractAndFormatDataData, toSelectionColProps } from './utils'
 import RowEditor from './RowEditor'
 
+import virtualizedGridRenderer from './virtualizedRenderer'
+
 export * from './cols'
 
 export {
@@ -26,5 +28,6 @@ export {
   extractAndFormatDataData,
   toSelectionColProps,
   RowEditor,
+  virtualizedGridRenderer,
 }
 export default Grid

@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 // import { action } from '@storybook/addon-actions'
 // import { linkTo } from '@storybook/addon-links'
 import R from 'ramda'
-import { createData, headers, randomRow } from './data'
+import { createData, headers, randomRow } from '../data'
 import ControlledEditDemo from './ControlledEditDemo'
 
 import Grid, {
@@ -13,7 +13,7 @@ import Grid, {
   FlexColHeader,
   defaultFlexCellRenderer,
   defaultFlexColHeaderRenderer,
-} from '../index'
+} from '../../index'
 import FilterDemo from './FilterDemo'
 
 // const createRow = _ => randomRow(headers)

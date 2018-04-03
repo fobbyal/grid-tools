@@ -1,5 +1,5 @@
 import React from 'react'
-import Grid from '../index'
+import Grid from '../../index'
 
 class FilterDemo extends React.Component {
   state = {

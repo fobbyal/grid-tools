@@ -62,18 +62,19 @@
   },
   "peerDependencies": {
     "data.maybe": "^1.2.2",
-    "fbjs": "^0.8.16",
     "moment": "^2.20.1",
     "numeral": "^2.0.6",
     "ramda": "^0.25.0",
     "react": ">=16",
     "react-dom": ">=16",
-    "react-virtualized": "^9.18.5",
     "styled-components": "^2.3.0"
   },
   "dependencies": {
     "moment": "^2.22.0",
-    "numeral": "^2.0.6"
+    "numeral": "^2.0.6",
+    "react-addons-shallow-compare": "^15.6.2",
+    "react-broadcast": "^0.7.0",
+    "react-virtualized": "^9.18.5"
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]
