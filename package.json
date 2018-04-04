@@ -75,7 +75,8 @@
     "numeral": "^2.0.6",
     "react-addons-shallow-compare": "^15.6.2",
     "react-broadcast": "^0.7.0",
-    "react-virtualized": "^9.18.5"
+    "react-virtualized": "^9.18.5",
+    "shallow-equal-explain": "^0.0.4"
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]

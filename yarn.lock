@@ -7390,6 +7390,13 @@ sha.js@^2.4.0, sha.js@^2.4.8:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
+shallow-equal-explain@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/shallow-equal-explain/-/shallow-equal-explain-0.0.4.tgz#613b332fd1378759e9d7e8f9aa015a4d5b402994"
+  dependencies:
+    ramda "^0.25.0"
+    unionize "^1.0.0"
+
 shallowequal@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-0.2.2.tgz#1e32fd5bcab6ad688a4812cb0cc04efc75c7014e"
@@ -8079,6 +8086,10 @@ union-value@^1.0.0:
     get-value "^2.0.6"
     is-extendable "^0.1.1"
     set-value "^0.4.3"
+
+unionize@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/unionize/-/unionize-1.0.0.tgz#ed2cc4230b458366bb17bb72cd06c5c328e08d0a"
 
 uniq@^1.0.1:
   version "1.0.1"

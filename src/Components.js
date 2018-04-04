@@ -38,6 +38,16 @@ export const BasicCell = styled.div`
   }
 `
 
+/* prettier-ignore */
+export const BasicCellInput = styled.input`
+  border: 2px solid black;
+  text-align: ${props => props.alignment};
+  ${props => (props.fontSize ? 'font-size:' + props.fontSize + ';' : '')}
+  ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')}
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+`
+
 export const BasicColHeader = styled.div`
   border-right: 1px solid #ccc;
   display: flex;

@@ -6,6 +6,7 @@ import { storiesOf } from '@storybook/react'
 import R from 'ramda'
 import { createData, headers, randomRow } from '../data'
 import ControlledEditDemo from './ControlledEditDemo'
+import CellEditDemo from './CellEditDemo'
 
 import Grid, {
   flexGridRenderer,
@@ -51,7 +52,7 @@ const splitColHeaderRenderer = props => {
 
 const commonProps = { headers, data }
 const debugHeaders = R.take(5, headers)
-const debugData = R.range(0, 300).map(_ => randomRow(debugHeaders))
+const debugData = R.range(0, 5).map(_ => randomRow(debugHeaders))
 
 const debugProps = { headers: debugHeaders, data: debugData }
 const tenKData = createData(10000)
@@ -149,3 +150,4 @@ storiesOf('Flex Grid', module)
   ))
   .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} controlled />)
   .add('Un-Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)
+  .add('Free Edit', () => <CellEditDemo {...commonProps} />)

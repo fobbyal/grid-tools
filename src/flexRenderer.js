@@ -4,7 +4,9 @@ import R from 'ramda'
 import Grid from './Grid'
 import { sumWidth, formatData, extractData, sumHeight } from './utils'
 import DefaultPager from './DefaultPager'
-import { BasicCell, BasicColHeader, SortIndicator } from './Components'
+import { BasicCell, BasicColHeader, SortIndicator, BasicCellInput } from './Components'
+import CellEditContainer from './CellEditContainer'
+import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
   flex: 0 0 ${props => props.width}px;
@@ -18,6 +20,11 @@ export const CellContent = styled.div`
 `
 /* prettier-ignore */
 export const Cell = BasicCell.extend`
+  flex: 0 0 ${props => props.width}px;
+  width: ${props => props.width}px;
+`
+
+export const CellEditor = BasicCellInput.extend`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
 `
@@ -91,23 +98,32 @@ class FlexGridRow extends React.PureComponent {
   }
 }
 
-export const defaultCellRenderer = ({
-  rowIndex,
-  columnIndex,
-  header,
-  width,
-  height,
-  data,
-  render,
-  ...rest
-}) => {
+class PureCell extends React.PureComponent {
+  render() {
+    const { display, ...rest } = this.props
+    return (
+      <Cell {...rest}>
+        <CellContent>{display}</CellContent>
+      </Cell>
+    )
+  }
+  // componentDidUpdate(prevProps) {
+  //   const currentProps = this.props
+  //   const shallowEqualExplanation = shallowEqualExplain(prevProps, currentProps)
+
+  //   console.log({ prevProps, currentProps, shallowEqualExplanation })
+  // }
+}
+
+export const defaultCellRenderer = props => {
+  const { isEditing } = props
+  if (isEditing) {
+    return <CellEditContainer {...props} />
+  }
+  const { rowIndex, columnIndex, header, width, height, data, render, ...rest } = props
   const value = extractData({ header, rowData: data[rowIndex] })
   const display = formatData({ header, value, rowData: data[rowIndex] })
-  return (
-    <Cell {...rest} width={width} height={height} title={value}>
-      <CellContent> {display} </CellContent>
-    </Cell>
-  )
+  return <PureCell {...rest} width={width} height={height} title={value} display={display} />
 }
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />
@@ -281,6 +297,7 @@ const flexGridRenderer = ({
       })}
       style={style}
       className={className}
+      tabIndex="0"
     >
       {/* col header non-scrolling part/fixed columns */}
       {numOfFixedCols > 0 && (

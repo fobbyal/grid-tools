@@ -505,10 +505,22 @@ class Grid extends React.PureComponent {
     }
   }
 
-  isEditing() {
+  isGridEditing() {
     const { editingRow } = this.state
     const { showAdd } = this.props
     return showAdd || !R.isNil(editingRow)
+  }
+
+  isRowEditing() {
+    const { editingRow, editMode } = this.state
+    const { showAdd } = this.props
+    return showAdd || (editMode === 'row' && !R.isNil(editingRow))
+  }
+
+  isCellEditing(rowIndex, columnIndex) {
+    const { editMode } = this.props
+    const { editingRow, editingColumn } = this.state
+    return editMode === 'cell' && rowIndex === editingRow && columnIndex === editingColumn
   }
 
   commitRowEdit = ({ currentRow, editedRow }) => {
@@ -552,6 +564,34 @@ class Grid extends React.PureComponent {
     const pos = extractPosition(e)
     const { rowIndex, columnIndex } = pos
     this.edit(rowIndex, columnIndex)
+  }
+
+  gridKeyDown = e => {
+    console.log('gothere...')
+    const { x2: columnIndex, y2: rowIndex } = normalizeBounds(this.state)
+    const selectionValid = !R.isNil(columnIndex) && !R.isNil(rowIndex)
+    console.log(selectionValid, columnIndex, rowIndex, this.isGridEditing())
+    if (selectionValid) {
+      const isEditAttempt =
+        !this.isGridEditing() &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        e.keyCode >= 32 &&
+        e.keyCode <= 126 &&
+        e.key.length === 1
+      if (isEditAttempt) {
+        console.log('attempting edit', {
+          editingColumn: columnIndex,
+          editingRow: rowIndex,
+          initialEditChar: String.fromCharCode(e.keyCode),
+        })
+        this.setState({
+          editingColumn: columnIndex,
+          editingRow: rowIndex,
+          initialEditChar: String.fromCharCode(e.keyCode),
+        })
+      }
+    }
   }
 
   cellMouseDown = e => {
@@ -642,12 +682,16 @@ class Grid extends React.PureComponent {
       height: rowHeightOf(rowIndex, rowHeight),
       width: header.width,
       alignment: header.alignment,
-      isCellEditing:
-        editMode === 'cell' && editingRow === rowIndex && editingColumn === columnIndex,
+      isEditing: this.isCellEditing(rowIndex, columnIndex),
+      commitRowEdit: this.commitRowEdit,
     }
   }
 
-  getGridContainerProps = ({ width, height } = {}) => ({ width, height })
+  getGridContainerProps = ({ width, height } = {}) => ({
+    width,
+    height,
+    onKeyDown: this.gridKeyDown,
+  })
 
   getColumnHeaderProps = ({ key, index, header }) => ({
     key: key || header.ident,
@@ -679,7 +723,7 @@ class Grid extends React.PureComponent {
         ? addWithSelected ? this.state.view[y1] : {}
         : this.state.view[this.state.editingRow],
       headers: this.props.headers,
-      isEditing: this.isEditing(),
+      isEditing: this.isRowEditing(),
     }
   }
 
@@ -696,7 +740,6 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       data: view,
       hasPaging: this.hasPaging(),
-      isEditing: this.isEditing(),
       renderRowEditor: this.props.renderRowEditor,
     })
   }
