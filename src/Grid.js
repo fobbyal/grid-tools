@@ -13,6 +13,7 @@ import R from 'ramda'
 import ScrollPane from './ScrollPane'
 import moment from 'moment'
 import RowEditor from './RowEditor'
+import { applyEdits, generateInitialEditInfo, addRow, removeRow, updateRow } from './editEngine'
 
 import {
   ROW_INDEX_ATTRIBUTE,
@@ -138,14 +139,11 @@ const computeView = ({
   headers,
   rowsPerPage,
   currentPage,
-  editedMap,
+  editInfo,
 }) => {
   // TODO have to add edited value
   //
-  const editedData =
-    R.isNil(editedMap) || editedMap.size === 0
-      ? data
-      : R.map(row => editedMap.get(row) || row, data)
+  const editedData = applyEdits({ data, editInfo })
 
   const filteredData =
     !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
@@ -200,11 +198,15 @@ class Grid extends React.PureComponent {
     currentPage: PropTypes.number,
     onPageChange: PropTypes.number,
     rowsPerPage: PropTypes.number,
+    // this handles row edits
     onEdit: PropTypes.func,
     showAdd: PropTypes.bool,
     addWithSelected: PropTypes.bool,
     onSelectionChange: PropTypes.func,
     renderRowEditor: PropTypes.func,
+    // this handles cell edits
+    onEditInfoChange: PropTypes.func,
+    editInfo: PropTypes.func,
   }
 
   static defaultProps = {
@@ -229,12 +231,22 @@ class Grid extends React.PureComponent {
   }
 
   scrollSync = new ScrollSyncHelper()
-  /* 
-   * two way map is used here because the data can be filtered or sorted
-  /* orignal data to modified data or [data] -- for undo purpose */
-  editedMap = new Map()
-  /* modified data to original */
-  dirtyMap = new Map()
+
+  localEditInfo = generateInitialEditInfo()
+
+  isEditInfoControlled = () =>
+    !R.isNil(this.props.editInfo) && !R.isNil(this.props.onEditInfoChange)
+
+  editInfo = () => (this.isEditInfoControlled() ? this.props.editInfo : this.localEditInfo)
+
+  setEditInfo = editInfo => {
+    if (this.isEditInfoControlled()) {
+      this.props.onEditInfoChange(editInfo)
+      return false
+    }
+    this.localEditInfo = editInfo
+    return true
+  }
 
   state = {
     hoveredRow: undefined,
@@ -250,13 +262,12 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       rowsPerPage: this.props.rowsPerPage,
       currentPage: this.props.currentPage || 1,
-      editedMap: this.editedMap,
+      editInfo: this.editInfo(),
     }),
     sortOptions: this.props.initialSortOptions,
     currentPage: this.props.currentPage || 1,
     editingRow: undefined,
     editingColumn: undefined,
-    editInfo: {},
   }
 
   bodyMouseRelease = e => {
@@ -280,12 +291,13 @@ class Grid extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { data, sortOptions, fuzzyFilter } = this.props
+    const { data, sortOptions, fuzzyFilter, currentPage, editInfo } = this.props
     if (
       data !== nextProps.data ||
       sortOptions !== nextProps.sortOptions ||
       fuzzyFilter !== nextProps.fuzzyFilter ||
-      this.props.currentPage !== nextProps.currentPage
+      currentPage !== nextProps.currentPage ||
+      editInfo !== nextProps.editInfo
     ) {
       this.setState(
         ({ editingRow, editingColumn, x1, x2, y1, y2, currentPage }) => ({
@@ -423,6 +435,7 @@ class Grid extends React.PureComponent {
     sortOptions = this.sortOptions(),
     fuzzyFilter = this.props.fuzzyFilter,
     currentPage = this.currentPage(),
+    editInfo = this.editInfo(),
   } = {}) =>
     computeView({
       data,
@@ -431,7 +444,7 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       rowsPerPage: this.props.rowsPerPage,
       currentPage,
-      editedMap: this.editedMap,
+      editInfo,
     })
 
   /*  selection starts */
@@ -447,7 +460,7 @@ class Grid extends React.PureComponent {
     }
   }
 
-  /** this is for external listeners only*/
+  /** this is for external listeners only */
   selectionChanged = _ => {
     const { headers, onSelectionChange } = this.props
     if (onSelectionChange) {
@@ -499,27 +512,26 @@ class Grid extends React.PureComponent {
   }
 
   commitRowEdit = ({ currentRow, editedRow }) => {
-    // TODO use immutable js here ? so we can implement undo easily?
-    // TODO currentRow == undefined for new rows
     if (currentRow !== editedRow) {
-      if (this.props.onEdit) {
+      if (this.props.onEdit && this.props.edi) {
         // expect new data to be passed down via props
         this.props.onEdit({ originalRow: currentRow, editedRow })
       } else {
-        if (this.dirtyMap.has(currentRow)) {
-          const originalRow = this.dirtyMap.get(currentRow)
-          this.editedMap.set(originalRow, editedRow)
-          this.dirtyMap.set(editedRow, originalRow)
-          this.dirtyMap.delete(currentRow)
-        } else {
-          this.editedMap.set(currentRow, editedRow)
-          this.dirtyMap.set(editedRow, currentRow)
+        const updateState = this.setEditInfo(
+          updateRow({
+            editInfo: this.editInfo(),
+            currentRow,
+            editedRow,
+          })
+        )
+
+        if (updateState) {
+          this.setState({
+            ...this.generateViewProps(),
+            editingRow: undefined,
+            editingColumn: undefined,
+          })
         }
-        this.setState({
-          ...this.generateViewProps(),
-          editingRow: undefined,
-          editingColumn: undefined,
-        })
       }
     }
   }
@@ -605,7 +617,7 @@ class Grid extends React.PureComponent {
   })
 
   getCellProps = ({ key, rowIndex, columnIndex, header, data, rowData, rowHeight, ...rest }) => {
-    const { selectionType, hoverType } = this.props
+    const { selectionType, hoverType, editingRow, editingColumn, editMode } = this.props
     return {
       [ROW_INDEX_ATTRIBUTE]: rowIndex,
       key: key || rowIndex + '*' + header.ident,
@@ -630,6 +642,8 @@ class Grid extends React.PureComponent {
       height: rowHeightOf(rowIndex, rowHeight),
       width: header.width,
       alignment: header.alignment,
+      isCellEditing:
+        editMode === 'cell' && editingRow === rowIndex && editingColumn === columnIndex,
     }
   }
 
@@ -682,7 +696,7 @@ class Grid extends React.PureComponent {
       headers: this.props.headers,
       data: view,
       hasPaging: this.hasPaging(),
-      //isEditing: this.isEditing(),
+      isEditing: this.isEditing(),
       renderRowEditor: this.props.renderRowEditor,
     })
   }

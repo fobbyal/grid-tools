@@ -7,6 +7,6 @@ import Grid, { virtualizedGridRenderer } from '../../index'
 import { createData, headers } from '../data'
 
 const data = createData(80)
-storiesOf('Free edit grid', module).add('Basic', () => (
+storiesOf('Virtualized grid', module).add('Basic', () => (
   <Grid data={data} headers={headers} render={virtualizedGridRenderer()} />
 ))

@@ -34,7 +34,7 @@ class ControlledEditDemo extends React.Component {
 
   render() {
     const { data, showAdd } = this.state
-    const { headers } = this.props
+    const { headers, controlled } = this.props
     return (
       <div>
         <div style={{ marginBottom: '.3em' }}>
@@ -50,7 +50,7 @@ class ControlledEditDemo extends React.Component {
               headerWidth: '130px',
             }),
           })}
-          onEdit={this.onEdit}
+          onEdit={controlled ? this.onEdit : undefined}
           onSelectionChange={this.selectionChange}
           isEditable
           showAdd={showAdd}

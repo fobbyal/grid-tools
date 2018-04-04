@@ -147,4 +147,5 @@ storiesOf('Flex Grid', module)
   .add('10k rows non Scroll paging', () => (
     <Grid headers={headers} data={tenKData} rowsPerPage={15} render={flexGridRenderer()} />
   ))
-  .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)
+  .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} controlled />)
+  .add('Un-Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)
