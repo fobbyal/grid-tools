@@ -14,6 +14,7 @@ import ScrollPane from './ScrollPane'
 import moment from 'moment'
 import RowEditor from './RowEditor'
 import { applyEdits, generateInitialEditInfo, addRow, removeRow, updateRow } from './editEngine'
+import { selector, normalizeSelection, isCellSelected, isRowSelected } from './selection-util'
 
 import {
   ROW_INDEX_ATTRIBUTE,
@@ -24,28 +25,6 @@ import {
 
 const rowHeightOf = (index, rowHeight) =>
   typeof rowHeight === 'function' ? rowHeight(index) : rowHeight
-
-const empty = {}
-
-const normalizeBounds = selection => {
-  const { x1, y1, x2, y2 } = selection
-  if (R.isNil(x1) && R.isNil(x2) && R.isNil(y1) && R.isNil(y2)) return empty
-
-  const xMin = !R.isNil(x2) ? Math.min(x1, x2) : x1
-  const xMax = !R.isNil(x2) ? Math.max(x1, x2) : x1
-  const yMin = !R.isNil(y2) ? Math.min(y1, y2) : y1
-  const yMax = !R.isNil(y2) ? Math.max(y1, y2) : y1
-  return { x1: xMin, x2: xMax, y1: yMin, y2: yMax }
-}
-const isCellSelected = (rowIndex, columnIndex, selection) => {
-  const { x1, x2, y1, y2 } = normalizeBounds(selection)
-  return rowIndex <= y2 && rowIndex >= y1 && columnIndex <= x2 && columnIndex >= x1
-}
-
-const isRowSelected = (rowIndex, selection) => {
-  const { y1, y2 } = normalizeBounds(selection)
-  return rowIndex <= y2 && rowIndex >= y1
-}
 
 const toggleSortOrder = order => (order === 'asc' ? 'desc' : order === 'desc' ? undefined : 'asc')
 
@@ -448,6 +427,23 @@ class Grid extends React.PureComponent {
     })
 
   /*  selection starts */
+
+  selectRight = expand => {
+    this.setState(selector.right(this.state, expand, this.props.headers.length))
+  }
+
+  selectLeft = expand => {
+    this.setState(selector.left(this.state, expand))
+  }
+
+  selectTop = expand => {
+    this.setState(selector.up(this.state, expand))
+  }
+
+  selectBottom = expand => {
+    this.setState(selector.down(this.state, expand, this.state.view.length))
+  }
+
   startSelectionState(rowIndex, columnIndex) {
     this.selecting = this.props.selectionMode === 'multi' && true
     return { x1: columnIndex, y1: rowIndex, x2: columnIndex, y2: rowIndex }
@@ -464,7 +460,7 @@ class Grid extends React.PureComponent {
   selectionChanged = _ => {
     const { headers, onSelectionChange } = this.props
     if (onSelectionChange) {
-      const { x1, x2, y1, y2 } = normalizeBounds(this.state)
+      const { x1, x2, y1, y2 } = normalizeSelection(this.state)
       const selectedRows = []
       const selectedHeaders = []
       const { view } = this.state
@@ -567,10 +563,8 @@ class Grid extends React.PureComponent {
   }
 
   gridKeyDown = e => {
-    console.log('gothere...')
-    const { x2: columnIndex, y2: rowIndex } = normalizeBounds(this.state)
+    const { x2: columnIndex, y2: rowIndex } = normalizeSelection(this.state)
     const selectionValid = !R.isNil(columnIndex) && !R.isNil(rowIndex)
-    console.log(selectionValid, columnIndex, rowIndex, this.isGridEditing())
     if (selectionValid) {
       const isEditAttempt =
         !this.isGridEditing() &&
@@ -588,10 +582,22 @@ class Grid extends React.PureComponent {
         this.setState({
           editingColumn: columnIndex,
           editingRow: rowIndex,
-          initialEditChar: String.fromCharCode(e.keyCode),
         })
       }
     }
+    if (!this.isGridEditing()) {
+      if (e.keyCode === 37) this.selectLeft(e.shiftKey)
+      if (e.keyCode === 39) this.selectRight(e.shiftKey)
+      if (e.keyCode === 38) this.selectTop(e.shiftKey)
+      if (e.keyCode === 40) this.selectBottom(e.shiftKey)
+    }
+  }
+
+  cancelCellEdit = () => {
+    this.setState({
+      editingColumn: undefined,
+      editingRow: undefined,
+    })
   }
 
   cellMouseDown = e => {
@@ -657,7 +663,7 @@ class Grid extends React.PureComponent {
   })
 
   getCellProps = ({ key, rowIndex, columnIndex, header, data, rowData, rowHeight, ...rest }) => {
-    const { selectionType, hoverType, editingRow, editingColumn, editMode } = this.props
+    const { selectionType, hoverType } = this.props
     return {
       [ROW_INDEX_ATTRIBUTE]: rowIndex,
       key: key || rowIndex + '*' + header.ident,
@@ -682,8 +688,14 @@ class Grid extends React.PureComponent {
       height: rowHeightOf(rowIndex, rowHeight),
       width: header.width,
       alignment: header.alignment,
+      /* for editor */
       isEditing: this.isCellEditing(rowIndex, columnIndex),
       commitRowEdit: this.commitRowEdit,
+      cancelEdit: this.cancelCellEdit,
+      selectRight: this.selectRight,
+      selectLeft: this.selectLeft,
+      selectTop: this.selectTop,
+      selectBottom: this.selectBottom,
     }
   }
 
@@ -712,7 +724,7 @@ class Grid extends React.PureComponent {
   })
 
   getRowEditorProps = _ => {
-    const { y1 } = normalizeBounds(this.state)
+    const { y1 } = normalizeSelection(this.state)
     const { addWithSelected } = this.props
     return {
       onClose: this.cancelEdit,

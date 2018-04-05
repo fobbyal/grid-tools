@@ -1,6 +1,6 @@
 import React from 'react'
 import { BasicCellInput } from './Components'
-import { sumWidth, formatData, extractData, sumHeight } from './utils'
+import { formatData, extractData } from './utils'
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 
 export const CellEditor = BasicCellInput.extend`
@@ -60,6 +60,7 @@ class CellEditContainer extends React.Component {
     const { value } = this.state
 
     const rowData = data[rowIndex]
+
     if (commitRowEdit) {
       commitRowEdit({ currentRow: rowData, editedRow: { ...rowData, [header.ident]: value } })
     } else {
@@ -67,7 +68,56 @@ class CellEditContainer extends React.Component {
     }
   }
 
-  cancelEdit = _ => {}
+  cancelEdit = _ => {
+    if (this.props.cancelEdit) {
+      this.props.cancelEdit()
+    }
+  }
+
+  inputKeyDown = e => {
+    const { selectRight, selectBottom, selectLeft, selectTop } = this.props
+    console.log('key typed in input', e.keyCode)
+    // enter
+    if (e.keyCode === 13) {
+      this.commitEdit()
+    }
+    // escape
+    if (e.keyCode === 27) {
+      this.cancelEdit()
+    }
+    // right arrow
+    if (
+      e.keyCode === 39 &&
+      this.node &&
+      typeof this.node.selectionStart === 'number' &&
+      this.node.selectionStart === this.node.value.length &&
+      this.node.selectionStart === this.node.selectionEnd
+    ) {
+      this.commitEdit()
+      selectRight && selectRight()
+    }
+    // left arrow
+    if (
+      e.keyCode === 37 &&
+      this.node &&
+      typeof this.node.selectionStart === 'number' &&
+      this.node.selectionStart === 0 &&
+      this.node.selectionStart === this.node.selectionEnd
+    ) {
+      this.commitEdit()
+      selectLeft && selectLeft()
+    }
+    // up arrow
+    if (e.keyCode === 38) {
+      this.commitEdit()
+      selectTop && selectTop()
+    }
+    // down arrow
+    if (e.keyCode === 40) {
+      this.commitEdit()
+      selectBottom && selectBottom()
+    }
+  }
 
   render() {
     const { rowIndex, columnIndex, width, alignment, height, fontSize, fontWeight } = this.props
@@ -90,6 +140,7 @@ class CellEditContainer extends React.Component {
         onBlur={this.commitEdit}
         innerRef={this.refHandler}
         onChange={this.inputValueChanged}
+        onKeyDown={this.inputKeyDown}
       />
     )
   }
