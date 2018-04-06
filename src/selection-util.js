@@ -27,7 +27,7 @@ export const left = (selection, expand) => {
   const { x1, y1, x2, y2 } = normalizeSelection(selection)
   let x = expand ? x2 - 1 : x1 - 1
   x = x < 0 ? 0 : x
-  return expand ? { x1: x, x2, y1, y2 } : { x1: x, x2: x, y1, y2: y1 }
+  return expand ? { x1: x1, x2: x, y1, y2 } : { x1: x, x2: x, y1, y2: y1 }
 }
 
 export const right = (selection, expand, colCount) => {
@@ -44,7 +44,7 @@ export const up = (selection, expand) => {
 
   y = y < 0 ? 0 : y
 
-  return expand ? { y1: y, y2, x1, x2 } : { x1, y1: y, x2: x1, y2: y }
+  return expand ? { y1: y1, y2: y, x1, x2 } : { x1, y1: y, x2: x1, y2: y }
 }
 
 export const down = (selection, expand, rowCount) => {
