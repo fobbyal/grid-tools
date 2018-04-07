@@ -1,11 +1,12 @@
 import React from 'react'
+import R from 'ramda'
 import { formatData, extractData } from './utils'
 /* eslint-disable no-unused-vars  */
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 /* eslint-enable  no-unused-vars */
 // import PropTypes from 'prop-types'
 
-//TODO: determin prop types later
+// TODO: determin prop types later
 const getInitialState = ({ rowIndex, columnIndex, header, width, height, data, render }) => {
   const value = extractData({ header, rowData: data[rowIndex] }) || ''
   const display = formatData({ header, value, rowData: data[rowIndex] })
@@ -40,13 +41,13 @@ class CellEditContainer extends React.Component {
 
   refHandler = n => (this.node = n)
 
-  commitEdit = _ => {
+  commitEdit = commitedValue => {
     /**
      * TODO the following could be dynamic for example 1 value changing 2
      * may need special logic or tricks from header to describe this logic
      **/
     const { rowIndex, header, data, commitRowEdit } = this.props
-    const { value } = this.state
+    const value = R.isNil(commitedValue) ? this.state.value : commitedValue
 
     const rowData = data[rowIndex]
 
@@ -63,29 +64,37 @@ class CellEditContainer extends React.Component {
     }
   }
 
+  leaveEditState = () => {
+    if (this.props.value !== this.state.value) {
+      this.commitEdit()
+      return
+    }
+    this.cancelEdit()
+  }
+
   /** navigation props ***/
 
   selectLeftCell = () => {
     const { selectLeft } = this.props
-    this.commitEdit()
+    this.leaveEditState()
     selectLeft && selectLeft()
   }
 
   selectRightCell = () => {
     const { selectRight } = this.props
-    this.commitEdit()
+    this.leaveEditState()
     selectRight && selectRight()
   }
 
   selectTopCell = () => {
     const { selectTop } = this.props
-    this.commitEdit()
+    this.leaveEditState()
     selectTop && selectTop()
   }
 
   selectBottomCell = () => {
     const { selectBottom } = this.props
-    this.commitEdit()
+    this.leaveEditState()
     selectBottom && selectBottom()
   }
 
@@ -158,20 +167,32 @@ class CellEditContainer extends React.Component {
     }
   }
 
-  getInputProps = ({ refKey }) => ({
+  getInputProps = ({ refKey = 'ref' }) => ({
     ...this.getCommonProps(),
-    onBlur: this.commitEdit,
+    onBlur: this.leaveEditState,
     [refKey]: this.refHandler,
     // ref: this.refHandler,
     onChange: this.inputValueChanged,
     onKeyDown: this.inputKeyDown,
   })
 
-  getDropdownProps = () => ({})
+  dropdownValueChanged = ({ value }) => {
+    console.log('selected and committing', value)
+    this.commitEdit(value)
+  }
+
+  getDropdownProps = ({ refKey = 'ref' }) => ({
+    ...this.getCommonProps(),
+    onBlur: this.leaveEditState,
+    [refKey]: this.refHandler,
+    onChange: this.dropdownValueChanged,
+    inputKeyDown: e => console.log('input keydown called', e),
+    choices: this.props.header.choices,
+  })
 
   render() {
     const { render } = this.props
-    return render({ getInputProps: this.getInputProps })
+    return render({ getInputProps: this.getInputProps, getDropdownProps: this.getDropdownProps })
   }
 }
 

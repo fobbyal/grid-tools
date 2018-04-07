@@ -5,6 +5,29 @@ import styled from 'styled-components'
 import { List } from 'react-virtualized'
 import R from 'ramda'
 
+const listContainerStyle = `
+  border: solid 1px #ccc;
+  border-radius: 3px;
+  background-color: white;
+`
+
+const VirtualizedList = styled(List)`
+  ${listContainerStyle};
+`
+
+const BasicList = styled.div`
+  ${listContainerStyle};
+  min-height: 30px;
+`
+
+const Item = styled.div`
+  font-weight: ${props => (props.selected ? 'bold' : 'normal')};
+  color: ${props => (props.selected ? 'brown' : 'initial')};
+  background-color: ${props => (props.hilighted ? '#eee' : 'initial')};
+  padding: 4px 0.3em;
+  cursor: pointer;
+`
+
 // TODO: think about values that may be other primitives
 const partialMatch = (a, b) =>
   !R.isNil(a) &&
@@ -19,6 +42,18 @@ const matchesInput = inputValue => ({ value, text }) =>
   partialMatch(value, inputValue) ||
   partialMatch(text, inputValue)
 
+const renderListItem = ({ getItemProps, style, item, index, selectedItem, highlightedIndex }) => (
+  <Item
+    {...getItemProps({ item, index })}
+    key={item.value}
+    style={style}
+    selected={selectedItem === item}
+    hilighted={highlightedIndex === index}
+  >
+    {item.text || item.value}
+  </Item>
+)
+
 const renderVirtualizedList = ({
   getItemProps,
   /* isOpen, */
@@ -31,10 +66,11 @@ const renderVirtualizedList = ({
   arrowProps,
   choices,
   minWidth,
+  justOpened,
 }) => {
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
 
-  const visibleChoices = choices.filter(matchesInput(inputValue))
+  const visibleChoices = justOpened ? choices : choices.filter(matchesInput(inputValue))
 
   const rowRenderer = ({
     key, // Unique key within array of rows
@@ -43,31 +79,26 @@ const renderVirtualizedList = ({
     isVisible, // This row is visible within the List (eg it is not an overscanned row)
     style, // Style object to be applied to row (to position it)
   }) => {
-    const item = visibleChoices[index]
-    // console.log('render cell')
-    return (
-      <div
-        {...getItemProps({ item, index })}
-        key={item.value}
-        style={{
-          ...style,
-          backgroundColor: highlightedIndex === index ? 'gray' : 'white',
-          fontWeight: selectedItem === item ? 'bold' : 'normal',
-        }}
-      >
-        {item.text || item.value}
-      </div>
-    )
+    return renderListItem({
+      getItemProps,
+      style,
+      item: visibleChoices[index],
+      index,
+      selectedItem,
+      highlightedIndex,
+    })
   }
-  console.log('min width is ', visibleChoices.length)
+  // console.log('min width is ', visibleChoices.length)
+  const index = R.findIndex(a => a === selectedItem, visibleChoices)
 
   return (
-    <List
-      width={300}
-      height={240}
+    <VirtualizedList
+      width={minWidth}
+      height={250}
       rowCount={visibleChoices.length}
-      rowHeight={20}
+      rowHeight={30}
       rowRenderer={rowRenderer}
+      scrollToIndex={justOpened && index >= 0 ? index : undefined}
     />
   )
 }
@@ -85,28 +116,30 @@ const renderBasicList = ({
   choices,
   minWidth,
 }) => (
-  <div ref={ref} style={{ ...style, minWidth: minWidth + 'px', border: '1px solid #ccc' }}>
-    {choices
-      // .filter(matchesInput(inputValue))
-      .map((item, index) => (
-        <div
-          {...getItemProps({ item, index })}
-          key={item.value}
-          style={{
-            backgroundColor: highlightedIndex === index ? 'gray' : 'white',
-            fontWeight: selectedItem === item ? 'bold' : 'normal',
-          }}
-        >
-          {item.text || item.value}
-        </div>
-      ))}
-  </div>
+  <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px' }}>
+    {choices.map((item, index) =>
+      renderListItem({
+        getItemProps,
+        item,
+        index,
+        selectedItem,
+        highlightedIndex,
+      })
+    )}
+  </BasicList>
 )
 
 class DropDownCellEditor extends React.Component {
-  handelInputRef = n => (this.input = n)
+  handelInputRef = node => {
+    console.log('inner ref method is', this.props.innerRef)
+    this.input = node
+    console.log('inner ref method is', this.props.innerRef)
+    if (this.props.innerRef) {
+      this.props.innerRef(node)
+    }
+  }
 
-  state = { showSelection: false, initialState: true }
+  state = { showSelection: false, justOpened: true }
 
   componentDidMount() {
     // console.log('input is ', this.input)
@@ -115,7 +148,7 @@ class DropDownCellEditor extends React.Component {
 
   inputValueChanged = value => {
     console.log('value changed to ', value)
-    this.setState({ initialState: false })
+    this.setState({ justOpened: false })
   }
 
   render() {
@@ -128,17 +161,20 @@ class DropDownCellEditor extends React.Component {
       width = 150,
       height = 25,
       placeholder,
+      onBlur,
     } = this.props
-    const { showSelection } = this.state
+    const { showSelection, justOpened } = this.state
     // TODO match min width of cell
     const isLongList = choices.length > 10
     const renderList = isLongList ? renderVirtualizedList : renderBasicList
 
     const selectedItem = R.find(c => value === c.value, choices)
+    const hilightedIndex = R.findIndex(c => value === c.value, choices)
 
     return (
       <Downshift
         defaultSelectedItem={selectedItem}
+        defaultHighlightedIndex={hilightedIndex}
         onInputValueChange={this.inputValueChanged}
         onChange={onChange}
         itemToString={({ vallue, text }) => text || value + ''}
@@ -149,6 +185,7 @@ class DropDownCellEditor extends React.Component {
                 {...getInputProps({ placeholder })}
                 ref={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
+                onBlur={onBlur}
                 className={className}
               />
             ) : (
@@ -156,6 +193,7 @@ class DropDownCellEditor extends React.Component {
                 {...getToggleButtonProps()}
                 ref={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
+                onBlur={onBlur}
                 className={className}
               >
                 {downshiftProps.selectedItem
@@ -167,7 +205,13 @@ class DropDownCellEditor extends React.Component {
               <PortaledPopper
                 referenceElement={this.input}
                 render={popperProps =>
-                  renderList({ ...popperProps, ...downshiftProps, choices, minWidth: width })
+                  renderList({
+                    ...popperProps,
+                    ...downshiftProps,
+                    choices,
+                    minWidth: width,
+                    justOpened,
+                  })
                 }
               />
             )}

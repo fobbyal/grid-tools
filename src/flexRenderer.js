@@ -6,6 +6,7 @@ import { sumWidth, formatData, extractData, sumHeight } from './utils'
 import DefaultPager from './DefaultPager'
 import { BasicCell, BasicColHeader, SortIndicator, BasicCellInput } from './Components'
 import CellEditContainer from './CellEditContainer'
+import DropdownCellEditor from './DropdownCellEditor'
 // import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
@@ -129,8 +130,12 @@ export const defaultCellRenderer = ({
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return <PureCell {...rest} width={width} height={height} title={value} display={display} />
 }
-export const defaultCellEditRender = ({ getInputProps }) => (
+export const inputCellEditRender = ({ getInputProps }) => (
   <CellInputEditor {...getInputProps({ refKey: 'innerRef' })} />
+)
+
+export const dropdownEditRender = ({ getDropdownProps }) => (
+  <DropdownCellEditor {...getDropdownProps({ refKey: 'innerRef' })} />
 )
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />
@@ -139,14 +144,11 @@ class FlexGridCell extends React.PureComponent {
   render() {
     // console.log('rendering cell..')
     // TODO: strip props that are not for editing here
-    const {
-      isEditing,
-      render = defaultCellRenderer,
-      editRender = defaultCellEditRender,
-      ...rest
-    } = this.props
+    const { isEditing, render = defaultCellRenderer, editRender, ...rest } = this.props
     if (isEditing) {
-      return <CellEditContainer {...rest} render={editRender} />
+      const computedEditRender =
+        editRender || (rest.header.choices ? dropdownEditRender : inputCellEditRender)
+      return <CellEditContainer {...rest} render={computedEditRender} />
     }
     return render(this.props)
   }

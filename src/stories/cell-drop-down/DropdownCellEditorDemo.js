@@ -2,7 +2,7 @@ import React from 'react'
 import DropdownCellEditor from '../../DropdownCellEditor'
 
 class DropDownCellEditorDemo extends React.Component {
-  state = { selected: this.props.choices[0].value }
+  state = { selected: this.props.choices[this.props.choices.length - 1].value }
 
   valueChanged = value => {
     console.log('value changed to ', value)
