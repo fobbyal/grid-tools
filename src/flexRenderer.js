@@ -6,7 +6,7 @@ import { sumWidth, formatData, extractData, sumHeight } from './utils'
 import DefaultPager from './DefaultPager'
 import { BasicCell, BasicColHeader, SortIndicator, BasicCellInput } from './Components'
 import CellEditContainer from './CellEditContainer'
-import { shallowEqualExplain } from 'shallow-equal-explain'
+// import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
   flex: 0 0 ${props => props.width}px;
@@ -24,7 +24,7 @@ export const Cell = BasicCell.extend`
   width: ${props => props.width}px;
 `
 
-export const CellEditor = BasicCellInput.extend`
+export const CellInputEditor = BasicCellInput.extend`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
 `
@@ -115,23 +115,39 @@ class PureCell extends React.PureComponent {
   // }
 }
 
-export const defaultCellRenderer = props => {
-  const { isEditing } = props
-  if (isEditing) {
-    return <CellEditContainer {...props} />
-  }
-  const { rowIndex, columnIndex, header, width, height, data, render, ...rest } = props
+export const defaultCellRenderer = ({
+  rowIndex,
+  columnIndex,
+  header,
+  width,
+  height,
+  data,
+  render,
+  ...rest
+}) => {
   const value = extractData({ header, rowData: data[rowIndex] })
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return <PureCell {...rest} width={width} height={height} title={value} display={display} />
 }
+export const defaultCellEditRender = ({ getInputProps }) => (
+  <CellInputEditor {...getInputProps({ refKey: 'innerRef' })} />
+)
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />
 
 class FlexGridCell extends React.PureComponent {
   render() {
     // console.log('rendering cell..')
-    const { render = defaultCellRenderer } = this.props
+    // TODO: strip props that are not for editing here
+    const {
+      isEditing,
+      render = defaultCellRenderer,
+      editRender = defaultCellEditRender,
+      ...rest
+    } = this.props
+    if (isEditing) {
+      return <CellEditContainer {...rest} render={editRender} />
+    }
     return render(this.props)
   }
 }
@@ -233,6 +249,7 @@ const flexGridRenderer = ({
   data,
   hasPaging,
   renderRowEditor,
+  gridContainerRefHandler,
 }) => {
   const pagerHeight = 35
   const rawDataWidth = sumWidth(headers)
@@ -298,6 +315,7 @@ const flexGridRenderer = ({
       style={style}
       className={className}
       tabIndex="0"
+      innerRef={gridContainerRefHandler}
     >
       {/* col header non-scrolling part/fixed columns */}
       {numOfFixedCols > 0 && (

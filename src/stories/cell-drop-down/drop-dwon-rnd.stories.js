@@ -4,10 +4,23 @@ import PortaledPopperDemo from './PortalPopperDemo'
 import DownshiftExample from './DownshiftExample'
 import { action } from '@storybook/addon-actions'
 import DropdownCellEditor from '../../DropdownCellEditor'
-import R from 'ramda'
+import DropdownCellEditorDemo from './DropdownCellEditorDemo'
+import Chance from 'chance'
 
 // ClickedPopper.js
 import { storiesOf } from '@storybook/react'
+
+const chance = new Chance()
+
+console.log('chance is ', chance)
+
+const virtualiedChoices = chance
+  .unique(() => chance.word({ syllables: 4 }), 1000)
+  .map((text, value) => ({ value, text }))
+
+const normalChoices = chance
+  .unique(() => chance.word({ syllables: 4 }), 9)
+  .map((text, value) => ({ value, text }))
 
 storiesOf('DropDown RND')
   .add('Popper Doc Example', () => <ClickExample />)
@@ -16,11 +29,8 @@ storiesOf('DropDown RND')
     <DownshiftExample items={['one', 'two', 'three']} onChange={action('selected item:')} />
   ))
   .add('Dropdown Cell editor', () => (
-    <DropdownCellEditor items={['one', 'two', 'three']} onChange={action('selected item:')} />
+    <DropdownCellEditor choices={normalChoices} onChange={action('selected item:')} />
   ))
   .add('Virtualized Dropdown Cell editor', () => (
-    <DropdownCellEditor
-      items={R.range(1, 1000).map(i => i + ' abcd ')}
-      onChange={action('selected item:')}
-    />
+    <DropdownCellEditorDemo choices={virtualiedChoices} />
   ))

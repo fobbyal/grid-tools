@@ -1,24 +1,12 @@
 import React from 'react'
-import { BasicCellInput } from './Components'
 import { formatData, extractData } from './utils'
+/* eslint-disable no-unused-vars  */
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
+/* eslint-enable  no-unused-vars */
+// import PropTypes from 'prop-types'
 
-export const CellEditor = BasicCellInput.extend`
-  flex: 0 0 ${props => props.width}px;
-  width: ${props => props.width}px;
-`
-
-const getInitialState = ({
-  rowIndex,
-  columnIndex,
-  header,
-  width,
-  height,
-  data,
-  render,
-  isEditing,
-  ...rest
-}) => {
+//TODO: determin prop types later
+const getInitialState = ({ rowIndex, columnIndex, header, width, height, data, render }) => {
   const value = extractData({ header, rowData: data[rowIndex] }) || ''
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return { value, display }
@@ -40,6 +28,7 @@ class CellEditContainer extends React.Component {
 
   valueChanged = value => {
     console.log('value changed to', value)
+    // TODO: prevent string and number
     const { header, data, rowIndex } = this.props
     const display = formatData({ header, value, rowData: data[rowIndex] })
     this.setState({ value, display })
@@ -74,8 +63,33 @@ class CellEditContainer extends React.Component {
     }
   }
 
+  /** navigation props ***/
+
+  selectLeftCell = () => {
+    const { selectLeft } = this.props
+    this.commitEdit()
+    selectLeft && selectLeft()
+  }
+
+  selectRightCell = () => {
+    const { selectRight } = this.props
+    this.commitEdit()
+    selectRight && selectRight()
+  }
+
+  selectTopCell = () => {
+    const { selectTop } = this.props
+    this.commitEdit()
+    selectTop && selectTop()
+  }
+
+  selectBottomCell = () => {
+    const { selectBottom } = this.props
+    this.commitEdit()
+    selectBottom && selectBottom()
+  }
+
   inputKeyDown = e => {
-    const { selectRight, selectBottom, selectLeft, selectTop } = this.props
     console.log('key typed in input', e.keyCode)
     // enter
     if (e.keyCode === 13) {
@@ -93,9 +107,11 @@ class CellEditContainer extends React.Component {
       this.node.selectionStart === this.node.value.length &&
       this.node.selectionStart === this.node.selectionEnd
     ) {
-      this.commitEdit()
-      selectRight && selectRight()
+      this.selectRightCell()
     }
+
+    // tab
+    if (e.keyCode === 9) this.selectRightCell()
     // left arrow
     if (
       e.keyCode === 37 &&
@@ -104,45 +120,58 @@ class CellEditContainer extends React.Component {
       this.node.selectionStart === 0 &&
       this.node.selectionStart === this.node.selectionEnd
     ) {
-      this.commitEdit()
-      selectLeft && selectLeft()
+      this.selectLeftCell()
     }
+
     // up arrow
-    if (e.keyCode === 38) {
-      this.commitEdit()
-      selectTop && selectTop()
-    }
+    if (e.keyCode === 38) this.selectTopCell()
     // down arrow
-    if (e.keyCode === 40) {
-      this.commitEdit()
-      selectBottom && selectBottom()
+    if (e.keyCode === 40) this.selectBottomCell()
+  }
+
+  getCommonProps = () => {
+    const {
+      style,
+      className,
+      rowIndex,
+      columnIndex,
+      width,
+      alignment,
+      height,
+      fontSize,
+      fontWeight,
+    } = this.props
+
+    const { value, display } = this.state
+    return {
+      style,
+      className,
+      COLUMN_INDEX_ATTRIBUTE: columnIndex,
+      ROW_INDEX_ATTRIBUTE: rowIndex,
+      width,
+      height,
+      fontSize,
+      fontWeight,
+      value,
+      display,
+      alignment,
     }
   }
 
+  getInputProps = ({ refKey }) => ({
+    ...this.getCommonProps(),
+    onBlur: this.commitEdit,
+    [refKey]: this.refHandler,
+    // ref: this.refHandler,
+    onChange: this.inputValueChanged,
+    onKeyDown: this.inputKeyDown,
+  })
+
+  getDropdownProps = () => ({})
+
   render() {
-    const { rowIndex, columnIndex, width, alignment, height, fontSize, fontWeight } = this.props
-
-    const { value, display } = this.state
-
-    return (
-      <CellEditor
-        {...{
-          COLUMN_INDEX_ATTRIBUTE: columnIndex,
-          ROW_INDEX_ATTRIBUTE: rowIndex,
-          width,
-          height,
-          fontSize,
-          fontWeight,
-          value,
-          display,
-          alignment,
-        }}
-        onBlur={this.commitEdit}
-        innerRef={this.refHandler}
-        onChange={this.inputValueChanged}
-        onKeyDown={this.inputKeyDown}
-      />
-    )
+    const { render } = this.props
+    return render({ getInputProps: this.getInputProps })
   }
 }
 

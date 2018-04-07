@@ -534,11 +534,14 @@ class Grid extends React.PureComponent {
         )
 
         if (updateState) {
-          this.setState({
-            ...this.generateViewProps(),
-            editingRow: undefined,
-            editingColumn: undefined,
-          })
+          this.setState(
+            {
+              ...this.generateViewProps(),
+              editingRow: undefined,
+              editingColumn: undefined,
+            },
+            this.focusGrid
+          )
         }
       }
     }
@@ -592,12 +595,16 @@ class Grid extends React.PureComponent {
       if (e.keyCode === 40) this.selectBottom(e.shiftKey)
     }
   }
+  focusGrid = () => this.gridContainer && this.gridContainer.focus && this.gridContainer.focus()
 
   cancelCellEdit = () => {
-    this.setState({
-      editingColumn: undefined,
-      editingRow: undefined,
-    })
+    this.setState(
+      {
+        editingColumn: undefined,
+        editingRow: undefined,
+      },
+      this.focusGrid
+    )
   }
 
   cellMouseDown = e => {
@@ -739,6 +746,8 @@ class Grid extends React.PureComponent {
     }
   }
 
+  gridContainerRefHandler = node => (this.gridContainer = node)
+
   render() {
     console.log('grid renderer.... ')
     const { view } = this.state
@@ -753,6 +762,7 @@ class Grid extends React.PureComponent {
       data: view,
       hasPaging: this.hasPaging(),
       renderRowEditor: this.props.renderRowEditor,
+      gridContainerRefHandler: this.gridContainerRefHandler,
     })
   }
 }

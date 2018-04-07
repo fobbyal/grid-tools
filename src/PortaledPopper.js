@@ -43,7 +43,7 @@ class PortaledPopper extends React.Component {
 
   render() {
     const { render, ...rest } = this.props
-    console.log('rendering here...', this.anchor)
+    if (process.env.NODE_ENV === 'development') console.log('rendering popper on:', this.anchor)
     return ReactDOM.createPortal(<Popper {...rest}>{render}</Popper>, this.anchor)
   }
 }
