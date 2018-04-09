@@ -2813,9 +2813,9 @@ dotenv@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-5.0.1.tgz#a5317459bd3d79ab88cff6e44057a6a3fbb1fcef"
 
-downshift@^1.31.3:
-  version "1.31.3"
-  resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.3.tgz#09743d904de8cd18d6f22d2075c943b898aa0ef0"
+downshift@^1.31.4:
+  version "1.31.4"
+  resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.4.tgz#72ab0b8ac4c5801221ed098f97817c70899c9d16"
 
 duplexer@^0.1.1:
   version "0.1.1"

@@ -120,7 +120,10 @@ class CellEditContainer extends React.Component {
     }
 
     // tab
-    if (e.keyCode === 9) this.selectRightCell()
+    if (e.keyCode === 9) {
+      e.preventDefault()
+      this.selectRightCell()
+    }
     // left arrow
     if (
       e.keyCode === 37 &&
@@ -136,6 +139,22 @@ class CellEditContainer extends React.Component {
     if (e.keyCode === 38) this.selectTopCell()
     // down arrow
     if (e.keyCode === 40) this.selectBottomCell()
+  }
+
+  dropdownKeyDown = e => {
+    console.log('key typed in input', e.keyCode)
+    // escape
+    if (e.keyCode === 27) this.cancelEdit()
+    // right arrow
+    if (e.keyCode === 39) this.selectRightCell()
+
+    // tab
+    if (e.keyCode === 9) {
+      e.preventDefault()
+      this.selectRightCell()
+    }
+    // left arrow
+    if (e.keyCode === 37) this.selectLeftCell()
   }
 
   getCommonProps = () => {
@@ -186,7 +205,7 @@ class CellEditContainer extends React.Component {
     onBlur: this.leaveEditState,
     [refKey]: this.refHandler,
     onChange: this.dropdownValueChanged,
-    inputKeyDown: e => console.log('input keydown called', e),
+    onKeyDown: this.dropdownKeyDown,
     choices: this.props.header.choices,
   })
 

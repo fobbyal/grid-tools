@@ -28,6 +28,11 @@ const Item = styled.div`
   cursor: pointer;
 `
 
+const ComboSelector = styled.button`
+  background-color: white;
+  border: 1px solid black;
+`
+
 // TODO: think about values that may be other primitives
 const partialMatch = (a, b) =>
   !R.isNil(a) &&
@@ -131,9 +136,7 @@ const renderBasicList = ({
 
 class DropDownCellEditor extends React.Component {
   handelInputRef = node => {
-    console.log('inner ref method is', this.props.innerRef)
     this.input = node
-    console.log('inner ref method is', this.props.innerRef)
     if (this.props.innerRef) {
       this.props.innerRef(node)
     }
@@ -162,6 +165,7 @@ class DropDownCellEditor extends React.Component {
       height = 25,
       placeholder,
       onBlur,
+      onKeyDown,
     } = this.props
     const { showSelection, justOpened } = this.state
     // TODO match min width of cell
@@ -189,9 +193,9 @@ class DropDownCellEditor extends React.Component {
                 className={className}
               />
             ) : (
-              <button
-                {...getToggleButtonProps()}
-                ref={this.handelInputRef}
+              <ComboSelector
+                {...getToggleButtonProps({ onKeyDown })}
+                innerRef={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
                 onBlur={onBlur}
                 className={className}
@@ -199,7 +203,7 @@ class DropDownCellEditor extends React.Component {
                 {downshiftProps.selectedItem
                   ? downshiftProps.selectedItem.text || downshiftProps.selectedItem.value
                   : placeholder || 'Select a value'}
-              </button>
+              </ComboSelector>
             )}
             {showSelection && (
               <PortaledPopper
