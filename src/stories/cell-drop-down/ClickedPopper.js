@@ -40,7 +40,6 @@ class StandaloneExample extends PureComponent {
                   <li>Popper element aseaseafef</li>
                   <li>Popper element aseaseafef</li>
                 </ul>
-                <div ref={arrowProps.ref} style={arrowProps.style} />
               </div>
             )}
           </Popper>
