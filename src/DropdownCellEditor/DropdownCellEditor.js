@@ -74,6 +74,7 @@ const renderVirtualizedList = ({
   justOpened,
 }) => {
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
+  console.log('virtualized style is ', style)
 
   const visibleChoices = justOpened ? choices : choices.filter(matchesInput(inputValue))
 
@@ -97,14 +98,16 @@ const renderVirtualizedList = ({
   const index = R.findIndex(a => a === selectedItem, visibleChoices)
 
   return (
-    <VirtualizedList
-      width={minWidth}
-      height={250}
-      rowCount={visibleChoices.length}
-      rowHeight={30}
-      rowRenderer={rowRenderer}
-      scrollToIndex={justOpened && index >= 0 ? index : undefined}
-    />
+    <div ref={ref} style={style}>
+      <VirtualizedList
+        width={minWidth}
+        height={250}
+        rowCount={visibleChoices.length}
+        rowHeight={30}
+        rowRenderer={rowRenderer}
+        scrollToIndex={justOpened && index >= 0 ? index : undefined}
+      />
+    </div>
   )
 }
 
@@ -120,19 +123,22 @@ const renderBasicList = ({
   arrowProps,
   choices,
   minWidth,
-}) => (
-  <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px' }}>
-    {choices.map((item, index) =>
-      renderListItem({
-        getItemProps,
-        item,
-        index,
-        selectedItem,
-        highlightedIndex,
-      })
-    )}
-  </BasicList>
-)
+}) => {
+  console.log('basic list style is ', style)
+  return (
+    <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px' }}>
+      {choices.map((item, index) =>
+        renderListItem({
+          getItemProps,
+          item,
+          index,
+          selectedItem,
+          highlightedIndex,
+        })
+      )}
+    </BasicList>
+  )
+}
 
 class DropDownCellEditor extends React.Component {
   handelInputRef = node => {
@@ -140,14 +146,15 @@ class DropDownCellEditor extends React.Component {
     if (this.props.innerRef) {
       this.props.innerRef(node)
     }
+    this.setState({ showSelection: true })
   }
 
   state = { showSelection: false, justOpened: true }
 
-  componentDidMount() {
-    // console.log('input is ', this.input)
-    if (this.input) this.setState({ showSelection: true })
-  }
+  // componentDidMount() {
+  //   // console.log('input is ', this.input)
+  //   if (this.input)
+  // }
 
   inputValueChanged = value => {
     console.log('value changed to ', value)
@@ -210,8 +217,8 @@ class DropDownCellEditor extends React.Component {
                 referenceElement={this.input}
                 render={popperProps =>
                   renderList({
-                    ...popperProps,
                     ...downshiftProps,
+                    ...popperProps,
                     choices,
                     minWidth: width,
                     justOpened,

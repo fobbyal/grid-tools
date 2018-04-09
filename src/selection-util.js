@@ -23,35 +23,48 @@ export const isRowSelected = (rowIndex, selection) => {
 }
 
 export const left = (selection, expand) => {
-  // return x >= 0 ? { x, y, shift } : { x: 0, y, shift }
-  const { x1, y1, x2, y2 } = normalizeSelection(selection)
-  let x = expand ? x2 - 1 : x1 - 1
-  x = x < 0 ? 0 : x
-  return expand ? { x1: x1, x2: x, y1, y2 } : { x1: x, x2: x, y1, y2: y1 }
+  const { x1, y1, x2, y2 } = selection
+
+  if (!expand) {
+    const x = Math.max(x1 - 1, 0)
+    return { x1: x, x2: x, y1, y2: y1 }
+  }
+  const x = Math.max(x2 - 1, 0)
+
+  return { x1, x2: x, y1, y2 }
 }
 
 export const right = (selection, expand, colCount) => {
-  const { x1, y1, x2, y2 } = normalizeSelection(selection)
-  let x = expand ? x2 + 1 : x1 + 1
-  x = x < colCount ? x : colCount - 1
-  return expand ? { x1, x2: x, y1, y2 } : { x1: x, x2: x, y1, y2: y1 }
+  const { x1, y1, x2, y2 } = selection
+
+  if (!expand) {
+    const x = Math.min(x1 + 1, colCount - 1)
+    return { x1: x, x2: x, y1, y2: y1 }
+  }
+  const x = Math.min(x2 + 1, colCount - 1)
+
+  return { x1, x2: x, y1, y2 }
 }
 
 export const up = (selection, expand) => {
-  const { x1, y1, x2, y2 } = normalizeSelection(selection)
-
-  let y = expand ? y2 - 1 : y1 - 1
-
-  y = y < 0 ? 0 : y
-
-  return expand ? { y1: y1, y2: y, x1, x2 } : { x1, y1: y, x2: x1, y2: y }
+  const { x1, y1, x2, y2 } = selection
+  if (!expand) {
+    const y = Math.max(y1 - 1, 0)
+    return { x1, y1: y, x2: x1, y2: y }
+  }
+  const y = Math.max(y2 - 1, 0)
+  return { y1: y1, y2: y, x1, x2 }
 }
 
 export const down = (selection, expand, rowCount) => {
-  const { x1, y1, x2, y2 } = normalizeSelection(selection)
-  let y = expand ? y2 + 1 : y1 + 1
-  y = y < rowCount ? y : rowCount - 1
-  return expand ? { x1, x2, y1, y2: y } : { x1, x2: x1, y1: y, y2: y }
+  const { x1, y1, x2, y2 } = selection
+  if (!expand) {
+    const y = Math.min(y1 + 1, rowCount - 1)
+    return { x1, y1: y, x2: x1, y2: y }
+  }
+  const y = Math.min(y2 + 1, rowCount - 1)
+
+  return { x1, x2, y1, y2: y }
 }
 
 export const selector = { left, right, up, down }
