@@ -593,6 +593,10 @@ class Grid extends React.PureComponent {
       if (e.keyCode === 39) this.selectRight(e.shiftKey)
       if (e.keyCode === 38) this.selectTop(e.shiftKey)
       if (e.keyCode === 40) this.selectBottom(e.shiftKey)
+      if (e.keyCode === 9) {
+        e.preventDefault()
+        this.selectRight()
+      }
     }
   }
   focusGrid = () => this.gridContainer && this.gridContainer.focus && this.gridContainer.focus()

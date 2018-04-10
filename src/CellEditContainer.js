@@ -142,7 +142,7 @@ class CellEditContainer extends React.Component {
   }
 
   dropdownKeyDown = e => {
-    console.log('key typed in input', e.keyCode)
+    console.log('key typed in dropdown selector', e.keyCode)
     // escape
     if (e.keyCode === 27) this.cancelEdit()
     // right arrow
@@ -155,6 +155,40 @@ class CellEditContainer extends React.Component {
     }
     // left arrow
     if (e.keyCode === 37) this.selectLeftCell()
+  }
+
+  dropdownInputKeyDown = e => {
+    console.log('key typed in dropdown input', e.keyCode)
+    // escape
+    if (e.keyCode === 27) {
+      this.cancelEdit()
+    }
+    // right arrow
+    if (
+      e.keyCode === 39 &&
+      this.node &&
+      typeof this.node.selectionStart === 'number' &&
+      this.node.selectionStart === this.node.value.length &&
+      this.node.selectionStart === this.node.selectionEnd
+    ) {
+      this.selectRightCell()
+    }
+
+    // tab
+    if (e.keyCode === 9) {
+      e.preventDefault()
+      this.selectRightCell()
+    }
+    // left arrow
+    if (
+      e.keyCode === 37 &&
+      this.node &&
+      typeof this.node.selectionStart === 'number' &&
+      this.node.selectionStart === 0 &&
+      this.node.selectionStart === this.node.selectionEnd
+    ) {
+      this.selectLeftCell()
+    }
   }
 
   getCommonProps = () => {
@@ -200,14 +234,20 @@ class CellEditContainer extends React.Component {
     this.commitEdit(value)
   }
 
-  getDropdownProps = ({ refKey = 'ref' }) => ({
-    ...this.getCommonProps(),
-    onBlur: this.leaveEditState,
-    [refKey]: this.refHandler,
-    onChange: this.dropdownValueChanged,
-    onKeyDown: this.dropdownKeyDown,
-    choices: this.props.header.choices,
-  })
+  getDropdownProps = ({ refKey = 'ref' }) => {
+    const choices = this.props.header && this.props.header.choices
+    const virtualized = choices && choices.length > 10
+    const onKeyDown = virtualized ? this.dropdownInputKeyDown : this.dropdownKeyDown
+    return {
+      ...this.getCommonProps(),
+      onBlur: this.leaveEditState,
+      [refKey]: this.refHandler,
+      onChange: this.dropdownValueChanged,
+      onKeyDown,
+      choices,
+      virtualized,
+    }
+  }
 
   render() {
     const { render } = this.props

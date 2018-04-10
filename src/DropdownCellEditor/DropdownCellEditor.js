@@ -173,11 +173,10 @@ class DropDownCellEditor extends React.Component {
       placeholder,
       onBlur,
       onKeyDown,
+      virtualized,
     } = this.props
     const { showSelection, justOpened } = this.state
-    // TODO match min width of cell
-    const isLongList = choices.length > 10
-    const renderList = isLongList ? renderVirtualizedList : renderBasicList
+    const renderList = virtualized ? renderVirtualizedList : renderBasicList
 
     const selectedItem = R.find(c => value === c.value, choices)
     const hilightedIndex = R.findIndex(c => value === c.value, choices)
@@ -191,9 +190,9 @@ class DropDownCellEditor extends React.Component {
         itemToString={({ vallue, text }) => text || value + ''}
         render={({ getInputProps, getToggleButtonProps, ...downshiftProps }) => (
           <div>
-            {isLongList ? (
+            {virtualized ? (
               <input
-                {...getInputProps({ placeholder })}
+                {...getInputProps({ placeholder, onKeyDown })}
                 ref={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
                 onBlur={onBlur}
