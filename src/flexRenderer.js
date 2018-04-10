@@ -154,7 +154,7 @@ export const defaultCellRenderer = ({
   const value = extractData({ header, rowData: data[rowIndex] })
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return (
-    <Cell {...rest} width={width} height={height} title={value}>
+    <Cell {...rest} width={width} height={height} title={value + ''}>
       <CellContent> {display} </CellContent>
     </Cell>
   )
