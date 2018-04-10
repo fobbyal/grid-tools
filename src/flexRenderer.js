@@ -128,7 +128,7 @@ export const defaultCellRenderer = ({
 }) => {
   const value = extractData({ header, rowData: data[rowIndex] })
   const display = formatData({ header, value, rowData: data[rowIndex] })
-  return <PureCell {...rest} width={width} height={height} title={value} display={display} />
+  return <PureCell {...rest} width={width} height={height} title={value + ''} display={display} />
 }
 export const inputCellEditRender = ({ getInputProps }) => (
   <CellInputEditor {...getInputProps({ refKey: 'innerRef' })} />

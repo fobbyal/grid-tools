@@ -677,7 +677,7 @@ class Grid extends React.PureComponent {
     const { selectionType, hoverType } = this.props
     return {
       [ROW_INDEX_ATTRIBUTE]: rowIndex,
-      key: key || rowIndex + '*' + header.ident,
+      key: key || rowIndex + '-x-' + columnIndex + '-' + header.ident,
       [COLUMN_INDEX_ATTRIBUTE]: columnIndex,
       header,
       onMouseDown: this.cellMouseDown,
@@ -717,7 +717,7 @@ class Grid extends React.PureComponent {
   })
 
   getColumnHeaderProps = ({ key, index, header }) => ({
-    key: key || header.ident,
+    key: key || index + '-x-' + header.ident,
     header,
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
