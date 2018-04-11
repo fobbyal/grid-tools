@@ -313,11 +313,11 @@ const flexGridRenderer = ({
       {...getContainerProps({
         width: containerWidth,
         height: containerHeight,
+        refKey: 'innerRef',
       })}
       style={style}
       className={className}
       tabIndex="0"
-      innerRef={gridContainerRefHandler}
     >
       {/* col header non-scrolling part/fixed columns */}
       {numOfFixedCols > 0 && (

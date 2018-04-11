@@ -710,10 +710,11 @@ class Grid extends React.PureComponent {
     }
   }
 
-  getGridContainerProps = ({ width, height } = {}) => ({
+  getGridContainerProps = ({ width, height, refKey = 'ref' } = {}) => ({
     width,
     height,
     onKeyDown: this.gridKeyDown,
+    [refKey]: this.gridContainerRefHandler,
   })
 
   getColumnHeaderProps = ({ key, index, header }) => ({
@@ -750,7 +751,22 @@ class Grid extends React.PureComponent {
     }
   }
 
+  getClipboardHelperProps = ({ refKey = 'ref' }) => ({
+    [refKey]: this.clipboardHelperRefHandler,
+    style: {
+      border: 'none',
+      position: 'fixed',
+      bottom: 0,
+      right: 0,
+      width: '100vw',
+      height: '0px',
+      outline: 'none',
+    },
+  })
+
   gridContainerRefHandler = node => (this.gridContainer = node)
+
+  clipboardHelperRefHandler = node => (this.clipbardHelper = node)
 
   render() {
     console.log('grid renderer.... ')
@@ -762,11 +778,12 @@ class Grid extends React.PureComponent {
       getContainerProps: this.getGridContainerProps,
       getPagerProps: this.getPagerProps,
       getRowEditorProps: this.getRowEditorProps,
+      getClipboardHelperProps: this.getClipboardHelperProps,
       headers: this.props.headers,
       data: view,
       hasPaging: this.hasPaging(),
       renderRowEditor: this.props.renderRowEditor,
-      gridContainerRefHandler: this.gridContainerRefHandler,
+      // gridContainerRefHandler: this.gridContainerRefHandler,
     })
   }
 }
