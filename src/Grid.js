@@ -204,6 +204,7 @@ class Grid extends React.PureComponent {
     addWithSelected: PropTypes.bool,
     onSelectionChange: PropTypes.func,
     renderRowEditor: PropTypes.func,
+    mapEditRow: PropTypes.func,
   }
 
   static defaultProps = {
@@ -445,7 +446,7 @@ class Grid extends React.PureComponent {
     }
   }
 
-  /** this is for external listeners only*/
+  /** this is for external listeners only */
   selectionChanged = _ => {
     const { headers, onSelectionChange } = this.props
     if (onSelectionChange) {
@@ -663,6 +664,7 @@ class Grid extends React.PureComponent {
         : this.state.view[this.state.editingRow],
       headers: this.props.headers,
       isEditing: this.isEditing(),
+      mapEditRow: this.props.mapEditRow,
     }
   }
 
