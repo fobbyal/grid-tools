@@ -252,6 +252,7 @@ const flexGridRenderer = ({
   hasPaging,
   renderRowEditor,
   gridContainerRefHandler,
+  getClipboardHelperProps,
 }) => {
   const pagerHeight = 35
   const rawDataWidth = sumWidth(headers)
@@ -319,6 +320,7 @@ const flexGridRenderer = ({
       className={className}
       tabIndex="0"
     >
+      <input {...getClipboardHelperProps()} />
       {/* col header non-scrolling part/fixed columns */}
       {numOfFixedCols > 0 && (
         <FlexGridRow

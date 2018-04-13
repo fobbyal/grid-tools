@@ -13,7 +13,12 @@ import R from 'ramda'
 import ScrollPane from './ScrollPane'
 import moment from 'moment'
 import RowEditor from './RowEditor'
-import { applyEdits, generateInitialEditInfo, addRow, removeRow, updateRow } from './editEngine'
+import {
+  applyEdits,
+  generateInitialEditInfo,
+  /* TODO need conrols for addRow, removeRow, */
+  updateRow,
+} from './editEngine'
 import { selector, normalizeSelection, isCellSelected, isRowSelected } from './selection-util'
 
 import {
@@ -263,6 +268,19 @@ class Grid extends React.PureComponent {
   componentDidMount() {
     window.document.body.addEventListener('mouseup', this.bodyMouseRelease)
     window.document.body.addEventListener('mouseleave', this.bodyMouseRelease)
+    if (this.clipboardHelper && this.clipboardHelper.focus) {
+      console.log('found clipboard helper', this.clipboardHelper)
+      this.clipboardHelper.focus()
+      if (this.clipboardHelper.nodeName !== 'INPUT') {
+        console.log(
+          'clipboardHelper is not input. please render input with getClipboardHelperProps'
+        )
+      }
+    } else {
+      console.log(
+        'Please render an INPUT element with getClipboardHelperProps to support copy&paste.'
+      )
+    }
   }
   componentWillUnmount() {
     window.document.body.removeEventListener('mouseleave', this.bodyMouseRelease)
@@ -599,7 +617,16 @@ class Grid extends React.PureComponent {
       }
     }
   }
-  focusGrid = () => this.gridContainer && this.gridContainer.focus && this.gridContainer.focus()
+
+  focusGrid = () => {
+    if (this.clipboardHelper && this.clipboardHelper.focus) {
+      // console.log('clipboard focus available focusting')
+      this.clipboardHelper.focus()
+    } else if (this.gridContainer && this.gridContainer.focus) {
+      // console.log('grid focus available focusting')
+      this.gridContainer.focus()
+    }
+  }
 
   cancelCellEdit = () => {
     this.setState(
@@ -624,7 +651,10 @@ class Grid extends React.PureComponent {
     const isSelecting = this.selecting
     this.setState(
       _ => this.expandSelectionState(rowIndex, columnIndex, true),
-      isSelecting ? this.selectionChanged : undefined
+      () => {
+        this.focusGrid()
+        isSelecting && this.selectionChanged()
+      }
     )
   }
 
@@ -751,22 +781,30 @@ class Grid extends React.PureComponent {
     }
   }
 
-  getClipboardHelperProps = ({ refKey = 'ref' }) => ({
+  getClipboardHelperProps = ({ refKey = 'ref' } = {}) => ({
     [refKey]: this.clipboardHelperRefHandler,
     style: {
-      border: 'none',
       position: 'fixed',
       bottom: 0,
       right: 0,
       width: '100vw',
       height: '0px',
+      border: 'none',
       outline: 'none',
     },
+    onFocus: () => console.log('focused gained'),
+    onBlur: () => console.log('focused lost'),
+    onCopy: this.onCopy,
+    onPaste: this.onPaste,
   })
 
   gridContainerRefHandler = node => (this.gridContainer = node)
 
-  clipboardHelperRefHandler = node => (this.clipbardHelper = node)
+  clipboardHelperRefHandler = node => (this.clipboardHelper = node)
+
+  onCopy = e => console.log('on copy', e)
+
+  onPaste = e => console.log('on paste', e)
 
   render() {
     console.log('grid renderer.... ')
