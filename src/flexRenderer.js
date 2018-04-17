@@ -40,6 +40,7 @@ export const CellContent = styled.div`
 export const Cell = styled.div`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
+  max-width: ${props => props.width}px;
   display: flex;
   border-left: 1px solid #ccc;
   align-items: center;
