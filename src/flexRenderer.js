@@ -23,6 +23,8 @@ export const ColHeader = styled.div`
   color: ${props => props.color || 'white'};
   font-weight: ${props => props.fontWeight || 'bold'};
   font-size: ${props => props.fontSize || '0.85em'};
+  padding-left: 0.85em;
+  padding-right: 0.85em;
   &:first-child {
     border-left: 1px solid steelblue;
     border-top-left-radius: 3px;
