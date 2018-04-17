@@ -11,6 +11,7 @@ const mapAlignmentToJustifyContent = alignment =>
 export const ColHeader = styled.div`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
+  max-width: ${props => props.width}px;
   border-right: 1px solid #ccc;
   display: flex;
   justify-content: center;
