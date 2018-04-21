@@ -12,7 +12,14 @@ class DropDownCellEditorDemo extends React.Component {
   render() {
     const { selected } = this.state
     const { choices } = this.props
-    return <DropdownCellEditor choices={choices} value={selected} onChange={this.valueChanged} />
+    return (
+      <DropdownCellEditor
+        virtualized
+        choices={choices}
+        value={selected}
+        onChange={this.valueChanged}
+      />
+    )
   }
 }
 
