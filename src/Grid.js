@@ -191,6 +191,7 @@ class Grid extends React.PureComponent {
     // this handles cell edits
     onEditInfoChange: PropTypes.func,
     editInfo: PropTypes.func,
+    mapEditRow: PropTypes.func,
   }
 
   static defaultProps = {
@@ -778,6 +779,7 @@ class Grid extends React.PureComponent {
         : this.state.view[this.state.editingRow],
       headers: this.props.headers,
       isEditing: this.isRowEditing(),
+      mapEditRow: this.props.mapEditRow,
     }
   }
 

@@ -32,12 +32,15 @@ const renderEditor = ({
   )
 }
 
-const createEditRow = ({ showAdd, headers, rowData }) => {
-  if (!rowData) return {}
-  if (!showAdd) return rowData
+const noop = _ => _
+
+const createEditRow = ({ showAdd, headers, rowData, modifyNewData, mapEditRow = noop }) => {
+  console.log('mapping row here...', mapEditRow)
+  if (!rowData) return mapEditRow({})
+  if (!showAdd) return mapEditRow(rowData)
   const newData = { ...rowData }
   headers.filter(h => h.isKey).forEach(h => (newData[h.ident] = null))
-  return newData
+  return mapEditRow(newData)
 }
 
 const modifyRow = ({ header, value, rowData }) => {

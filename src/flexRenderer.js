@@ -12,6 +12,7 @@ import DropdownCellEditor from './DropdownCellEditor'
 export const ColHeader = BasicColHeader.extend`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
+  max-width: ${props => props.width}px;
 `
 export const CellContent = styled.div`
   white-space: nowrap;
@@ -28,6 +29,7 @@ export const Cell = BasicCell.extend`
 export const CellInputEditor = BasicCellInput.extend`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
+  max-width: ${props => props.width}px;
 `
 
 /* prettier-ignore */
