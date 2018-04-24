@@ -54,3 +54,9 @@ export const fromPasteEvent = evt =>
   fromNullable(evt.clipboardData)
     .chain(clipData => fromEmpty(clipData.getData('Text')))
     .map(parseClipData)
+
+export const copyToClipboard = ({ evt, clipboard }) => txtData => {
+  clipboard.setData('Text', txtData)
+  evt.preventDefault()
+  console.log('copied data: [', clipboard.getData('Text'), ']')
+}

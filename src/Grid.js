@@ -7,6 +7,13 @@ import {
   extractAndFormatData,
   extractData,
 } from './utils'
+import {
+  copyToClipboard,
+  toClipboardData,
+  fromPasteEvent,
+  expandDataToSelection,
+} from './clipboard-utils'
+import { fromNullable, Just /*, Nothing */ } from 'data.maybe'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
 import R from 'ramda'
@@ -19,7 +26,13 @@ import {
   /* TODO need conrols for addRow, removeRow, */
   updateRow,
 } from './editEngine'
-import { selector, normalizeSelection, isCellSelected, isRowSelected } from './selection-util'
+import {
+  selector,
+  normalizeSelection,
+  isCellSelected,
+  isRowSelected,
+  getSelectedData,
+} from './selection-util'
 
 import {
   ROW_INDEX_ATTRIBUTE,
@@ -804,7 +817,22 @@ class Grid extends React.PureComponent {
 
   clipboardHelperRefHandler = node => (this.clipboardHelper = node)
 
-  onCopy = e => console.log('on copy', e)
+  onCopy = e => {
+    const selection = normalizeSelection(this.state)
+    console.log('copied selectio', selection)
+    const { view: data } = this.state
+    const { headers } = this.props
+    const selectedData = getSelectedData({ headers, data }, selection)
+    console.log('copied data', selectedData)
+    const rawClipboardData = toClipboardData(selectedData)
+    console.log('copied clip board data', rawClipboardData)
+
+    const clipboardInfo = fromNullable(e.clipboardData).map(clipboard => ({ evt: e, clipboard }))
+
+    fromNullable(copyToClipboard)
+      .ap(clipboardInfo)
+      .ap(Just(rawClipboardData))
+  }
 
   onPaste = e => console.log('on paste', e)
 

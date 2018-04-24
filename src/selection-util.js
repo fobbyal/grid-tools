@@ -1,4 +1,5 @@
 import R from 'ramda'
+import { extractData } from './utils'
 
 const empty = {}
 
@@ -68,3 +69,14 @@ export const down = (selection, expand, rowCount) => {
 }
 
 export const selector = { left, right, up, down }
+
+export const getSelectedData = ({ data, headers }, { x1, y1, x2, y2 }) => {
+  const rows = R.range(y1, y2 + 1)
+  const cols = R.range(x1, x2 + 1)
+  // console.log('rows', rows, 'cols', cols, 'data ', data, ' headers ', headers)
+
+  const getData = rowIdx => colIndex =>
+    extractData({ rowData: data[rowIdx], header: headers[colIndex] })
+
+  return rows.map(rowIdx => cols.map(getData(rowIdx)))
+}
