@@ -1,6 +1,6 @@
 {
   "name": "@integec/grid-tools",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "scripts": {
@@ -65,14 +65,14 @@
   },
   "peerDependencies": {
     "data.maybe": "^1.2.2",
+    "downshift": "^1.31.4",
     "moment": "^2.20.1",
     "numeral": "^2.0.6",
     "react": ">=16",
     "react-dom": ">=16",
     "react-popper": "^1.0.0-beta.6",
     "react-virtualized": "^9.18.5",
-    "styled-components": "2.4.0",
-    "downshift": "^1.31.4"
+    "styled-components": "2.4.0"
   },
   "dependencies": {
     "data.maybe": "^1.2.2",
