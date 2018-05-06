@@ -43,7 +43,7 @@ import {
   COL_IDENT_ATTRIBUTE,
 } from './constants.js'
 
-const noop = _ => _
+const noopEditRowProcess = ({ editedRow }) => editedRow
 
 const rowHeightOf = (index, rowHeight) =>
   typeof rowHeight === 'function' ? rowHeight(index) : rowHeight
@@ -222,7 +222,7 @@ class Grid extends React.PureComponent {
     showAdd: false,
     addWithSelected: false,
     renderRowEditor: props => <RowEditor {...props} />,
-    processEditedRow: noop,
+    processEditedRow: noopEditRowProcess,
   }
 
   static childContextTypes = {
@@ -557,10 +557,17 @@ class Grid extends React.PureComponent {
     return editMode === 'cell' && rowIndex === editingRow && columnIndex === editingColumn
   }
 
+  processUpdate = ({ currentRow, editedRow: row }) => {
+    const { mapEditRow, processEditedRow } = this.props
+    const editedRow = mapEditRow
+      ? mapEditRow(row)
+      : processEditedRow({ currentRow, editedRow: row })
+    return { currentRow, editedRow }
+  }
+
   commitRowEdit = ({ currentRow, editedRow: row }) => {
     if (currentRow !== row) {
-      const { mapEditRow, processEditedRow } = this.props
-      const editedRow = mapEditRow ? mapEditRow(row) : processEditedRow(row)
+      const { editedRow } = this.processUpdate({ currentRow, editedRow: row })
       if (this.props.onEdit) {
         // expect new data to be passed down via props
         this.props.onEdit({ originalRow: currentRow, editedRow })
@@ -871,16 +878,16 @@ class Grid extends React.PureComponent {
   batchUpdate = updates => {
     if (this.props.onBatchUpdate) {
       // expect new data to be passed down via props
-      this.props.onBatchUpdate(updates)
+      this.props.onBatchUpdate(updates.map(this.processUpdate))
     } else if (this.props.onEdit) {
       for (let i = 0; i < updates.length; i++) {
-        this.props.onEdit(updates[0])
+        this.props.onEdit(this.processUpdate(updates[0]))
       }
     } else {
       const updateState = this.setEditInfo(
         batchUpdateRow({
           editInfo: this.editInfo(),
-          updates,
+          updates: updates.map(this.processUpdate),
         })
       )
 

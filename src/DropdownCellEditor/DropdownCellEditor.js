@@ -106,6 +106,7 @@ const renderVirtualizedList = ({
         rowHeight={30}
         rowRenderer={rowRenderer}
         scrollToIndex={justOpened && index >= 0 ? index : undefined}
+        id="drop-down-vr-list"
       />
     </div>
   )
@@ -149,12 +150,24 @@ class DropDownCellEditor extends React.Component {
     this.setState({ showSelection: true })
   }
 
-  state = { showSelection: false, justOpened: true }
+  handelListRef = node => {
+    this.list = node
+    console.log('list is', node)
+  }
 
-  // componentDidMount() {
-  //   // console.log('input is ', this.input)
-  //   if (this.input)
-  // }
+  handleBlur = e => {
+    console.log('blur is ', e)
+    const { virtualized, onBlur } = this.props
+    if (!virtualized) {
+      onBlur(e)
+    } else {
+      if (!e.relatedTarget || e.relatedTarget.getAttribute('id') !== 'drop-down-vr-list') {
+        onBlur(e)
+      }
+    }
+  }
+
+  state = { showSelection: false, justOpened: true }
 
   inputValueChanged = value => {
     console.log('value changed to ', value)
@@ -171,7 +184,6 @@ class DropDownCellEditor extends React.Component {
       width = 150,
       height = 25,
       placeholder,
-      onBlur,
       onKeyDown,
       virtualized,
     } = this.props
@@ -195,7 +207,7 @@ class DropDownCellEditor extends React.Component {
                 {...getInputProps({ placeholder, onKeyDown })}
                 ref={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
-                onBlur={onBlur}
+                onBlur={this.handleBlur}
                 className={className}
               />
             ) : (
@@ -203,7 +215,7 @@ class DropDownCellEditor extends React.Component {
                 {...getToggleButtonProps({ onKeyDown })}
                 innerRef={this.handelInputRef}
                 style={{ ...style, width: width + 'px', height: height + 'px' }}
-                onBlur={onBlur}
+                onBlur={this.handleBlur}
                 className={className}
               >
                 {downshiftProps.selectedItem
@@ -221,6 +233,7 @@ class DropDownCellEditor extends React.Component {
                     choices,
                     minWidth: width,
                     justOpened,
+                    ref: popperProps.ref,
                   })
                 }
               />

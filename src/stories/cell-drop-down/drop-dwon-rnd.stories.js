@@ -28,7 +28,7 @@ const normalChoices = chance
   .unique(() => chance.word({ syllables: 4 }), 9)
   .map((text, value) => ({ value, text }))
 
-storiesOf('DropDown RND')
+storiesOf('DropDown RND', module)
   .add('Popper Doc Example', () => <ClickExample />)
   .add('Portaled Popper', () => <PortaledPopperDemo />)
   .add('Downshift doc example', () => (
