@@ -6,14 +6,15 @@ import {
   extractColIdent,
   extractAndFormatData,
   extractData,
+  fromEmpty,
 } from './utils'
 import {
   copyToClipboard,
   toClipboardData,
   fromPasteEvent,
-  expandDataToSelection,
+  normalizePasteInfo,
 } from './clipboard-utils'
-import { fromNullable, Just /*, Nothing */ } from 'data.maybe'
+import { fromNullable, Just } from 'data.maybe'
 import PropTypes from 'prop-types'
 import ScrollSyncHelper from './ScrollSyncHelper'
 import R from 'ramda'
@@ -25,6 +26,7 @@ import {
   generateInitialEditInfo,
   /* TODO need conrols for addRow, removeRow, */
   updateRow,
+  batchUpdateRow,
 } from './editEngine'
 import {
   selector,
@@ -40,6 +42,8 @@ import {
   SCROLL_SYNC_CONTEXT,
   COL_IDENT_ATTRIBUTE,
 } from './constants.js'
+
+const noop = _ => _
 
 const rowHeightOf = (index, rowHeight) =>
   typeof rowHeight === 'function' ? rowHeight(index) : rowHeight
@@ -205,6 +209,7 @@ class Grid extends React.PureComponent {
     onEditInfoChange: PropTypes.func,
     editInfo: PropTypes.func,
     mapEditRow: PropTypes.func,
+    processEditedRow: PropTypes.func,
   }
 
   static defaultProps = {
@@ -217,6 +222,7 @@ class Grid extends React.PureComponent {
     showAdd: false,
     addWithSelected: false,
     renderRowEditor: props => <RowEditor {...props} />,
+    processEditedRow: noop,
   }
 
   static childContextTypes = {
@@ -551,12 +557,15 @@ class Grid extends React.PureComponent {
     return editMode === 'cell' && rowIndex === editingRow && columnIndex === editingColumn
   }
 
-  commitRowEdit = ({ currentRow, editedRow }) => {
-    if (currentRow !== editedRow) {
-      if (this.props.onEdit && this.props.edi) {
+  commitRowEdit = ({ currentRow, editedRow: row }) => {
+    if (currentRow !== row) {
+      const { mapEditRow, processEditedRow } = this.props
+      const editedRow = mapEditRow ? mapEditRow(row) : processEditedRow(row)
+      if (this.props.onEdit) {
         // expect new data to be passed down via props
         this.props.onEdit({ originalRow: currentRow, editedRow })
       } else {
+        // if edit info is controlled then there should not be state updates
         const updateState = this.setEditInfo(
           updateRow({
             editInfo: this.editInfo(),
@@ -586,7 +595,7 @@ class Grid extends React.PureComponent {
     )
 
   undoEdit() {
-    /* tobe implemented via short-cut key */
+    /* todo implemented via short-cut key */
   }
 
   /* editing ends */
@@ -792,7 +801,6 @@ class Grid extends React.PureComponent {
         : this.state.view[this.state.editingRow],
       headers: this.props.headers,
       isEditing: this.isRowEditing(),
-      mapEditRow: this.props.mapEditRow,
     }
   }
 
@@ -834,7 +842,73 @@ class Grid extends React.PureComponent {
       .ap(Just(rawClipboardData))
   }
 
-  onPaste = e => console.log('on paste', e)
+  pastedToBatchUpdate = ({ columnIndex, rowIndex, dataSet }) => {
+    console.log('pasting to ', 'row[' + rowIndex + ']:col[' + columnIndex + ']', dataSet)
+    const updatedData = []
+    const { view } = this.state
+    const { headers } = this.props
+
+    for (let y = rowIndex, dy = 0; y < view.length && dy < dataSet.length; y++, dy++) {
+      console.log('pasting rowIndex from ', dy, ' to ', y)
+      const dataSetRow = dataSet[dy]
+      const currentRow = view[y]
+      const editedRow = { ...currentRow }
+      for (let x = columnIndex, dx = 0; x < headers.length && dx < dataSetRow.length; x++, dx++) {
+        const header = headers[x]
+        const ident = header.ident
+        if (this.isEditable({ header, rowData: currentRow })) {
+          // TODO: hadle special cases for selection types as well as numbers
+          // look to row editro
+          editedRow[ident] = dataSetRow[dx]
+        }
+      }
+      updatedData.push({ currentRow, editedRow })
+    }
+    console.log('final edit ops', updatedData)
+    return updatedData
+  }
+
+  batchUpdate = updates => {
+    if (this.props.onBatchUpdate) {
+      // expect new data to be passed down via props
+      this.props.onBatchUpdate(updates)
+    } else if (this.props.onEdit) {
+      for (let i = 0; i < updates.length; i++) {
+        this.props.onEdit(updates[0])
+      }
+    } else {
+      const updateState = this.setEditInfo(
+        batchUpdateRow({
+          editInfo: this.editInfo(),
+          updates,
+        })
+      )
+
+      if (updateState) {
+        this.setState(
+          {
+            ...this.generateViewProps(),
+            editingRow: undefined,
+            editingColumn: undefined,
+          },
+          this.focusGrid
+        )
+      }
+    }
+  }
+
+  onPaste = e => {
+    e.preventDefault()
+    const selection = fromEmpty(normalizeSelection(this.state))
+    const clipboardData = fromPasteEvent(e)
+
+    Just(normalizePasteInfo)
+      .ap(selection)
+      .ap(clipboardData)
+      .map(this.pastedToBatchUpdate)
+      .map(this.batchUpdate)
+      .getOrElse('')
+  }
 
   render() {
     console.log('grid renderer.... ')
@@ -851,7 +925,6 @@ class Grid extends React.PureComponent {
       data: view,
       hasPaging: this.hasPaging(),
       renderRowEditor: this.props.renderRowEditor,
-      // gridContainerRefHandler: this.gridContainerRefHandler,
     })
   }
 }

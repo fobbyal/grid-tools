@@ -19,24 +19,11 @@ const immutableSet = (key, value) =>
     return m
   })
 
-export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
-  const { history } = editInfo
-  let finalEdit = editInfo
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i]) {
-      finalEdit = removeRow({ editInfo: finalEdit, row: rows }, false)
-    }
-  }
-  return { ...finalEdit, history: [...history, finalEdit] }
-}
-
-export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, ignoreHistory) => {
+export const removeRow = ({ editInfo = generateInitialEditInfo(), mutation }) => {
   const { added, updated, dirtyMap, updatedMap, removed, history, ...rest } = editInfo
-
   const originalRow = dirtyMap.get(currentRow)
   const isUpdated = dirtyMap.has(currentRow)
   const isAdded = added.includes(currentRow)
-
   return {
     removed: isAdded ? removed : [...removed, isUpdated ? originalRow : currentRow],
     added: isAdded ? added.filter(row => row !== currentRow) : added,
@@ -53,35 +40,17 @@ export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, 
           return m
         })(updatedMap)
       : updatedMap,
-    history: ignoreHistory ? undefined : [...history, editInfo],
+    history: [...history, editInfo],
     ...rest,
   }
 }
 
-export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) =>
-  batchUpdate({ editInfo, updates: rows.map(editedRow => ({ editedRow })) })
-
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })
 
-export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates }) => {
-  const { history } = editInfo
-  let finalEdit = editInfo
-  for (let i = 0; i < updates.length; i++) {
-    if (updates[i]) {
-      const { currentRow, editedRow } = updates[i]
-      finalEdit = updateRow({ editInfo: finalEdit, currentRow, editedRow }, false)
-    }
-  }
-  return { ...finalEdit, history: [...history, finalEdit] }
-}
-
-export const updateRow = (
-  { editInfo = generateInitialEditInfo(), currentRow, editedRow },
-  ignoreHistory
-) => {
+export const updateRow = ({ editInfo = generateInitialEditInfo(), currentRow, editedRow }) => {
   if (currentRow === undefined && !R.isNil(editedRow)) {
-    const { added, history, ...rest } = editInfo
+    const { /* dirtyMap, */ added, history, ...rest } = editInfo
     return {
       added: [...added, editedRow],
       // dirtyMap: immutableSet(editedRow, undefined)(dirtyMap),
@@ -94,9 +63,16 @@ export const updateRow = (
       return {
         added: [...added.filter(row => row !== currentRow), editedRow],
         dirtyMap,
+        // dirtyMap: immutableOp(m => {
+        //   // remove  transitive row
+        //   m.delete(currentRow)
+        //   // add new edited row
+        //   m.set(editedRow, undefined)
+        //   return m
+        // })(dirtyMap),
         updatedMap,
         updated,
-        history: ignoreHistory ? undefined : [editInfo, ...history],
+        history: [editInfo, ...history],
         ...rest,
       }
       // editing data that has been editted before
@@ -113,7 +89,7 @@ export const updateRow = (
         })(dirtyMap),
         updatedMap: immutableSet(originalRow, editedRow)(updatedMap),
         updated: [...R.filter(row => row !== currentRow, updated), editedRow],
-        history: ignoreHistory ? undefined : [editInfo, ...history],
+        history: [editInfo, ...history],
         ...rest,
       }
     } else {
@@ -122,7 +98,7 @@ export const updateRow = (
         dirtyMap: immutableSet(editedRow, currentRow)(dirtyMap),
         updatedMap: immutableSet(currentRow, editedRow)(updatedMap),
         updated: [...updated, editedRow],
-        history: ignoreHistory ? undefined : [editInfo, ...history],
+        history: [editInfo, ...history],
         ...rest,
       }
     }

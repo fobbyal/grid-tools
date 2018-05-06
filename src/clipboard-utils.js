@@ -1,5 +1,5 @@
 import R from 'ramda'
-import { fromNullable, Just, Nothing } from 'data.maybe'
+import { fromNullable } from 'data.maybe'
 import { fromEmpty } from './utils'
 
 // prettier-ignore
@@ -17,6 +17,12 @@ export const toClipboardData = R.compose(
 )
 
 const clearNil = row => row.map(d => (R.isEmpty(d) ? undefined : d))
+
+export const normalizePasteInfo = selection => data => {
+  const dataSet = expandDataToSelection(selection)(data)
+  const { x1, y1 } = selection
+  return { columnIndex: x1, rowIndex: y1, dataSet }
+}
 
 const parseClipData = rawData =>
   rawData
