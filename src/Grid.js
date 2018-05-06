@@ -559,6 +559,7 @@ class Grid extends React.PureComponent {
 
   processUpdate = ({ currentRow, editedRow: row }) => {
     const { mapEditRow, processEditedRow } = this.props
+    qa
     const editedRow = mapEditRow
       ? mapEditRow(row)
       : processEditedRow({ currentRow, editedRow: row })

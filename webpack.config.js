@@ -17,6 +17,7 @@ module.exports = env => ({
     'numeral',
     'react-popper',
     'react-virtualized',
+    'downshift',
   ],
   module: {
     rules: [{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }],
