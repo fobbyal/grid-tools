@@ -59,7 +59,7 @@ export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, 
 }
 
 export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) =>
-  batchUpdate({ editInfo, updates: rows.map(editedRow => ({ editedRow })) })
+  batchUpdateRow({ editInfo, updates: rows.map(editedRow => ({ editedRow })) })
 
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })

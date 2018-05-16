@@ -207,7 +207,8 @@ class Grid extends React.PureComponent {
     renderRowEditor: PropTypes.func,
     // this handles cell edits
     onEditInfoChange: PropTypes.func,
-    editInfo: PropTypes.func,
+    // define shpae of editInfo
+    editInfo: PropTypes.object,
     mapEditRow: PropTypes.func,
     processEditedRow: PropTypes.func,
   }
@@ -559,10 +560,12 @@ class Grid extends React.PureComponent {
 
   processUpdate = ({ currentRow, editedRow: row }) => {
     const { mapEditRow, processEditedRow } = this.props
-    qa
+    // console.log('procssing edited frow with', mapEditRow,processEditedRow)
     const editedRow = mapEditRow
       ? mapEditRow(row)
       : processEditedRow({ currentRow, editedRow: row })
+
+    // console.log('result is ',editedRow)
     return { currentRow, editedRow }
   }
 
@@ -582,16 +585,20 @@ class Grid extends React.PureComponent {
           })
         )
 
-        if (updateState) {
-          this.setState(
-            {
-              ...this.generateViewProps(),
-              editingRow: undefined,
-              editingColumn: undefined,
-            },
-            this.focusGrid
-          )
-        }
+        this.setState(
+          _ =>
+            updateState
+              ? {
+                  ...this.generateViewProps(),
+                  editingRow: undefined,
+                  editingColumn: undefined,
+                }
+              : {
+                  editingRow: undefined,
+                  editingColumn: undefined,
+                },
+          this.focusGrid
+        )
       }
     }
   }
@@ -892,16 +899,27 @@ class Grid extends React.PureComponent {
         })
       )
 
-      if (updateState) {
-        this.setState(
-          {
-            ...this.generateViewProps(),
-            editingRow: undefined,
-            editingColumn: undefined,
-          },
-          this.focusGrid
-        )
-      }
+      this.setState(
+        _ =>
+          updateState
+            ? {
+                ...this.generateViewProps(),
+                editingRow: undefined,
+                editingColumn: undefined,
+              }
+            : {
+                editingRow: undefined,
+                editingColumn: undefined,
+              },
+
+        this.focusGrid
+      )
+    }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // when edit is contgroled from
+    if (prevProps.editInfo !== this.props.editInfo) {
+      this.setState({ ...this.generateViewProps() })
     }
   }
 
