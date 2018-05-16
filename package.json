@@ -55,6 +55,8 @@
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "lint-staged": "^7.0.3",
+    "moment": "^2.22.1",
+    "numeral": "^2.0.6",
     "prettier-eslint": "^8.8.1",
     "prop-types": "^15.6.1",
     "ramda": "^0.25.0",
@@ -62,13 +64,12 @@
     "react-dom": "^16.1.1",
     "react-popper": "^1.0.0-beta.6",
     "react-virtualized": "^9.18.5",
+    "shallow-equal-explain": "^0.0.4",
     "styled-components": "2.4.0"
   },
   "peerDependencies": {
     "data.maybe": "^1.2.2",
     "downshift": "^1.31.4",
-    "moment": "^2.20.1",
-    "numeral": "^2.0.6",
     "react": ">=16",
     "react-dom": ">=16",
     "react-popper": "^1.0.0-beta.6",
@@ -78,10 +79,7 @@
   "dependencies": {
     "data.maybe": "^1.2.2",
     "fbjs": "^0.8.16",
-    "moment": "^2.22.0",
-    "numeral": "^2.0.6",
-    "react-broadcast": "^0.7.0",
-    "shallow-equal-explain": "^0.0.4"
+    "react-broadcast": "^0.7.0"
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]
