@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components'
 
 const mapAlignmentToJustifyContent = alignment =>
@@ -33,9 +32,6 @@ export const BasicCell = styled.div`
   ${props => (props.fontWeight ? 'font-weight:' + props.fontWeight + ';' : '')}
   padding-left: 0.2em;
   padding-right: 0.2em;
-  &:last-child {
-    border-right: 1px solid #ccc;
-  }
 `
 
 /* prettier-ignore */

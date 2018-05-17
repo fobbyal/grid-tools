@@ -2,7 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import R from 'ramda'
 import Grid from './Grid'
-import { sumWidth, formatData, extractData, sumHeight } from './utils'
+import { formatData, extractData } from './utils'
+import computeGridProps from './computeGridProps'
 import DefaultPager from './DefaultPager'
 import { BasicCell, BasicColHeader, SortIndicator, BasicCellInput } from './Components'
 import CellEditContainer from './CellEditContainer'
@@ -14,16 +15,23 @@ export const ColHeader = BasicColHeader.extend`
   width: ${props => props.width}px;
   max-width: ${props => props.width}px;
 `
-export const CellContent = styled.div`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-`
+// export const CellContent = styled.div`
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   pointer-events: none;
+// `
 /* prettier-ignore */
+/* to have the ellipsis we need dispay block instead of flex */
 export const Cell = BasicCell.extend`
   flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  height: 100%;
+  text-align: center;
 `
 
 export const CellInputEditor = BasicCellInput.extend`
@@ -44,11 +52,9 @@ const ScrollingHeaderRow = Row.extend`
   position: absolute;
   top: ${props => props.yOffSet || '0'}px;
   left: ${props => props.xOffSet || '0'}px;
-  overflow: hidden;
-  /*
-   * colCount is for the 1px border for each Header... 
-   * box-sizing doesn't work here because it does not count children
- */
+  overflow-x: hidden;
+  overflow-y: ${props => (props.scrollY ? 'scroll' : 'hidden')};
+  background-color: steelblue;
   width: ${props => props.width}px;
 `.withComponent(Grid.SyncedScrollPane)
 
@@ -58,32 +64,15 @@ const TableContentContainer = styled(Grid.SyncedScrollPane)`
   top: ${props => props.yOffSet || 0}px;
   width: ${props => props.width}px;
   height: ${props => props.height - props.yOffSet}px;
-  /*overflow: ${props => (props.showScroll ? 'scroll' : 'hidden')};*/
-  overflow-x:${props => (props.scrollX ? 'scroll' : 'hidden')};
-  overflow-y:${props => (props.scrollY ? 'scroll' : 'hidden')};
-  
-  ${props => (!props.scrollX ? 'border-bottom: 1px solid #ccc;' : '')}
-  ${props =>
-    props.fixed
-      ? `
-    box-sizing: content-box;
-    border-bottom: ${22 - (props.fixedScrollHeightAdjustment || 6)}px solid #ccc;
-    border-bottom-left-radius: 3px;
-  `
-      : ''}
+  overflow-x: ${props => (props.scrollX ? 'scroll' : 'hidden')};
+  overflow-y: ${props => (props.scrollY ? 'scroll' : 'hidden')};
   & * {
     box-sizing: border-box;
   }
 `
-/* header.length is for the border box and 17 is for the scroll height = width */
-// width: ${props => props.width + (props.showScroll ? 17 : 0)}px;
-// height: ${props => props.height - props.yOffSet + (props.showScroll ? 17 : 0)}px;
-
-const TableContent = ({ scroll, showScroll, children, ...props }) =>
+const TableContent = ({ scroll, children, ...props }) =>
   props.width === 0 ? null : scroll ? (
-    <TableContentContainer showScroll={showScroll} {...props}>
-      {children}
-    </TableContentContainer>
+    <TableContentContainer {...props}>{children}</TableContentContainer>
   ) : (
     children
   )
@@ -107,7 +96,10 @@ class PureCell extends React.PureComponent {
     console.log('in cell render...')
     return (
       <Cell {...rest}>
-        <CellContent>{display}</CellContent>
+        {
+          //  <CellContent>{display}</CellContent>
+        }
+        {display}
       </Cell>
     )
   }
@@ -179,53 +171,12 @@ class FlexGridColHeader extends React.PureComponent {
   }
 }
 
-const splitFixedCols = (numOfFixedCols, headers) => ({
-  rowHeaders: R.take(numOfFixedCols, headers),
-  dataHeaders: R.drop(numOfFixedCols, headers),
-})
-
 /* prettier-ignore */
 const FlexGridContainer = styled.div`
   position: relative;
   ${({ width }) => (width ? 'width: ' + width + 'px;' : '')} 
   ${({ height }) => (height ? 'height: ' + height + 'px;' : '')}
 `
-
-const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
-
-const UpperRight = styled.div`
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  background-color: steelblue;
-  border-left: 1px solid #ccc;
-  border-top-right-radius: 3px;
-  width: 16px;
-  height: ${props => props.headerRowHeight - 1}px;
-`
-
-const computeFixedGridWidths = ({ rowHeaders, borderSize }) => {
-  const width = sumWidth(rowHeaders) // (rowHeaders.length > 0 ? (rowHeaders.length - 1) * borderSize : 0)
-  return { headerWidth: width + 1, containerWidth: width }
-}
-
-const computeScrollingGridWidths = ({
-  normalizedWidth,
-  rowHeaders,
-  scrollX,
-  scrollY,
-  fixedColCount,
-  headers,
-  scrollSize,
-  borderSize,
-}) => {
-  if (!scrollX) return {}
-  const numOfCols = headers.length - fixedColCount
-  const borderWidths = (numOfCols - 1) * borderSize
-  const headerWidth = normalizedWidth - sumWidth(rowHeaders) + borderWidths
-  const containerWidth = headerWidth + (scrollY && scrollX ? scrollSize : 0)
-  return { headerWidth, containerWidth }
-}
 
 const flexGridRenderer = ({
   style,
@@ -241,8 +192,12 @@ const flexGridRenderer = ({
   pagerRenderer = defaultPagerRenderer,
   editByRow = true,
   editByCell = false,
+  pagerHeight = 35,
   // TODO: have to get css expert
-  fixedScrollHeightAdjustment = 6,
+  // fixedScrollHeightAdjustment = 6,
+  scrollBarHeightAdjustment,
+  scrollBarWidthAdjustment,
+  borderSize,
 } = {}) => ({
   getColumnHeaderProps,
   getRowProps,
@@ -257,39 +212,38 @@ const flexGridRenderer = ({
   gridContainerRefHandler,
   getClipboardHelperProps,
 }) => {
-  const pagerHeight = 35
-  const rawDataWidth = sumWidth(headers)
-  const rawDataHeight = sumHeight({ data, rowHeight })
-  const normalizedWidth = R.isNil(width) ? rawDataWidth : R.min(width, rawDataWidth)
+  // const rawDataWidth = sumWidth(headers)
+  // const rawDataHeight = sumHeight({ data, rowHeight })
+  // const normalizedWidth = R.isNil(width) ? rawDataWidth : R.min(width, rawDataWidth)
 
-  /* do not scroll when we can fit everything */
-  const scroll =
-    width && height && headerRowHeight && (width < rawDataWidth || height < rawDataHeight)
-  const scrollX = scroll && width < rawDataWidth
-  const scrollY = scroll && height < rawDataHeight
-  const numOfFixedCols = !scrollX ? 0 : autoFixColByKey ? countKeyCols(headers) : fixedColCount
-  // const scrollY = scroll && height <
-  const { rowHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
-  const scrollSize = 17
-  const borderSize = 1
-  const containerWidth =
-    normalizedWidth + headers.length - 1 + (scrollY && scrollX ? scrollSize : 0)
-  const scrollPaneHeight = numOfFixedCols > 0 && scrollX ? height + 5 + scrollSize : height + 5
-  const fixedPaneHeight = height + fixedScrollHeightAdjustment
+  // /* do not scroll when we can fit everything */
+  // const scroll =
+  //   width && height && headerRowHeight && (width < rawDataWidth || height < rawDataHeight)
+  // const scrollX = scroll && width < rawDataWidth
+  // const scrollY = scroll && height < rawDataHeight
+  // const numOfFixedCols = !scrollX ? 0 : autoFixColByKey ? countKeyCols(headers) : fixedColCount
+  // // const scrollY = scroll && height <
+  // const { rowHeaders, dataHeaders } = splitFixedCols(numOfFixedCols, headers)
+  // const scrollSize = 17
+  // const borderSize = 1
+  // const containerWidth =
+  //   normalizedWidth + headers.length - 1 + (scrollY && scrollX ? scrollSize : 0)
+  // const scrollPaneHeight = numOfFixedCols > 0 && scrollX ? height + 5 + scrollSize : height + 5
+  // const fixedPaneHeight = height + fixedScrollHeightAdjustment
 
   // TODO: fix width issue for all browsers chrome/safari/firefox
   //
-  const scrollWidth = computeScrollingGridWidths({
-    normalizedWidth,
-    rowHeaders,
-    scrollX,
-    scrollY,
-    fixedColCount,
-    headers,
-    scrollSize,
-    borderSize,
-  })
-  const fixedWidth = computeFixedGridWidths({ rowHeaders, borderSize })
+  // const scrollWidth = computeScrollingGridWidths({
+  //   normalizedWidth,
+  //   rowHeaders,
+  //   scrollX,
+  //   scrollY,
+  //   fixedColCount,
+  //   headers,
+  //   scrollSize,
+  //   borderSize,
+  // })
+  // const fixedWidth = computeFixedGridWidths({ rowHeaders, borderSize })
 
   // console.log('provided width', width)
   // console.log('rawDataWidth', rawDataWidth)
@@ -298,9 +252,38 @@ const flexGridRenderer = ({
   // console.log('fixedWidth', fixedWidth)
   // console.log('scrollWidth', scrollWidth)
 
-  const containerHeight = R.isNil(height)
-    ? undefined
-    : height + (scroll ? 17 : 0) + (hasPaging ? pagerHeight : 0)
+  // const containerHeight = R.isNil(height)
+  //   ? undefined
+  //   : height + (scroll ? 17 : 0) + (hasPaging ? pagerHeight : 0)
+  const {
+    scroll,
+    scrollX,
+    scrollY,
+    numOfFixedCols,
+    rowHeaders,
+    dataHeaders,
+    containerWidth,
+    scrollPaneHeight,
+    containerHeight,
+    hasFixedCols,
+    fixedHeaderWidth,
+    contentViewPortWidth,
+  } = computeGridProps({
+    headers,
+    data,
+    rowHeight,
+    width,
+    height,
+    scrollBarWidthAdjustment,
+    scrollBarHeightAdjustment,
+    // fixedScrollHeightAdjustment,
+    borderSize,
+    fixedColCount,
+    autoFixColByKey,
+    headerRowHeight,
+    hasPaging,
+    pagerHeight,
+  })
 
   const pagerStyle = {
     height: pagerHeight + 'px',
@@ -309,8 +292,6 @@ const flexGridRenderer = ({
     bottom: scroll ? '0px' : undefined,
     width: scroll ? containerWidth + 'px' : undefined,
   }
-
-  const topOffSet = 0
 
   return (
     <FlexGridContainer
@@ -325,15 +306,16 @@ const flexGridRenderer = ({
     >
       <input {...getClipboardHelperProps()} />
       {/* col header non-scrolling part/fixed columns */}
-      {numOfFixedCols > 0 && (
+      {hasFixedCols && (
         <FlexGridRow
           {...getRowProps({
             isHeader: true,
             headers: rowHeaders,
             headerRowHeight,
-            yOffSet: topOffSet,
+            scroll,
+            // width is ommited because it is auto calced
+            // if not supplied
           })}
-          scroll={scroll}
         >
           {rowHeaders.map((header, index) => (
             <FlexGridColHeader
@@ -348,12 +330,12 @@ const flexGridRenderer = ({
         {...getRowProps({
           isHeader: true,
           headers: dataHeaders,
-          width: scrollWidth.headerWidth,
+          width: contentViewPortWidth,
           headerRowHeight,
-          yOffSet: topOffSet,
+          xOffSet: fixedHeaderWidth,
+          scrollY,
+          scroll,
         })}
-        xOffSet={fixedWidth.headerWidth}
-        scroll={scroll}
       >
         {dataHeaders.map((header, index) => (
           <FlexGridColHeader
@@ -363,26 +345,24 @@ const flexGridRenderer = ({
           />
         ))}
       </FlexGridRow>
-      {scrollY && <UpperRight headerRowHeight={headerRowHeight} />}
+      {/* scrollY && <UpperRight headerRowHeight={headerRowHeight} /> */}
       {/* table body fixed columns */}
       {numOfFixedCols > 0 && (
         <TableContent
-          height={fixedPaneHeight}
-          width={fixedWidth.containerWidth}
-          yOffSet={headerRowHeight + topOffSet}
+          height={scrollPaneHeight}
+          width={fixedHeaderWidth}
+          yOffSet={headerRowHeight}
           headers={rowHeaders}
-          scroll
-          showScroll={false}
+          scroll={scroll}
+          scrollX
           vertical
           horizontal={false}
-          fixed
-          fixedScrollHeightAdjustment={fixedScrollHeightAdjustment}
         >
           {R.range(0, data.length).map(rowIndex => (
             <FlexGridRow
               {...getRowProps({
                 index: rowIndex,
-                headers,
+                headers: rowHeaders,
                 rowHeight,
               })}
             >
@@ -404,12 +384,11 @@ const flexGridRenderer = ({
       {/* table body data columns */}
       <TableContent
         height={scrollPaneHeight}
-        width={scrollWidth.containerWidth}
-        yOffSet={headerRowHeight + topOffSet}
+        width={contentViewPortWidth}
+        yOffSet={headerRowHeight}
         headers={dataHeaders}
         scroll={scroll}
-        xOffSet={fixedWidth.containerWidth}
-        showScroll={scroll}
+        xOffSet={fixedHeaderWidth - 1}
         scrollX={scrollX}
         scrollY={scrollY}
         vertical

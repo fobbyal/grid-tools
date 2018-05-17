@@ -734,6 +734,9 @@ class Grid extends React.PureComponent {
     rowHeight,
     headerRowHeight,
     yOffSet,
+    xOffSet,
+    scroll,
+    scrollY,
   }) => ({
     key: key || index,
     width: width === undefined || width === null ? sumWidth(headers) : width,
@@ -741,6 +744,9 @@ class Grid extends React.PureComponent {
     colCount: headers.length,
     isHeader,
     yOffSet,
+    xOffSet,
+    scroll,
+    scrollY,
   })
 
   getCellProps = ({ key, rowIndex, columnIndex, header, data, rowData, rowHeight, ...rest }) => {
@@ -918,12 +924,12 @@ class Grid extends React.PureComponent {
       )
     }
   }
-  //componentDidUpdate(prevProps, prevState) {
+  // componentDidUpdate(prevProps, prevState) {
   //  //when edit is contgroled from
   //  if (prevProps.editInfo !== this.props.editInfo) {
   //    this.setState({ ...this.generateViewProps() })
   //  }
-  //}
+  // }
 
   onPaste = e => {
     e.preventDefault()
