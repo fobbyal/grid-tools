@@ -80,7 +80,7 @@ export const updateRow = (
   { editInfo = generateInitialEditInfo(), currentRow, editedRow },
   ignoreHistory
 ) => {
-  if (currentRow === undefined && !R.isNil(editedRow)) {
+  if ((currentRow === undefined || R.isEmpty(currentRow)) && !R.isNil(editedRow)) {
     const { added, history, ...rest } = editInfo
     return {
       added: [...added, editedRow],
