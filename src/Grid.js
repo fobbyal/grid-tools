@@ -145,6 +145,7 @@ const computeView = ({
   // TODO have to add edited value
   //
   const editedData = applyEdits({ data, editInfo })
+  console.log('*****calling compute view******')
 
   const filteredData =
     !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
@@ -332,6 +333,7 @@ class Grid extends React.PureComponent {
               this.isPagingControlled() && this.props.currentPage !== nextProps.currentPage
                 ? nextProps.currentPage
                 : currentPage,
+            editInfo: editInfo !== nextProps.editInfo ? nextProps.editInfo : this.editInfo(),
           }),
           editingRow: data !== nextProps.data ? undefined : editingRow,
           editingColumn: data !== nextProps.data ? undefined : editingColumn,
@@ -916,12 +918,12 @@ class Grid extends React.PureComponent {
       )
     }
   }
-  componentDidUpdate(prevProps, prevState) {
-    // when edit is contgroled from
-    if (prevProps.editInfo !== this.props.editInfo) {
-      this.setState({ ...this.generateViewProps() })
-    }
-  }
+  //componentDidUpdate(prevProps, prevState) {
+  //  //when edit is contgroled from
+  //  if (prevProps.editInfo !== this.props.editInfo) {
+  //    this.setState({ ...this.generateViewProps() })
+  //  }
+  //}
 
   onPaste = e => {
     e.preventDefault()

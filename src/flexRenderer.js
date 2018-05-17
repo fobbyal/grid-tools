@@ -104,7 +104,7 @@ class FlexGridRow extends React.PureComponent {
 class PureCell extends React.PureComponent {
   render() {
     const { display, ...rest } = this.props
-    //console.log('in cell render...')
+    console.log('in cell render...')
     return (
       <Cell {...rest}>
         <CellContent>{display}</CellContent>
