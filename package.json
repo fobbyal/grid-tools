@@ -1,6 +1,6 @@
 {
   "name": "@integec/grid-tools",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "pretty:write": "prettier --write \"lib/**/*.js\"",
     "precommit": "lint-staged",
     "lint:fix-file": "eslint --fix",
-    "prepublisOnly": "yarn build:prod"
+    "prepublishOnly": "yarn build:prod"
   },
   "repository": {
     "type": "git",
