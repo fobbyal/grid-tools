@@ -16,7 +16,7 @@
     "pretty:write": "prettier --write \"src/**/*.js\"",
     "precommit": "lint-staged",
     "lint:fix-file": "eslint --fix",
-    "prepublish": "yarn build:prod"
+    "prepublisOnly": "yarn build:prod"
   },
   "repository": {
     "type": "git",
