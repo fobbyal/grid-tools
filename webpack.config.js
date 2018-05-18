@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = env => ({
-  entry: './src/index.js',
+  entry: './lib/index.js',
   devtool: env.prod ? 'sourcemap' : 'cheap-eval-source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),

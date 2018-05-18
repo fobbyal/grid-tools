@@ -7,10 +7,6 @@
     "ramda",
     "transform-class-properties",
     "transform-object-rest-spread",
-    ["module-resolver", {
-      "root": ["./"],
-      "alias": { }
-    }]
   ],
 	"env": {
     "presets": [
