@@ -1,6 +1,6 @@
 {
   "name": "@integec/grid-tools",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Integ Grid Tools",
   "main": "dist/integ-grid-tools.js",
   "scripts": {
