@@ -4,17 +4,17 @@
   "description": "Integ Grid Tools",
   "main": "lib/index.js",
   "scripts": {
-    "build": "rimraf lib/* && babel src --out-dir lib --source-maps inline",
-    "build:watch": "rimraf lib/* && babel src --out-dir lib --watch --source-maps inline",
+    "build": "rimraf lib && babel src --out-dir lib --source-maps inline",
+    "build:watch": "rimraf lib && babel src --out-dir lib --watch --source-maps inline",
     "build:prod":
-      " rimraf lib/* && cross-env NODE_ENV=production babel src --out-dir lib --source-maps",
+      " rimraf lib && cross-env NODE_ENV=production babel src --out-dir lib --source-maps",
     "storybook": "start-storybook -h 0.0.0.0 -p 6006",
     "build-storybook": "build-storybook",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cover": "jest --coverage",
-    "pretty": "prettier --debug-check \"lib/**/*.js\" ",
-    "pretty:write": "prettier --write \"lib/**/*.js\"",
+    "pretty": "prettier --debug-check \"src/**/*.js\" ",
+    "pretty:write": "prettier --write \"src/**/*.js\"",
     "precommit": "lint-staged",
     "lint:fix-file": "eslint --fix",
     "prepublishOnly": "yarn build:prod"
@@ -41,6 +41,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "chance": "^1.0.13",
+    "cross-env": "^5.2.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
@@ -58,6 +59,7 @@
     "numeral": "^2.0.6",
     "prettier-eslint": "^8.8.1",
     "prop-types": "^15.6.1",
+    "rimraf": "^2.6.2",
     "shallow-equal-explain": "^0.0.4"
   },
   "dependencies": {

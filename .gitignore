@@ -1,6 +1,7 @@
 /node_modules
 /npm-debug.log
 /dist
+/lib
 stats.json
 docker-app/node_modules
 /coverage
