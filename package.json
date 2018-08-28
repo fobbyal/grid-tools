@@ -1,12 +1,13 @@
 {
   "name": "@integec/grid-tools",
-  "version": "1.1.6",
+  "version": "2.0.0",
   "description": "Integ Grid Tools",
-  "main": "dist/integ-grid-tools.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "webpack --env.dev",
-    "build:watch": "webpack --watch --env.dev",
-    "build:prod": "webpack -p --env.prod",
+    "build": "rimraf lib/* && babel src --out-dir lib --source-maps inline",
+    "build:watch": "rimraf lib/* && babel src --out-dir lib --watch --source-maps inline",
+    "build:prod":
+      " rimraf lib/* && cross-env NODE_ENV=production babel src --out-dir lib --source-maps",
     "storybook": "start-storybook -h 0.0.0.0 -p 6006",
     "build-storybook": "build-storybook",
     "test": "jest",
@@ -28,6 +29,7 @@
     "@storybook/addon-actions": "^3.4.0",
     "@storybook/addon-links": "^3.4.0",
     "@storybook/react": "^3.4.0",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.3",
@@ -39,8 +41,6 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "chance": "^1.0.13",
-    "data.maybe": "^1.2.2",
-    "downshift": "^1.31.4",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
@@ -58,27 +58,19 @@
     "numeral": "^2.0.6",
     "prettier-eslint": "^8.8.1",
     "prop-types": "^15.6.1",
-    "ramda": "^0.25.0",
-    "react": "^16.1.1",
-    "react-dom": "^16.1.1",
-    "react-popper": "^1.0.0-beta.6",
-    "react-virtualized": "^9.18.5",
-    "shallow-equal-explain": "^0.0.4",
-    "styled-components": "2.4.0"
+    "shallow-equal-explain": "^0.0.4"
   },
-  "peerDependencies": {
+  "dependencies": {
     "data.maybe": "^1.2.2",
     "downshift": "^1.31.4",
+    "fbjs": "^0.8.16",
+    "ramda": "^0.25.0",
     "react": ">=16",
+    "react-broadcast": "^0.7.0",
     "react-dom": ">=16",
     "react-popper": "^1.0.0-beta.6",
     "react-virtualized": "^9.18.5",
     "styled-components": "2.4.0"
-  },
-  "dependencies": {
-    "data.maybe": "^1.2.2",
-    "fbjs": "^0.8.16",
-    "react-broadcast": "^0.7.0"
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]

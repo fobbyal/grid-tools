@@ -1,6 +1,6 @@
 {
   "presets": [
-    ["env",{"modules":false }],
+    ["env",{"modules":"commonjs" }],
     "react"
   ],
   "plugins": [
@@ -9,10 +9,6 @@
     "transform-object-rest-spread",
   ],
 	"env": {
-    "presets": [
-      ["env",{"modules":false }],
-      "react"
-    ],
 		"test": {
 			"plugins": ["transform-es2015-modules-commonjs"]
 		}
