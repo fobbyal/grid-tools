@@ -1,26 +1,36 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Popper } from 'react-popper'
+import { Manager, Reference, Popper } from 'react-popper'
 import PropTypes from 'prop-types'
 
-/**
- * This is a simple wrapper class for the popper to be out of context
- * so there are no z-index/overflow issues
- * /
+/** Children : (Reference Render)
+ ({ ref }) => (
+        <button type="button" ref={ref}>
+          Reference element
+        </button>
+      )
+ */
 
-/** render should look like the following based on react popper docs
- * https://github.com/souporserious/react-popper
-   const defaultRender = ({ ref, style, placement, arrowProps }) => (
-     <div ref={ref} style={style} data-placement={placement}>
-       propert content
-     </div>
-   )
-**/
+/** PopperRender
+ ({ ref, style, placement, arrowProps }) => (
+        <div ref={ref} style={style} data-placement={placement}>
+          Popper element
+          <div ref={arrowProps.ref} style={arrowProps.style} />
+        </div>
+      )
+ **/
+
 class PortaledPopper extends React.Component {
   static propTypes = {
-    render: PropTypes.func.isRequired,
+    children: PropTypes.func.isRequired,
+    innerRef: PropTypes.func,
     modifiers: PropTypes.object.isRequired,
     placement: PropTypes.string.isRequired,
+    eventsEnabled: PropTypes.bool,
+    positionFixed: PropTypes.bool,
+    popperRender: PropTypes.func.isRequired,
+    popperVisible: PropTypes.bool,
+    referenceInnerRef: PropTypes.func,
   }
 
   static defaultProps = {
@@ -29,6 +39,9 @@ class PortaledPopper extends React.Component {
       preventOverflow: { enabled: false },
     },
     placement: 'bottom-start',
+    eventsEnabled: true,
+    positionFixed: false,
+    popperVisible: true,
   }
 
   constructor(props) {
@@ -42,9 +55,14 @@ class PortaledPopper extends React.Component {
   }
 
   render() {
-    const { render, ...rest } = this.props
-    if (process.env.NODE_ENV === 'development') console.log('rendering popper on:', this.anchor)
-    return ReactDOM.createPortal(<Popper {...rest}>{render}</Popper>, this.anchor)
+    const { children, popperRender, popperVisible, referenceInnerRef, ...popperProps } = this.props
+    return (
+      <Manager>
+        <Reference innerRef={referenceInnerRef}>{children}</Reference>
+        {popperVisible &&
+          ReactDOM.createPortal(<Popper {...popperProps}>{popperRender}</Popper>, this.anchor)}
+      </Manager>
+    )
   }
 }
 

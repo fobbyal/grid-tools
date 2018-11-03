@@ -2,17 +2,10 @@ import React from 'react'
 import Downshift from 'downshift'
 
 const BasicAutocomplete = ({ items, onChange }) => {
+  console.log('items', items)
   return (
-    <Downshift
-      onChange={onChange}
-      render={({
-        getInputProps,
-        getItemProps,
-        isOpen,
-        inputValue,
-        selectedItem,
-        highlightedIndex,
-      }) => (
+    <Downshift onChange={onChange}>
+      {({ getInputProps, getItemProps, isOpen, inputValue, selectedItem, highlightedIndex }) => (
         <div>
           <input {...getInputProps({ placeholder: 'Favorite fruit ?' })} />
           {isOpen ? (
@@ -35,7 +28,7 @@ const BasicAutocomplete = ({ items, onChange }) => {
           ) : null}
         </div>
       )}
-    />
+    </Downshift>
   )
 }
 

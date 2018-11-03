@@ -143,14 +143,6 @@ const renderBasicList = ({
 }
 
 class DropDownCellEditor extends React.Component {
-  handelInputRef = node => {
-    this.input = node
-    if (this.props.innerRef) {
-      this.props.innerRef(node)
-    }
-    this.setState({ showSelection: true })
-  }
-
   handelListRef = node => {
     this.list = node
     console.log('list is', node)
@@ -160,36 +152,68 @@ class DropDownCellEditor extends React.Component {
     console.log('blur is ', e)
     const { virtualized, onBlur } = this.props
     if (!virtualized) {
-      onBlur(e)
+      onBlur && onBlur(e)
     } else {
       if (!e.relatedTarget || e.relatedTarget.getAttribute('id') !== 'drop-down-vr-list') {
-        onBlur(e)
+        onBlur && onBlur(e)
       }
     }
   }
 
-  state = { showSelection: false, justOpened: true }
+  state = { showSelection: true, justOpened: true }
 
   inputValueChanged = value => {
     console.log('value changed to ', value)
     this.setState({ justOpened: false })
   }
 
+  renderInput = ({
+    getInputProps,
+    placeholder,
+    onKeyDown,
+    style = {},
+    className,
+    width = 150,
+    height = 25,
+    handleRef,
+  }) => (
+    <input
+      {...getInputProps({ placeholder, onKeyDown })}
+      ref={handleRef}
+      style={{ ...style, width: width + 'px', height: height + 'px' }}
+      onBlur={this.handleBlur}
+      className={className}
+    />
+  )
+  // innerRef={ref}
+
+  renderComboBox = ({
+    getToggleButtonProps,
+    placeholder,
+    onKeyDown,
+    selectedItem,
+    style = {},
+    className,
+    width = 150,
+    height = 25,
+    handleRef,
+  }) => (
+    <ComboSelector
+      innerRef={handleRef}
+      {...getToggleButtonProps({ onKeyDown })}
+      style={{ ...style, width: width + 'px', height: height + 'px' }}
+      onBlur={this.handleBlur}
+      className={className}
+    >
+      {selectedItem ? selectedItem.text || selectedItem.value : placeholder || 'Select a value'}
+    </ComboSelector>
+  )
+
   render() {
-    const {
-      className,
-      style = {},
-      choices,
-      value,
-      onChange,
-      width = 150,
-      height = 25,
-      placeholder,
-      onKeyDown,
-      virtualized,
-    } = this.props
+    const { choices, value, onChange, virtualized } = this.props
     const { showSelection, justOpened } = this.state
     const renderList = virtualized ? renderVirtualizedList : renderBasicList
+    const renderSelector = virtualized ? this.renderInput : this.renderComboBox
 
     const selectedItem = R.find(c => value === c.value, choices)
     const hilightedIndex = R.findIndex(c => value === c.value, choices)
@@ -201,47 +225,34 @@ class DropDownCellEditor extends React.Component {
         onInputValueChange={this.inputValueChanged}
         onChange={onChange}
         itemToString={({ vallue, text }) => text || value + ''}
-        render={({ getInputProps, getToggleButtonProps, ...downshiftProps }) => (
+      >
+        {downshiftProps => (
           <div>
-            {virtualized ? (
-              <input
-                {...getInputProps({ placeholder, onKeyDown })}
-                ref={this.handelInputRef}
-                style={{ ...style, width: width + 'px', height: height + 'px' }}
-                onBlur={this.handleBlur}
-                className={className}
-              />
-            ) : (
-              <ComboSelector
-                {...getToggleButtonProps({ onKeyDown })}
-                innerRef={this.handelInputRef}
-                style={{ ...style, width: width + 'px', height: height + 'px' }}
-                onBlur={this.handleBlur}
-                className={className}
-              >
-                {downshiftProps.selectedItem
-                  ? downshiftProps.selectedItem.text || downshiftProps.selectedItem.value
-                  : placeholder || 'Select a value'}
-              </ComboSelector>
-            )}
-            {showSelection && (
-              <PortaledPopper
-                referenceElement={this.input}
-                render={popperProps =>
-                  renderList({
-                    ...downshiftProps,
-                    ...popperProps,
-                    choices,
-                    minWidth: width,
-                    justOpened,
-                    ref: popperProps.ref,
-                  })
-                }
-              />
-            )}
+            <PortaledPopper
+              popperVisible
+              referenceInnerRef={this.props.innerRef}
+              popperRender={popperProps =>
+                renderList({
+                  ...downshiftProps,
+                  ...popperProps,
+                  choices,
+                  minWidth: this.props.width == null ? 150 : this.props.width,
+                  justOpened,
+                  ref: popperProps.ref,
+                })
+              }
+            >
+              {({ ref }) =>
+                renderSelector({
+                  ...this.props,
+                  ...downshiftProps,
+                  handleRef: ref,
+                })
+              }
+            </PortaledPopper>
           </div>
         )}
-      />
+      </Downshift>
     )
   }
 }

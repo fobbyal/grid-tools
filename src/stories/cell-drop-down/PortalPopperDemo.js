@@ -9,26 +9,26 @@ class Example extends React.Component {
 
   render() {
     const { showPopper } = this.state
-    return [
-      <div key="btn" type="button" ref={this.handelRef} onClick={this.togglePopper}>
-        Reference element
-      </div>,
-      showPopper ? (
-        <PortaledPopper
-          referenceElement={this.node}
-          render={({ ref, style, placement, arrowProps }) => (
-            <div ref={ref} style={style} data-placement={placement}>
-              <div>row1row1row1row1row1row1</div>
-              <div>row1row1row1row1row1row2</div>
-              <div>row1row1row1row1row1row3</div>
-              <div>row1row1row1row1row1row4</div>
-              <div>row1row1row1row1row1row5</div>
-            </div>
-          )}
-          key="popper"
-        />
-      ) : null,
-    ]
+    return (
+      <PortaledPopper
+        popperRender={({ ref, style, placement, arrowProps }) => (
+          <div ref={ref} style={style} data-placement={placement}>
+            <div>row1row1row1row1row1row1</div>
+            <div>row1row1row1row1row1row2</div>
+            <div>row1row1row1row1row1row3</div>
+            <div>row1row1row1row1row1row4</div>
+            <div>row1row1row1row1row1row5</div>
+          </div>
+        )}
+        popperVisible={showPopper}
+      >
+        {({ ref }) => (
+          <div ref={ref} key="btn" type="button" onClick={this.togglePopper}>
+            Reference element
+          </div>
+        )}
+      </PortaledPopper>
+    )
   }
 }
 export default Example
