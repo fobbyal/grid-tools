@@ -6,16 +6,19 @@ import Grid, { flexGridRenderer, renderRowEditorContent } from '../../index'
 class ControlledEditDemo extends React.Component {
   state = { data: this.props.data, showAdd: false }
 
-  onEdit = ({ originalRow, editedRow }) => {
+  onEdit = ({ originalRow, editedRow }, done) => {
     if (originalRow) {
       this.setState(({ data }) => ({
         data: data.map(row => (row === originalRow ? editedRow : row)),
       }))
     } else {
-      this.setState(({ data }) => ({
-        data: [editedRow, ...data],
-        showAdd: false,
-      }))
+      this.setState(
+        ({ data }) => ({
+          data: [editedRow, ...data],
+          showAdd: false,
+        }),
+        done
+      )
     }
   }
 
