@@ -584,7 +584,7 @@ class Grid extends React.PureComponent {
       const { editedRow } = this.processUpdate({ currentRow, editedRow: row })
       if (this.props.onEdit) {
         // expect new data to be passed down via props
-        this.props.onEdit({ originalRow: currentRow, editedRow })
+        this.props.onEdit({ originalRow: currentRow, editedRow }, this.focusGrid)
       } else {
         // console.log('***********adding stuff', currentRow, editedRow,'')
 
@@ -618,7 +618,13 @@ class Grid extends React.PureComponent {
   cancelEdit = () =>
     this.setState(
       _ => ({ editingRow: undefined, editingColumn: undefined }),
-      this.props.onEditCancel
+      () => {
+        try {
+          if (this.props.onEditCancel != null) this.props.onEditCancel()
+        } finally {
+          this.focusGrid()
+        }
+      }
     )
 
   undoEdit() {
@@ -910,10 +916,10 @@ class Grid extends React.PureComponent {
   batchUpdate = updates => {
     if (this.props.onBatchUpdate) {
       // expect new data to be passed down via props
-      this.props.onBatchUpdate(updates.map(this.processUpdate))
+      this.props.onBatchUpdate(updates.map(this.processUpdate), this.focusGrid)
     } else if (this.props.onEdit) {
       for (let i = 0; i < updates.length; i++) {
-        this.props.onEdit(this.processUpdate(updates[i]))
+        this.props.onEdit(this.processUpdate(updates[i]), this.focusGrid)
       }
     } else {
       const updateState = this.setEditInfo(
