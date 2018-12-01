@@ -12,7 +12,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - install:
+      - run:
           name: install
           command: yarn install
 
@@ -22,7 +22,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # not test at the momen will update later
-      - build:
+      - run:
           name: build
           command: yarn build:prod
 
