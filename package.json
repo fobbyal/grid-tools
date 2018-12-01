@@ -1,6 +1,6 @@
 {
   "name": "@integec/grid-tools",
-  "version": "2.2.2",
+  "version": "0.0.0-development",
   "description": "Integ Grid Tools",
   "main": "lib/index.js",
   "scripts": {
@@ -17,11 +17,11 @@
     "pretty:write": "prettier --write \"src/**/*.js\"",
     "precommit": "lint-staged",
     "lint:fix-file": "eslint --fix",
-    "prepublishOnly": "yarn build:prod"
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:fobbyal/grid-tools.git"
+    "url": "https:git@github.com:fobbyal/grid-tools.git"
   },
   "author": "Alex Liang <aliang@integconsulting.com>",
   "license": "ISC",
@@ -62,7 +62,8 @@
     "prop-types": "^15.6.1",
     "react-hot-loader": "^4.3.12",
     "rimraf": "^2.6.2",
-    "shallow-equal-explain": "^0.0.4"
+    "shallow-equal-explain": "^0.0.4",
+    "semantic-release": "^15.12.3"
   },
   "dependencies": {
     "data.maybe": "^1.2.3",
