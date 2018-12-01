@@ -42,6 +42,7 @@
     "babel-preset-react": "^6.24.1",
     "chance": "^1.0.13",
     "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
@@ -77,5 +78,10 @@
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
