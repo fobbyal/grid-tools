@@ -4,6 +4,7 @@ module.export = {
     '@semantic-release/release-notes-generator',
     '@semantic-release/github',
     '@semantic-release/git',
+    '@semantic-release/npm',
   ],
   preset: 'angular',
 }
