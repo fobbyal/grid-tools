@@ -11,7 +11,6 @@ import { extractAndFormatData } from '../utils'
 import { Consumer } from './VirtualizedContext'
 /* justify-content: ${props => mapAlignmentToJustifyContent(props.alignment) || 'center'}; */
 import CellEditContainer from '../CellEditContainer'
-import DropdownCellEditor from '../DropdownCellEditor'
 
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;

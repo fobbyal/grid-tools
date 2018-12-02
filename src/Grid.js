@@ -594,12 +594,20 @@ class Grid extends React.PureComponent {
     return { originalRow: currentRow, currentRow, editedRow }
   }
 
-  commitRowEdit = ({ currentRow, editedRow: row }) => {
+  commitRowEdit = editProps => {
+    const { currentRow, editedRow: row } = editProps
+    const { dataDidUpdate } = this.props
     if (currentRow !== row) {
       const { editedRow } = this.processUpdate({ currentRow, editedRow: row })
       if (this.props.onEdit) {
         // expect new data to be passed down via props
-        this.props.onEdit({ currentRow, originalRow: currentRow, editedRow }, this.focusGrid)
+        this.props.onEdit(
+          { ...editProps, currentRow, originalRow: currentRow, editedRow },
+          this.focusGrid
+        )
+        if (dataDidUpdate) {
+          dataDidUpdate({ ...editProps, currentRow, originalRow: currentRow, editedRow })
+        }
       } else {
         // console.log('***********adding stuff', currentRow, editedRow,'')
 
@@ -624,7 +632,12 @@ class Grid extends React.PureComponent {
                   editingRow: undefined,
                   editingColumn: undefined,
                 },
-          this.focusGrid
+          () => {
+            this.focusGrid && this.focusGrid()
+            dataDidUpdate &&
+              updateState &&
+              dataDidUpdate({ ...editProps, originalRow: currentRow, currentRow, editedRow })
+          }
         )
       }
     }
