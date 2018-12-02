@@ -5,9 +5,14 @@ import Grid from './Grid'
 import { formatData, extractData } from './utils'
 import computeGridProps from './computeGridProps'
 import DefaultPager from './DefaultPager'
-import { BasicCell, BasicColHeader, SortIndicator, BasicCellInput } from './Components'
+import {
+  BasicCell,
+  BasicColHeader,
+  SortIndicator,
+  inputCellEditRender,
+  dropdownEditRender,
+} from './Components'
 import CellEditContainer from './CellEditContainer'
-import DropdownCellEditor from './DropdownCellEditor'
 // import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
@@ -32,12 +37,6 @@ export const Cell = BasicCell.extend`
   /*display: block;*/
   height: 100%;
   text-align: center;
-`
-
-export const CellInputEditor = BasicCellInput.extend`
-  flex: 0 0 ${props => props.width}px;
-  width: ${props => props.width}px;
-  max-width: ${props => props.width}px;
 `
 
 /* prettier-ignore */
@@ -144,13 +143,6 @@ export const defaultCellRenderer = ({
     />
   )
 }
-export const inputCellEditRender = ({ getInputProps }) => (
-  <CellInputEditor {...getInputProps({ refKey: 'innerRef' })} />
-)
-
-export const dropdownEditRender = ({ getDropdownProps }) => (
-  <DropdownCellEditor {...getDropdownProps({ refKey: 'innerRef' })} />
-)
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />
 

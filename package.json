@@ -1,6 +1,6 @@
 {
   "name": "@integec/grid-tools",
-  "version": "2.2.2",
+  "version": "0.0.0-development",
   "description": "Integ Grid Tools",
   "main": "lib/index.js",
   "scripts": {
@@ -17,14 +17,14 @@
     "pretty:write": "prettier --write \"src/**/*.js\"",
     "precommit": "lint-staged",
     "lint:fix-file": "eslint --fix",
-    "prepublishOnly": "yarn build:prod"
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:fobbyal/grid-tools.git"
+    "url": "https:git@github.com:fobbyal/grid-tools.git"
   },
   "author": "Alex Liang <aliang@integconsulting.com>",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@storybook/addon-actions": "^3.4.0",
     "@storybook/addon-links": "^3.4.0",
@@ -42,6 +42,7 @@
     "babel-preset-react": "^6.24.1",
     "chance": "^1.0.13",
     "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
@@ -61,21 +62,31 @@
     "prop-types": "^15.6.1",
     "react-hot-loader": "^4.3.12",
     "rimraf": "^2.6.2",
+    "semantic-release": "^15.12.3",
     "shallow-equal-explain": "^0.0.4"
   },
   "dependencies": {
     "data.maybe": "^1.2.3",
+    "dom-helpers": "^3.4.0",
     "downshift": "^3.1.4",
     "fbjs": "^1.0.0",
     "ramda": "^0.25.0",
-    "react": ">=16",
+    "react": ">=16.3",
     "react-broadcast": "^0.7.0",
-    "react-dom": ">=16",
+    "react-dom": ">=16.3",
     "react-popper": "^1.0.2",
     "react-virtualized": "^9.21.0",
     "styled-components": "2.4.0"
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["npx prettier --write", "git add"]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

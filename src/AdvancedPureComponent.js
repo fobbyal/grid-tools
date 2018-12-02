@@ -1,5 +1,5 @@
 import React from 'react'
-//import shallowCompare from 'react-addons-shallow-compare'
+// import shallowCompare from 'react-addons-shallow-compare'
 import shallowEqual from 'fbjs/lib/shallowEqual'
 
 const createAdvancedPureComponent = (Component, toFlattenProps = _ => _) => {
@@ -8,7 +8,6 @@ const createAdvancedPureComponent = (Component, toFlattenProps = _ => _) => {
       return !shallowEqual(toFlattenProps(this.props), toFlattenProps(nextProps))
     }
     render() {
-      //console.log('rendered ', Component.displayName)
       const { children, ...props } = this.props
       return <Component {...props}>{children}</Component>
     }

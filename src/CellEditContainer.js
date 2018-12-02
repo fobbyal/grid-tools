@@ -52,15 +52,22 @@ class CellEditContainer extends React.Component {
     const rowData = data[rowIndex]
 
     if (commitRowEdit) {
-      commitRowEdit({ currentRow: rowData, editedRow: { ...rowData, [header.ident]: value } })
+      commitRowEdit({
+        currentRow: rowData,
+        editedRow: { ...rowData, [header.ident]: value },
+        rowIndex,
+        header,
+        data,
+      })
     } else {
       console.warn('commitRowEdit must be set on CellEditContainer for edit to have effect')
     }
   }
 
   cancelEdit = _ => {
-    if (this.props.cancelEdit) {
-      this.props.cancelEdit()
+    const { rowIndex, header, data, cancelEdit } = this.props
+    if (cancelEdit) {
+      cancelEdit({ rowIndex, header, data })
     }
   }
 

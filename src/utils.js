@@ -1,9 +1,9 @@
+import React from 'react'
 import R from 'ramda'
 import { fromNullable, Just, Nothing } from 'data.maybe'
 import moment from 'moment'
 import numeral from 'numeral'
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE, COL_IDENT_ATTRIBUTE } from './constants.js'
-
 export const fromEmpty = d => fromNullable(d).chain(v => (R.isEmpty(v) ? Nothing() : Just(v)))
 
 export const normalizeBounds = selection => {
