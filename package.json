@@ -24,7 +24,7 @@
     "url": "https:git@github.com:fobbyal/grid-tools.git"
   },
   "author": "Alex Liang <aliang@integconsulting.com>",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@storybook/addon-actions": "^3.4.0",
     "@storybook/addon-links": "^3.4.0",
