@@ -2,7 +2,6 @@ import Chance from 'chance'
 import R from 'ramda'
 import moment from 'moment'
 import { strCol, numCol, intCol, dollarCol, pctCol, dateCol } from '../cols'
-
 const chance = new Chance()
 //* test helpers
 export const randomRow = R.compose(
