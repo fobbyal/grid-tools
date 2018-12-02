@@ -1,4 +1,6 @@
+import React from 'react'
 import styled from 'styled-components'
+import DropdownCellEditor from './DropdownCellEditor'
 
 const mapAlignmentToJustifyContent = alignment =>
   alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : alignment
@@ -82,4 +84,17 @@ export const BasicColHeader = styled.div`
 export const SortIndicator = styled.i`
   justify-self: flex-end;
   margin-left: 0.2em;
+`
+
+export const inputCellEditRender = ({ getInputProps }) => (
+  <CellInputEditor {...getInputProps({ refKey: 'innerRef' })} />
+)
+
+export const dropdownEditRender = ({ getDropdownProps }) => (
+  <DropdownCellEditor {...getDropdownProps({ refKey: 'innerRef' })} />
+)
+export const CellInputEditor = BasicCellInput.extend`
+  flex: 0 0 ${props => props.width}px;
+  width: ${props => props.width}px;
+  max-width: ${props => props.width}px;
 `

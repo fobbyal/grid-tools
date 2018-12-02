@@ -11,7 +11,7 @@ import { extractData, formatData, extractAndFormatDataData, toSelectionColProps 
 import * as freeEditEngine from './editEngine'
 import RowEditor from './RowEditor'
 
-import virtualizedGridRenderer from './virtualizedRenderer'
+import virtualizedGridRenderer from './virtualized'
 
 export * from './cols'
 

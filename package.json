@@ -67,12 +67,13 @@
   },
   "dependencies": {
     "data.maybe": "^1.2.3",
+    "dom-helpers": "^3.4.0",
     "downshift": "^3.1.4",
     "fbjs": "^1.0.0",
     "ramda": "^0.25.0",
-    "react": ">=16",
+    "react": ">=16.3",
     "react-broadcast": "^0.7.0",
-    "react-dom": ">=16",
+    "react-dom": ">=16.3",
     "react-popper": "^1.0.2",
     "react-virtualized": "^9.21.0",
     "styled-components": "2.4.0"
@@ -84,5 +85,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

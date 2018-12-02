@@ -478,19 +478,22 @@ class Grid extends React.PureComponent {
   /*  selection starts */
 
   selectRight = expand => {
-    this.setState(selector.right(this.state, expand, this.props.headers.length))
+    this.setState(
+      selector.right(this.state, expand, this.props.headers.length),
+      this.selectionChanged
+    )
   }
 
   selectLeft = expand => {
-    this.setState(selector.left(this.state, expand))
+    this.setState(selector.left(this.state, expand), this.selectionChanged)
   }
 
   selectTop = expand => {
-    this.setState(selector.up(this.state, expand))
+    this.setState(selector.up(this.state, expand), this.selectionChanged)
   }
 
   selectBottom = expand => {
-    this.setState(selector.down(this.state, expand, this.state.view.length))
+    this.setState(selector.down(this.state, expand, this.state.view.length), this.selectionChanged)
   }
 
   startSelectionState(rowIndex, columnIndex) {
@@ -508,6 +511,7 @@ class Grid extends React.PureComponent {
   /** this is for external listeners only */
   selectionChanged = _ => {
     const { headers, onSelectionChange } = this.props
+    // console.log(this.state.x1, this.state.y1, this.state.x2, this.state.y2)
     if (onSelectionChange) {
       const { x1, x2, y1, y2 } = normalizeSelection(this.state)
       const selectedRows = []
@@ -520,9 +524,20 @@ class Grid extends React.PureComponent {
       for (let c = x1; c <= x2; c++) {
         selectedHeaders.push(headers[c])
       }
+
       onSelectionChange({ selectedRows, selectedHeaders })
     }
   }
+
+  getSelectionInfo = _ => ({
+    ...normalizeSelection(this.state),
+    rawPositions: {
+      x1: this.state.x1,
+      x2: this.state.x2,
+      y1: this.state.y1,
+      y2: this.state.y2,
+    },
+  })
 
   /* selection ends */
 
@@ -650,11 +665,11 @@ class Grid extends React.PureComponent {
         ((e.keyCode >= 32 && e.keyCode <= 126) || e.keyCode === 187 || e.keyCode === 189) &&
         e.key.length === 1
       if (isEditAttempt) {
-        // console.log('attempting edit', {
-        //   editingColumn: columnIndex,
-        //   editingRow: rowIndex,
-        //   initialEditChar: String.fromCharCode(e.keyCode),
-        // })
+        console.log('attempting edit', {
+          editingColumn: columnIndex,
+          editingRow: rowIndex,
+          initialEditChar: String.fromCharCode(e.keyCode),
+        })
         this.edit(rowIndex, columnIndex)
       }
     }
@@ -804,6 +819,7 @@ class Grid extends React.PureComponent {
       selectLeft: this.selectLeft,
       selectTop: this.selectTop,
       selectBottom: this.selectBottom,
+      ...rest,
     }
   }
 
@@ -975,6 +991,7 @@ class Grid extends React.PureComponent {
       data: view,
       hasPaging: this.hasPaging(),
       renderRowEditor: this.props.renderRowEditor,
+      getSelectionInfo: this.getSelectionInfo,
     })
   }
 }
