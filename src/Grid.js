@@ -843,7 +843,7 @@ class Grid extends React.PureComponent {
     [refKey]: this.gridContainerRefHandler,
   })
 
-  getColumnHeaderProps = ({ key, index, header }) => ({
+  getColumnHeaderProps = ({ key, index, header, ...rest }) => ({
     key: key || index + '-x-' + header.ident,
     header,
     width: header.width,
@@ -851,6 +851,7 @@ class Grid extends React.PureComponent {
     onClick: this.props.sortEnabled ? this.columnHeaderClick : undefined,
     sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.state.sortOptions) : undefined,
     'data-column-index': index,
+    ...rest,
   })
 
   getPagerProps = props => ({

@@ -6,6 +6,7 @@ import {
   inputCellEditRender,
   dropdownEditRender,
 } from '../Components'
+import R from 'ramda'
 import pureComponent from '../AdvancedPureComponent'
 import { extractAndFormatData } from '../utils'
 import { Consumer } from './VirtualizedContext'
@@ -55,8 +56,8 @@ export const defaultRowHeaderRender = ({
     {...getColumnHeaderProps({
       index: columnIndex,
       header: headers[columnIndex],
+      style,
     })}
-    style={style}
   >
     {extractAndFormatData({
       rowData: data[rowIndex],
@@ -92,8 +93,10 @@ export const defaultCellRender = ({
 
     return <CellEditContainer {...cellProps} render={computedEditRender} />
   }
+
+  // if (cellProps.style.position == null) console.log('no position')
   return (
-    <OptimzedContentCell {...cellProps}>
+    <OptimzedContentCell {...R.omit(['data'], cellProps)}>
       {extractAndFormatData({
         rowData: data[rowIndex],
         header: headers[columnIndex],
