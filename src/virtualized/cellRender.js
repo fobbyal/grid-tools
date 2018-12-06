@@ -79,6 +79,7 @@ export const defaultCellRender = ({
     editInfo,
   },
   reactVirtualizedProps: { columnIndex, key, rowIndex, style },
+  ...rest
 }) => {
   const cellProps = getCellProps({
     rowIndex: rowIndex,
@@ -86,6 +87,7 @@ export const defaultCellRender = ({
     header: headers[columnIndex],
     data,
     style,
+    ...rest,
   })
   if (cellProps.isEditing) {
     const computedEditRender =

@@ -65,12 +65,12 @@ class VritualizedRender extends React.Component {
       // pagerRenderer = defaultPagerRenderer,
       // editByRow = true,
       // editByCell = false,
-      // // TODO: have to get css expert
       // fixedScrollHeightAdjustment = 6,
     } = renderOptions
 
     const {
       scrollY,
+      scrollX,
       numOfFixedCols,
       // rowHeaders,
       // dataHeaders,
@@ -80,6 +80,7 @@ class VritualizedRender extends React.Component {
       // hasFixedCols,
       fixedHeaderWidth,
       // contentViewPortWidth,
+      totalWidth,
     } = computeGridProps({
       headers,
       data,
@@ -120,7 +121,8 @@ class VritualizedRender extends React.Component {
           }) => {
             return (
               <div
-                style={{ position: 'relative' }}
+                style={{ position: 'relative', ...style }}
+                className={className}
                 {...getContainerProps({ width, height, refKey: 'ref' })}
                 tabIndex="0"
               >
@@ -212,14 +214,14 @@ class VritualizedRender extends React.Component {
                   <div
                     style={{
                       position: 'absolute',
-                      left: `${width}px`,
-                      width: scrollbarSize() + 'px',
+                      left: `${Math.min(width, totalWidth)}px`,
+                      width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
                       height: `${headerRowHeight}px`,
                       top: '0px',
                       backgroundColor: 'steelblue',
                       borderRight: '1px solid #ccc',
                       borderBottom: '1px solid #ccc',
-                      borderLeft: '1px solid #ccc',
+                      // borderLeft: '1px solid #ccc',
                       borderTopRightRadius: '3px',
                     }}
                   />

@@ -68,6 +68,7 @@ const computeGridViewProps = ({
     contentViewPortWidth: hasFixedCols
       ? containerWidth - sumWidth(rowHeaders)
       : scroll ? containerWidth : null,
+    totalWidth: sumWidth(headers),
   }
 }
 export default computeGridViewProps
