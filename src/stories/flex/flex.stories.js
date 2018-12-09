@@ -132,6 +132,22 @@ storiesOf('Flex Grid', module)
   .add('No Scroll with paging', () => (
     <Grid {...commonProps} rowsPerPage={15} render={flexGridRenderer()} />
   ))
+
+  .add('10k rows scroll with alt rows', () => (
+    <Grid
+      headers={headers}
+      data={tenKData}
+      rowsPerPage={20}
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 800,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+      altBgColor="red"
+      altBy={data => data.unitId}
+    />
+  ))
   .add('10k rows scroll paging', () => (
     <Grid
       headers={headers}

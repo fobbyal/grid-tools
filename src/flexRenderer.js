@@ -104,44 +104,39 @@ export const defaultCellRenderer = ({
   height,
   data,
   render,
+  altIndexes,
+  altBgColor,
   ...rest
 }) => {
   const value = extractData({ header, rowData: data[rowIndex] })
   const display = formatData({ header, value, rowData: data[rowIndex] })
   /* todo may consider passing down just the hader */
 
-  const {
-    fontSize,
-    fontWeight,
-    backgroundColor,
-    hoverSelectionBackgroundColor,
-    hoverBackgroundColor,
-    selectionBackgroundColor,
-    hoverSelectionColor,
-    hoverColor,
-    selectionColor,
-    color,
-  } = header
+  // moved all this to grid getCellProps
+  // const {
+  //   fontSize,
+  //   fontWeight,
+  //   backgroundColor,
+  //   hoverSelectionBackgroundColor,
+  //   hoverBackgroundColor,
+  //   selectionBackgroundColor,
+  //   hoverSelectionColor,
+  //   hoverColor,
+  //   selectionColor,
+  //   color,
+  // } = header
 
-  return (
-    <PureCell
-      fontSize={fontSize}
-      fontWeight={fontWeight}
-      backgroundColor={backgroundColor}
-      hoverSelectionBackgroundColor={hoverSelectionBackgroundColor}
-      hoverBackgroundColor={hoverBackgroundColor}
-      selectionBackgroundColor={selectionBackgroundColor}
-      hoverSelectionColor={hoverSelectionColor}
-      hoverColor={hoverColor}
-      selectionColor={selectionColor}
-      title={value + ''}
-      width={width}
-      height={height}
-      display={display}
-      color={color}
-      {...rest}
-    />
-  )
+  // fontSize={fontSize}
+  // fontWeight={fontWeight}
+  // backgroundColor={backgroundColor || (altIndexes && altIndexes[rowIndex] && altBgColor)}
+  // hoverSelectionBackgroundColor={hoverSelectionBackgroundColor}
+  // hoverBackgroundColor={hoverBackgroundColor}
+  // selectionBackgroundColor={selectionBackgroundColor}
+  // hoverSelectionColor={hoverSelectionColor}
+  // hoverColor={hoverColor}
+  // selectionColor={selectionColor}
+  // color={color}
+  return <PureCell title={value + ''} width={width} height={height} display={display} {...rest} />
 }
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />

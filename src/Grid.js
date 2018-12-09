@@ -7,6 +7,7 @@ import {
   extractAndFormatData,
   extractData,
   fromEmpty,
+  computeAltIndexes,
 } from './utils'
 import {
   copyToClipboard,
@@ -147,6 +148,7 @@ const computeView = ({
   rowsPerPage,
   currentPage,
   editInfo,
+  altBy,
 }) => {
   // TODO have to add edited value
   //
@@ -173,6 +175,7 @@ const computeView = ({
     view: pagedData,
     filteredDataLength: filteredData.length,
     currentPage: normalizedCurrentPage,
+    altIndexes: computeAltIndexes({ data: pagedData, altBy }),
   }
 }
 
@@ -277,6 +280,7 @@ class Grid extends React.PureComponent {
       rowsPerPage: this.props.rowsPerPage,
       currentPage: this.props.currentPage || 1,
       editInfo: this.editInfo(),
+      altBy: this.props.altBy,
     }),
     sortOptions: this.props.initialSortOptions,
     currentPage: this.props.currentPage || 1,
@@ -464,6 +468,7 @@ class Grid extends React.PureComponent {
     fuzzyFilter = this.props.fuzzyFilter,
     currentPage = this.currentPage(),
     editInfo = this.editInfo(),
+    altBy = this.props.altBy,
   } = {}) =>
     computeView({
       data,
@@ -473,6 +478,7 @@ class Grid extends React.PureComponent {
       rowsPerPage: this.props.rowsPerPage,
       currentPage,
       editInfo,
+      altBy: this.props.altBy,
     })
 
   /*  selection starts */
@@ -832,6 +838,20 @@ class Grid extends React.PureComponent {
       selectLeft: this.selectLeft,
       selectTop: this.selectTop,
       selectBottom: this.selectBottom,
+      altIndexes: this.state.altIndexes,
+      altBgColor: this.props.altBgColor,
+      fontSize: header.fontSize,
+      fontWeight: header.fontWeight,
+      backgroundColor:
+        header.backgroundColor ||
+        (this.state.altIndexes && this.state.altIndexes[rowIndex] && this.props.altBgColor),
+      hoverSelectionBackgroundColor: header.hoverSelectionBackgroundColor,
+      hoverBackgroundColor: header.hoverBackgroundColor,
+      selectionBackgroundColor: header.selectionBackgroundColor,
+      hoverSelectionColor: header.hoverSelectionColor,
+      hoverColor: header.hoverColor,
+      selectionColor: header.selectionColor,
+      color: header.color,
       ...rest,
     }
   }
@@ -945,13 +965,16 @@ class Grid extends React.PureComponent {
 
   batchUpdate = updates => {
     if (this.props.onBatchUpdate) {
+      console.log('batch update')
       // expect new data to be passed down via props
       this.props.onBatchUpdate(updates.map(this.processUpdate), this.focusGrid)
     } else if (this.props.onEdit) {
+      console.log('on Edit')
       for (let i = 0; i < updates.length; i++) {
         this.props.onEdit(this.processUpdate(updates[i]), this.focusGrid)
       }
     } else {
+      console.log('self-controlled')
       const updateState = this.setEditInfo(
         batchUpdateRow({
           editInfo: this.editInfo(),
@@ -974,6 +997,9 @@ class Grid extends React.PureComponent {
 
         this.focusGrid
       )
+    }
+    if (this.props.dataDidUpdate) {
+      this.props.dataDidUpdate({ mode: 'batched', editRecords: updates.map(this.processUpdate) })
     }
   }
 
