@@ -1,4 +1,3 @@
-import React from 'react'
 import R from 'ramda'
 import { fromNullable, Just, Nothing } from 'data.maybe'
 import moment from 'moment'
@@ -127,4 +126,18 @@ export const sumHeight = ({ data = [], rowHeight }) => {
       .reduce(R.add)
   }
   return rowHeight * data.length
+}
+
+export const computeAltIndexes = ({ data, altBy }) => {
+  if (altBy == null || data == null || data.length === 0) return null
+  const indexArray = data.map(altBy)
+  let lastGroup = null
+  let result = []
+  let altIdx = 0
+  for (let i = 0; i < indexArray.length; i++) {
+    const isAlt = lastGroup != null && lastGroup !== indexArray[i]
+    result.push(isAlt ? ++altIdx : altIdx)
+    lastGroup = indexArray[i]
+  }
+  return result.map(idx => idx % 2 === 1)
 }

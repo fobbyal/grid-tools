@@ -15,6 +15,8 @@ storiesOf('Virtualized grid', module)
       editMode="cell"
       data={data}
       headers={headers}
+      altBgColor="red"
+      altBy={data => data.unitId}
       render={virtualizedGridRenderer({ autoFixColByKey: true })}
     />
   ))
