@@ -945,13 +945,16 @@ class Grid extends React.PureComponent {
 
   batchUpdate = updates => {
     if (this.props.onBatchUpdate) {
+      console.log('batch update')
       // expect new data to be passed down via props
       this.props.onBatchUpdate(updates.map(this.processUpdate), this.focusGrid)
     } else if (this.props.onEdit) {
+      console.log('on Edit')
       for (let i = 0; i < updates.length; i++) {
         this.props.onEdit(this.processUpdate(updates[i]), this.focusGrid)
       }
     } else {
+      console.log('self-controlled')
       const updateState = this.setEditInfo(
         batchUpdateRow({
           editInfo: this.editInfo(),
@@ -974,6 +977,9 @@ class Grid extends React.PureComponent {
 
         this.focusGrid
       )
+    }
+    if (this.props.dataDidUpdate) {
+      this.props.dataDidUpdate({ mode: 'batched', editRecords: updates.map(this.processUpdate) })
     }
   }
 
