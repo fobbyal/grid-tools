@@ -28,8 +28,7 @@ const computeScrollTo = ({
       rowIndex: scrollToRow,
     })
 
-    if (scrollLeft + fixedHeaderWidth >= offSet.scrollLeft)
-      return { scrollLeft: offSet.scrollLeft - fixedHeaderWidth }
+    if (scrollLeft + fixedHeaderWidth > offSet.scrollLeft) return { scrollToColumn: 0, scrollToRow }
 
     return { scrollToColumn, scrollToRow }
   }
