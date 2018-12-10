@@ -17,7 +17,7 @@ jobs:
           command: yarn install
 
       - run:
-          name: install
+          name: test
           command: yarn test
 
       # no test at the moment will update later
