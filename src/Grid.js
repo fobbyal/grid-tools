@@ -132,7 +132,7 @@ const computeSortOptions = (sortOptions, { ident, display }) => {
 const matchData = (rowData, fuzzyFilter) => header =>
   fromNullable(extractAndFormatData({ rowData, header }))
     .map(txt => txt.toLowerCase().includes(fuzzyFilter.toLowerCase()))
-    .getOrElse()
+    .getOrElse(false)
 
 const filterData = (data, headers, fuzzyFilter) => {
   const filteredHeaders = R.filter(({ isKey, isFiltered }) => isKey || isFiltered, headers)
