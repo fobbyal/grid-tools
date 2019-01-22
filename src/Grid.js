@@ -708,11 +708,6 @@ class Grid extends React.PureComponent {
     }
   }
 
-  deleteSelection = () => {
-    const selection = normalizeSelection(this.state)
-    console.log('deleting selection', selection)
-  }
-
   focusGrid = () => {
     if (this.clipboardHelper && this.clipboardHelper.focus) {
       // console.log('clipboard focus available focusting')
@@ -959,11 +954,37 @@ class Grid extends React.PureComponent {
       }
       updatedData.push({ currentRow, editedRow })
     }
-    console.log('final edit ops', updatedData)
+    // console.log('final edit ops', updatedData)
     return updatedData
   }
 
+  deleteSelection = () => {
+    const selection = normalizeSelection(this.state)
+    const { x1, x2, y1, y2 } = this.state
+    const { headers } = this.props
+    const { view } = this.state
+    console.log('deleting selection', selection)
+    console.log('view is', view, 'heder is', headers)
+    const updates = R.range(y1, y2 + 1)
+      .map(row => view[row])
+      .map(currentRow => ({
+        currentRow,
+        editedRow: {
+          ...currentRow,
+          ...R.range(x1, x2 + 1)
+            .filter(col => this.isEditable({ header: headers[col], rowData: currentRow }))
+            .map(col => ({ [headers[col].ident]: null }))
+            .reduce((a, b) => ({ ...a, ...b }), {}),
+        },
+      }))
+
+    // console.log('updates are ', updates)
+    this.batchUpdate(updates)
+  }
+
   batchUpdate = updates => {
+    console.log('batch updates are', updates)
+
     if (this.props.onBatchUpdate) {
       console.log('batch update')
       // expect new data to be passed down via props
