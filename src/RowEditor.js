@@ -66,14 +66,18 @@ class RowEditor extends React.Component {
   valueChanged = editInfo =>
     this.setState(({ editedRow }) => {
       const rowData = modifyRow({ ...this.props, ...editInfo, rowData: editedRow })
-      if (rowData !== editedRow && this.state.startValidation) {
-        const { validationSpec } = this.props
-        const validations = validate({
-          spec: validationSpec,
-          data: rowData,
-          editorProps: { ...this.props, extractData },
-        })
-        return { editedRow: rowData, validations }
+      if (rowData !== editedRow) {
+        if (this.state.startValidation) {
+          const { validationSpec } = this.props
+          const validations = validate({
+            spec: validationSpec,
+            data: rowData,
+            editorProps: { ...this.props, extractData },
+          })
+          return { editedRow: rowData, validations }
+        } else {
+          return { editedRow: rowData }
+        }
       }
     })
 
