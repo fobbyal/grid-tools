@@ -60,12 +60,13 @@ class RowEditor extends React.Component {
   state = {
     editedRow: createEditRow(this.props),
     validations: emptyValidations,
+    startValidation: false,
   }
 
   valueChanged = editInfo =>
     this.setState(({ editedRow }) => {
       const rowData = modifyRow({ ...this.props, ...editInfo, rowData: editedRow })
-      if (rowData !== editedRow) {
+      if (rowData !== editedRow && this.state.startValidation) {
         const { validationSpec } = this.props
         const validations = validate({
           spec: validationSpec,
@@ -84,7 +85,8 @@ class RowEditor extends React.Component {
       data: editedRow,
       editorProps: { ...this.props, extractData },
     })
-    this.setState({ validations })
+    console.log(validations)
+    this.setState({ validations, startValidation: true })
 
     return validations.length === 0
   }
@@ -149,6 +151,7 @@ class RowEditor extends React.Component {
           this.focusNode.setSelectionRange(0, this.focusNode.value.length)
         }
       }
+      this.setState({ startValidation: false })
     }
   }
 
