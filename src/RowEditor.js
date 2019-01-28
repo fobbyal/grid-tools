@@ -67,17 +67,17 @@ class RowEditor extends React.Component {
     this.setState(({ editedRow }) => {
       const rowData = modifyRow({ ...this.props, ...editInfo, rowData: editedRow })
       if (rowData !== editedRow) {
-        if (this.state.startValidation) {
+        /*if (this.state.startValidation) {
           const { validationSpec } = this.props
           const validations = validate({
             spec: validationSpec,
             data: rowData,
             editorProps: { ...this.props, extractData },
           })
-          return { editedRow: rowData, validations }
-        } else {
-          return { editedRow: rowData }
-        }
+          return { editedRow: rowData, validations }*/
+        //} else {
+        return { editedRow: rowData }
+        //}
       }
     })
 
@@ -147,6 +147,11 @@ class RowEditor extends React.Component {
     }
   }
 
+  onCancel = _ => {
+    this.setState({ validations: [] })
+    this.props.onClose()
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.isEditing && this.props.isEditing) {
       if (this.focusNode) {
@@ -175,7 +180,7 @@ class RowEditor extends React.Component {
       rowData: this.state.editedRow,
       valueChanged: this.valueChanged,
       onOk: this.onOk,
-      onCancel: this.props.onClose,
+      onCancel: this.onCancel,
       initialFocusRef: n => (this.focusNode = n),
       isTypeValid,
       validations,
