@@ -155,7 +155,7 @@ class RowEditor extends React.Component {
           this.focusNode.setSelectionRange(0, this.focusNode.value.length)
         }
       }
-      this.setState({ startValidation: false })
+      this.setState({ startValidation: false, validations: [] })
     }
   }
 
