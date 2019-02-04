@@ -140,7 +140,7 @@ const filterData = (data, headers, fuzzyFilter) => {
 }
 
 const computeView = ({
-  data,
+  data = [],
   sortOptions,
   comparator = defaultDataComparator,
   fuzzyFilter,

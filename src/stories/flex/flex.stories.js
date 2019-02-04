@@ -167,3 +167,30 @@ storiesOf('Flex Grid', module)
   .add('Controlled Row Editor', () => <ControlledEditDemo {...commonProps} controlled />)
   .add('Un-Controlled Row Editor', () => <ControlledEditDemo {...commonProps} />)
   .add('Free Edit', () => <CellEditDemo {...debugProps} />)
+  .add('No Data Render', () => (
+    <Grid
+      headers={headers}
+      data={[]}
+      isEditable
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 1100,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+    />
+  ))
+  .add('hide No Data Render', () => (
+    <Grid
+      headers={headers}
+      data={[]}
+      isEditable
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 1100,
+        height: 400,
+        autoFixColByKey: true,
+        noDataRender: null,
+      })}
+    />
+  ))
