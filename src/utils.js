@@ -107,6 +107,7 @@ export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) =
   if (type === 'num' && typeof value === 'string') {
     if (value.trim().length === 0) return ''
     if (isIntermediateNumber(value)) return value
+    if ((value.trim().length === 1 && value.match('-')) || value.endsWith('0')) return value
 
     const parsedValue = numeral(value).value()
     console.log('parsed value is ', parsedValue)
