@@ -46,7 +46,7 @@ class VirtualizedRender extends React.Component {
       data,
       getContainerProps,
       getClipboardHelperProps,
-      getSelectionInfo,
+      // getSelectionInfo,
     } = gridRenderProps
 
     const {

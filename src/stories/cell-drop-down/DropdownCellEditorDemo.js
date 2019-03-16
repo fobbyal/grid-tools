@@ -5,7 +5,7 @@ class DropDownCellEditorDemo extends React.Component {
   state = { selected: this.props.choices[this.props.choices.length - 1].value }
 
   valueChanged = value => {
-    console.log('value changed to ', value)
+    // console.log('value changed to ', value)
     this.setState({ selected: value })
   }
 

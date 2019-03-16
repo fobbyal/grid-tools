@@ -41,9 +41,9 @@ const createEditRow = ({ showAdd, headers, rowData, modifyNewData }) => {
 }
 
 const modifyRow = ({ header, value, rowData }) => {
-  console.log('editing row with raw info', header, value)
+  // console.log('editing row with raw info', header, value)
   const parsedValue = rawToValue({ value, header })
-  console.log('row editor parsed ', parsedValue)
+  // console.log('row editor parsed ', parsedValue)
   if (parsedValue !== undefined) {
     return header.dataSetter
       ? header.dataSetter({
@@ -89,7 +89,7 @@ class RowEditor extends React.Component {
       data: editedRow,
       editorProps: { ...this.props, extractData },
     })
-    console.log(validations)
+    // console.log(validations)
     this.setState({ validations, startValidation: true })
 
     return validations.length === 0
@@ -138,7 +138,7 @@ class RowEditor extends React.Component {
         R.filter(h => h.type === 'num')
       )
       const data = removeDotsOnEditedNums(headers)
-      console.log('normalized data is ', data)
+      // console.log('normalized data is ', data)
       this.props.commitEdit({
         currentRow: this.props.showAdd ? undefined : this.props.rowData,
         editedRow: data,

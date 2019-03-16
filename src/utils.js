@@ -99,7 +99,7 @@ const isIntermediateNumber = value =>
   value.endsWith(' ')
 
 export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) => {
-  console.log('raw value is ', value)
+  // console.log('raw value is ', value)
   // TODO: timezone issue
   if (moment.isMoment(value)) {
     return value.format(dataFormat)
@@ -112,7 +112,7 @@ export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) =
     if (isIntermediateNumber(value)) return value.trim()
 
     const parsedValue = numeral(value).value()
-    console.log('parsed value is ', parsedValue)
+    // console.log('parsed value is ', parsedValue)
     if (isNaN(parsedValue) || R.isNil(parsedValue)) return undefined
     return parsedValue
   }
@@ -147,7 +147,6 @@ export const computeAltIndexes = ({ data, altBy }) => {
 
 export const createControlledEditProps = ({ data, setData, processEdit }) => {
   const onEdit = (editInfo, focus) => {
-    console.log('single edit')
     setData(processEdit(editInfo)(data))
     focus()
   }

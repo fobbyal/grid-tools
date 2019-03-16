@@ -2,7 +2,7 @@ import React from 'react'
 import Downshift from 'downshift'
 
 const BasicAutocomplete = ({ items, onChange }) => {
-  console.log('items', items)
+  // console.log('items', items)
   return (
     <Downshift onChange={onChange}>
       {({ getInputProps, getItemProps, isOpen, inputValue, selectedItem, highlightedIndex }) => (
