@@ -91,9 +91,12 @@ export const toSelectionColProps = keyValues => {
 }
 
 const isIntermediateNumber = value =>
-  value.endsWith('.') &&
-  value.lastIndexOf('.') === value.indexOf('.') &&
-  !R.isNil(numeral(value.replace('.', '')))
+  (value.endsWith('.') &&
+    value.lastIndexOf('.') === value.indexOf('.') &&
+    !R.isNil(numeral(value.replace('.', '')))) ||
+  (value.trim().length === 1 && value.match('-')) ||
+  value.endsWith('0') ||
+  value.endsWith(' ')
 
 export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) => {
   console.log('raw value is ', value)
@@ -106,7 +109,7 @@ export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) =
   }
   if (type === 'num' && typeof value === 'string') {
     if (value.trim().length === 0) return ''
-    if (isIntermediateNumber(value)) return value
+    if (isIntermediateNumber(value)) return value.trim()
 
     const parsedValue = numeral(value).value()
     console.log('parsed value is ', parsedValue)

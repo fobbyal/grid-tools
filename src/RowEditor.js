@@ -120,13 +120,17 @@ class RowEditor extends React.Component {
         R.map(([header, value]) => {
           const val = rawToValue({
             header,
-            value: value.substr(0, value.length - 1),
+            value: value.endsWith('-.')
+              ? value.substr(0, value.length - 2)
+              : value.substr(0, value.length - 1),
           })
           return header.dataSetter
             ? header.dataSetter({ rowData: editedRow, header, value: val })
             : { [header.ident]: val }
         }),
-        R.filter(([_, value]) => typeof value === 'string' && value.endsWith('.')),
+        R.filter(
+          ([_, value]) => typeof value === 'string' && (value.endsWith('.') || value.endsWith('-'))
+        ),
         R.map(header => [header, extractData({ rowData: editedRow, header })]),
         R.filter(
           header => extractData({ rowData, header }) !== extractData({ rowData: editedRow, header })
