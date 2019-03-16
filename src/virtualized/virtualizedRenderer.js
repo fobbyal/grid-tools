@@ -37,7 +37,7 @@ const computeScrollTo = ({
 
 //
 //
-class VritualizedRender extends React.Component {
+class VirtualizedRender extends React.Component {
   render() {
     const { renderOptions = {}, gridRenderProps } = this.props
 
@@ -235,7 +235,7 @@ class VritualizedRender extends React.Component {
 }
 
 const virtualizedGridRenderer = renderOptions => gridRenderProps => (
-  <VritualizedRender renderOptions={renderOptions} gridRenderProps={gridRenderProps} />
+  <VirtualizedRender renderOptions={renderOptions} gridRenderProps={gridRenderProps} />
 )
 
 export default virtualizedGridRenderer

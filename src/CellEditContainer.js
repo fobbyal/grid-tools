@@ -6,7 +6,7 @@ import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 /* eslint-enable  no-unused-vars */
 // import PropTypes from 'prop-types'
 
-// TODO: determin prop types later
+// TODO: determine prop types later
 const getInitialState = ({ rowIndex, columnIndex, header, width, height, data, render }) => {
   const value = extractData({ header, rowData: data[rowIndex] }) || ''
   const display = formatData({ header, value, rowData: data[rowIndex] })
@@ -41,13 +41,13 @@ class CellEditContainer extends React.Component {
 
   refHandler = n => (this.node = n)
 
-  commitEdit = commitedValue => {
+  commitEdit = committedValue => {
     /**
      * TODO the following could be dynamic for example 1 value changing 2
      * may need special logic or tricks from header to describe this logic
      **/
     const { rowIndex, header, data, commitRowEdit } = this.props
-    const value = R.isNil(commitedValue) ? this.state.value : commitedValue
+    const value = R.isNil(committedValue) ? this.state.value : committedValue
 
     const rowData = data[rowIndex]
 

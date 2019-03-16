@@ -22,7 +22,7 @@ export const ColHeaderBase = BasicColHeader.extend`
 
 const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
-const OptimzedContentCell = pureComponent(Cell, flattenCellProps)
+const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
 
 const ColHeader = ({ header, sortOrder, width, ...rest }) => (
   <ColHeaderBase width={width} {...rest} sortable={header.sortable}>
@@ -98,12 +98,12 @@ export const defaultCellRender = ({
 
   // if (cellProps.style.position == null) console.log('no position')
   return (
-    <OptimzedContentCell {...R.omit(['data'], cellProps)}>
+    <OptimizedContentCell {...R.omit(['data'], cellProps)}>
       {extractAndFormatData({
         rowData: data[rowIndex],
         header: headers[columnIndex],
       })}
-    </OptimzedContentCell>
+    </OptimizedContentCell>
   )
 }
 
