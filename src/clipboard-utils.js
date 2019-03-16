@@ -64,5 +64,5 @@ export const fromPasteEvent = evt =>
 export const copyToClipboard = ({ evt, clipboard }) => txtData => {
   clipboard.setData('Text', txtData)
   evt.preventDefault()
-  console.log('copied data: [', clipboard.getData('Text'), ']')
+  // console.log('copied data: [', clipboard.getData('Text'), ']')
 }

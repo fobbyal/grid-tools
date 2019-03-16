@@ -43,6 +43,7 @@ import {
   SCROLL_SYNC_CONTEXT,
   COL_IDENT_ATTRIBUTE,
 } from './constants.js'
+import GridToolsContext from './context'
 
 const noopEditRowProcess = ({ editedRow }) => editedRow
 
@@ -153,7 +154,7 @@ const computeView = ({
   // TODO have to add edited value
   //
   const editedData = applyEdits({ data, editInfo })
-  console.log('*****calling compute view******')
+  // console.log('*****calling compute view******')
 
   const filteredData =
     !R.isNil(fuzzyFilter) && !R.isEmpty(fuzzyFilter)
@@ -238,9 +239,12 @@ class Grid extends React.PureComponent {
     processEditedRow: noopEditRowProcess,
   }
 
+  static contextType = GridToolsContext
+
   static childContextTypes = {
     [SCROLL_SYNC_CONTEXT]: PropTypes.object.isRequired,
   }
+
   getChildContext() {
     return {
       [SCROLL_SYNC_CONTEXT]: this.scrollSync,
@@ -289,11 +293,11 @@ class Grid extends React.PureComponent {
   }
 
   bodyMouseRelease = e => {
-    /* 
-    * this will only work with one grid on screen 
-    * may need to figureout another solution
-    * isPositionValid only cares if data-row-index data-column-index is there
-    * */
+    /*
+     * this will only work with one grid on screen
+     * may need to figureout another solution
+     * isPositionValid only cares if data-row-index data-column-index is there
+     * */
     if (this.selecting && !isPositionValid(extractPosition(e))) {
       this.selecting = false
     }
@@ -303,15 +307,15 @@ class Grid extends React.PureComponent {
     window.document.body.addEventListener('mouseup', this.bodyMouseRelease)
     window.document.body.addEventListener('mouseleave', this.bodyMouseRelease)
     if (this.clipboardHelper && this.clipboardHelper.focus) {
-      console.log('found clipboard helper', this.clipboardHelper)
+      // console.log('found clipboard helper', this.clipboardHelper)
       this.clipboardHelper.focus()
       if (this.clipboardHelper.nodeName !== 'INPUT') {
-        console.log(
+        console.warn(
           'clipboardHelper is not input. please render input with getClipboardHelperProps'
         )
       }
     } else {
-      console.log(
+      console.warn(
         'Please render an INPUT element with getClipboardHelperProps to support copy&paste.'
       )
     }
@@ -684,11 +688,11 @@ class Grid extends React.PureComponent {
         ((e.keyCode >= 32 && e.keyCode <= 126) || e.keyCode === 187 || e.keyCode === 189) &&
         e.key.length === 1
       if (isEditAttempt) {
-        console.log('attempting edit', {
-          editingColumn: columnIndex,
-          editingRow: rowIndex,
-          initialEditChar: String.fromCharCode(e.keyCode),
-        })
+        // console.log('attempting edit', {
+        //   editingColumn: columnIndex,
+        //   editingRow: rowIndex,
+        //   initialEditChar: String.fromCharCode(e.keyCode),
+        // })
         this.edit(rowIndex, columnIndex)
       }
     }
@@ -905,8 +909,8 @@ class Grid extends React.PureComponent {
       border: 'none',
       outline: 'none',
     },
-    onFocus: () => console.log('focused gained'),
-    onBlur: () => console.log('focused lost'),
+    // onFocus: () => console.log('focused gained'),
+    // onBlur: () => console.log('focused lost'),
     onCopy: this.onCopy,
     onPaste: this.onPaste,
   })
@@ -917,13 +921,13 @@ class Grid extends React.PureComponent {
 
   onCopy = e => {
     const selection = normalizeSelection(this.state)
-    console.log('copied selectio', selection)
+    if (this.isDebug()) console.log('copied selection', selection)
     const { view: data } = this.state
     const { headers } = this.props
     const selectedData = getSelectedData({ headers, data }, selection)
-    console.log('copied data', selectedData)
+    if (this.isDebug()) console.log('copied data', selectedData)
     const rawClipboardData = toClipboardData(selectedData)
-    console.log('copied clip board data', rawClipboardData)
+    if (this.isDebug()) console.log('copied clip board data', rawClipboardData)
 
     const clipboardInfo = fromNullable(e.clipboardData).map(clipboard => ({ evt: e, clipboard }))
 
@@ -933,13 +937,14 @@ class Grid extends React.PureComponent {
   }
 
   pastedToBatchUpdate = ({ columnIndex, rowIndex, dataSet }) => {
-    console.log('pasting to ', 'row[' + rowIndex + ']:col[' + columnIndex + ']', dataSet)
+    if (this.isDebug())
+      console.log('pasting to ', 'row[' + rowIndex + ']:col[' + columnIndex + ']', dataSet)
     const updatedData = []
     const { view } = this.state
     const { headers } = this.props
 
     for (let y = rowIndex, dy = 0; y < view.length && dy < dataSet.length; y++, dy++) {
-      console.log('pasting rowIndex from ', dy, ' to ', y)
+      if (this.isDebug()) console.log('pasting rowIndex from ', dy, ' to ', y)
       const dataSetRow = dataSet[dy]
       const currentRow = view[y]
       const editedRow = { ...currentRow }
@@ -963,8 +968,8 @@ class Grid extends React.PureComponent {
     const { x1, x2, y1, y2 } = this.state
     const { headers } = this.props
     const { view } = this.state
-    console.log('deleting selection', selection)
-    console.log('view is', view, 'heder is', headers)
+    if (this.isDebug()) console.log('deleting selection', selection)
+    if (this.isDebug()) console.log('view is', view, 'heder is', headers)
     const updates = R.range(y1, y2 + 1)
       .map(row => view[row])
       .map(currentRow => ({
@@ -983,19 +988,22 @@ class Grid extends React.PureComponent {
   }
 
   batchUpdate = updates => {
-    console.log('batch updates are', updates)
+    if (this.isDebug()) console.log('batch updates are', updates)
 
     if (this.props.onBatchUpdate) {
-      console.log('batch update')
+      if (this.isDebug()) console.log('batch update')
       // expect new data to be passed down via props
       this.props.onBatchUpdate(updates.map(this.processUpdate), this.focusGrid)
     } else if (this.props.onEdit) {
-      console.log('on Edit')
+      console.warn(
+        'onEdit prop used without onBatchUpdate Please use createControlledEditProps to create necessary props.\n' +
+          'pasting multiple values will not work!!!!'
+      )
       for (let i = 0; i < updates.length; i++) {
         this.props.onEdit(this.processUpdate(updates[i]), this.focusGrid)
       }
     } else {
-      console.log('self-controlled')
+      if (this.isDebug()) console.log('self-controlled')
       const updateState = this.setEditInfo(
         batchUpdateRow({
           editInfo: this.editInfo(),
@@ -1037,8 +1045,12 @@ class Grid extends React.PureComponent {
       .getOrElse('')
   }
 
+  isDebug = () => {
+    return this.context.debug
+  }
+
   render() {
-    console.log('grid renderer.... ')
+    if (this.isDebug()) console.log('grid renderer.... ')
     const { view } = this.state
     return this.props.render({
       getColumnHeaderProps: this.getColumnHeaderProps,

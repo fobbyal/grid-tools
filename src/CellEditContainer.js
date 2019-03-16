@@ -28,7 +28,7 @@ class CellEditContainer extends React.Component {
   }
 
   valueChanged = value => {
-    console.log('value changed to', value)
+    // console.log('value changed to', value)
     // TODO: prevent string and number
     const { header, data, rowIndex } = this.props
     const display = formatData({ header, value, rowData: data[rowIndex] })
@@ -106,7 +106,7 @@ class CellEditContainer extends React.Component {
   }
 
   inputKeyDown = e => {
-    console.log('key typed in input', e.keyCode)
+    // console.log('key typed in input', e.keyCode)
     // enter
     if (e.keyCode === 13) {
       this.commitEdit()
@@ -149,7 +149,7 @@ class CellEditContainer extends React.Component {
   }
 
   dropdownKeyDown = e => {
-    console.log('key typed in dropdown selector', e.keyCode)
+    // console.log('key typed in dropdown selector', e.keyCode)
     // escape
     if (e.keyCode === 27) this.cancelEdit()
     // right arrow
@@ -165,7 +165,7 @@ class CellEditContainer extends React.Component {
   }
 
   dropdownInputKeyDown = e => {
-    console.log('key typed in dropdown input', e.keyCode)
+    // console.log('key typed in dropdown input', e.keyCode)
     // escape
     if (e.keyCode === 27) {
       this.cancelEdit()
@@ -238,7 +238,7 @@ class CellEditContainer extends React.Component {
   })
 
   dropdownValueChanged = ({ value }) => {
-    console.log('selected and committing', value)
+    // console.log('selected and committing', value)
     this.commitEdit(value)
   }
 

@@ -75,7 +75,7 @@ const renderVirtualizedList = ({
   justOpened,
 }) => {
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
-  console.log('virtualized style is ', style)
+  // console.log('virtualized style is ', style)
 
   const visibleChoices = justOpened ? choices : choices.filter(matchesInput(inputValue))
 
@@ -126,7 +126,7 @@ const renderBasicList = ({
   choices,
   minWidth,
 }) => {
-  console.log('basic list style is ', style)
+  // console.log('basic list style is ', style)
   return (
     <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px' }}>
       {choices.map((item, index) =>
@@ -145,11 +145,11 @@ const renderBasicList = ({
 class DropDownCellEditor extends React.Component {
   handelListRef = node => {
     this.list = node
-    console.log('list is', node)
+    // console.log('list is', node)
   }
 
   handleBlur = e => {
-    console.log('blur is ', e)
+    // console.log('blur is ', e)
     const { virtualized, onBlur } = this.props
     if (!virtualized) {
       onBlur && onBlur(e)
@@ -163,7 +163,7 @@ class DropDownCellEditor extends React.Component {
   state = { showSelection: true, justOpened: true }
 
   inputValueChanged = value => {
-    console.log('value changed to ', value)
+    // console.log('value changed to ', value)
     this.setState({ justOpened: false })
   }
 

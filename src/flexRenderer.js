@@ -195,7 +195,7 @@ export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) 
 
 class FlexGridColHeader extends React.PureComponent {
   render() {
-    console.log('scroll y is ', this.props.scrollY)
+    // console.log('scroll y is ', this.props.scrollY)
     const { render = defaultColHeaderRenderer, ...rest } = this.props
     return render(rest)
   }
