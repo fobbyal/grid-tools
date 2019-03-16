@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
 // import { action } from '@storybook/addon-actions'
@@ -14,6 +14,7 @@ import Grid, {
   FlexColHeader,
   defaultFlexCellRenderer,
   defaultFlexColHeaderRenderer,
+  createControlledEditProps,
 } from '../../index'
 import FilterDemo from './FilterDemo'
 
@@ -57,6 +58,29 @@ const debugData = R.range(0, 5).map(_ => randomRow(debugHeaders))
 const debugProps = { headers: debugHeaders, data: debugData }
 const tenKData = createData(10000)
 
+const OnEditCopyPasteDemo = () => {
+  const [data, setData] = useState(debugData)
+
+  const processEdit = ({ editedRow, originalRow }) => d =>
+    d.map(row => (row === originalRow ? editedRow : row))
+
+  return (
+    <Grid
+      data={data}
+      headers={debugHeaders}
+      isEditable
+      editMode="cell"
+      {...createControlledEditProps({ data, setData, processEdit })}
+      render={flexGridRenderer({
+        headerRowHeight: 60,
+        width: 1100,
+        height: 400,
+        autoFixColByKey: true,
+      })}
+    />
+  )
+}
+
 storiesOf('Flex Grid', module)
   .add('debug', () => (
     <Grid
@@ -70,7 +94,8 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
-  .add('Broswer Scroll/No Scroll', () => <Grid {...commonProps} render={flexGridRenderer()} />)
+  .add('On Edit Copy & Paste', () => <OnEditCopyPasteDemo />)
+  .add('Browser Scroll/No Scroll', () => <Grid {...commonProps} render={flexGridRenderer()} />)
   .add('Simple Scroll', () => (
     <Grid
       {...commonProps}

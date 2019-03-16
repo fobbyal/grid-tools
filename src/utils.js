@@ -144,3 +144,18 @@ export const computeAltIndexes = ({ data, altBy }) => {
   }
   return result.map(idx => idx % 2 === 1)
 }
+
+export const createControlledEditProps = ({ data, setData, processEdit }) => {
+  const onEdit = (editInfo, focus) => {
+    console.log('single edit')
+    setData(processEdit(editInfo)(data))
+    focus()
+  }
+
+  const onBatchUpdate = (updates, focus) => {
+    setData(updates.map(processEdit).reduce((a, b) => b(a), data))
+    focus()
+  }
+
+  return { onEdit, onBatchUpdate }
+}
