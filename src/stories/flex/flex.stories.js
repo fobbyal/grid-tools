@@ -15,6 +15,7 @@ import Grid, {
   defaultFlexCellRenderer,
   defaultFlexColHeaderRenderer,
   createControlledEditProps,
+  GridToolContext,
 } from '../../index'
 import FilterDemo from './FilterDemo'
 
@@ -65,19 +66,21 @@ const OnEditCopyPasteDemo = () => {
     d.map(row => (row === originalRow ? editedRow : row))
 
   return (
-    <Grid
-      data={data}
-      headers={debugHeaders}
-      isEditable
-      editMode="cell"
-      {...createControlledEditProps({ data, setData, processEdit })}
-      render={flexGridRenderer({
-        headerRowHeight: 60,
-        width: 1100,
-        height: 400,
-        autoFixColByKey: true,
-      })}
-    />
+    <GridToolContext.Provider value={{ debug: true }}>
+      <Grid
+        data={data}
+        headers={debugHeaders}
+        isEditable
+        editMode="cell"
+        {...createControlledEditProps({ data, setData, processEdit })}
+        render={flexGridRenderer({
+          headerRowHeight: 60,
+          width: 1100,
+          height: 400,
+          autoFixColByKey: true,
+        })}
+      />
+    </GridToolContext.Provider>
   )
 }
 

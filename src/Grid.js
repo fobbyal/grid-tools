@@ -14,6 +14,7 @@ import {
   toClipboardData,
   fromPasteEvent,
   normalizePasteInfo,
+  normalizeCopiedContentForNumber,
 } from './clipboard-utils'
 import { fromNullable, Just } from 'data.maybe'
 import PropTypes from 'prop-types'
@@ -954,7 +955,11 @@ class Grid extends React.PureComponent {
         if (this.isEditable({ header, rowData: currentRow })) {
           // TODO: hadle special cases for selection types as well as numbers
           // look to row editro
-          editedRow[ident] = dataSetRow[dx]
+
+          const rawTxtContent = dataSetRow[dx]
+
+          editedRow[ident] =
+            header.type === 'num' ? normalizeCopiedContentForNumber(rawTxtContent) : rawTxtContent
         }
       }
       updatedData.push({ currentRow, editedRow })

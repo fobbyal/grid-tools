@@ -27,7 +27,7 @@ export const normalizePasteInfo = selection => data => {
 const parseClipData = rawData =>
   rawData
     .split(rawData.includes('\r') ? '\r' : '\n')
-    //excel may copy extra 0 length line
+    // excel may copy extra 0 length line
     .filter(row => row.length > 0)
     .map(row => clearNil(row.split('\t')))
 
@@ -66,3 +66,6 @@ export const copyToClipboard = ({ evt, clipboard }) => txtData => {
   evt.preventDefault()
   // console.log('copied data: [', clipboard.getData('Text'), ']')
 }
+
+export const normalizeCopiedContentForNumber = txtContent =>
+  txtContent == null || txtContent.trim().length === 0 ? null : txtContent.replace('$', '')
