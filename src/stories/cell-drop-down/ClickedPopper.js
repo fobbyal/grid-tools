@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Popper, Arrow } from 'react-popper'
+import { Popper } from 'react-popper'
 
 class StandaloneExample extends PureComponent {
   state = {
@@ -25,7 +25,7 @@ class StandaloneExample extends PureComponent {
         </div>
         {this.state.isOpen && (
           <Popper className="popper" referenceElement={this.target}>
-            {({ ref, style, placement, arrowProps }) => (
+            {({ ref, style, placement }) => (
               <div ref={ref} style={style} data-placement={placement}>
                 <ul>
                   <li>Popper element aseaseafef</li>

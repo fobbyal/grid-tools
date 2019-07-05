@@ -1,11 +1,32 @@
 {
-  "parser":"babel-eslint",
-  "plugins": [
-   "prettier"
+  "parser": "babel-eslint",
+  "plugins": ["prettier", "jest"],
+  "extends": [
+    "eslint:recommended",
+    "standard",
+    "standard-react",
+    "prettier",
+    "plugin:jest/recommended",
+    "eslint-config-prettier"
   ],
-  "extends": ["standard", "standard-react","prettier"],
-  "rules":{
-    "prettier/prettier" :"error",
-    "react/prop-types" : "ignore"
+  "rules": {
+    "react/prop-types": "off",
+    "no-async-promise-executor": "off",
+    "no-console": "off",
+    "react/jsx-uses-react": 1,
+    "react/jsx-uses-vars": 1,
+    "react/jsx-indent": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "React|jsx|css",
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ]
+  },
+  "env": {
+    "browser": true,
+    "node": true
   }
 }

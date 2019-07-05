@@ -40,7 +40,7 @@ const Pager = ({
           <PageButton
             disabled={page === currentPage}
             key={'page' + page}
-            onClick={e => setCurrentPage(page)}
+            onClick={_ => setCurrentPage(page)}
           >
             {page}
           </PageButton>

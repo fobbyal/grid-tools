@@ -4,7 +4,7 @@ import shallowEqual from 'fbjs/lib/shallowEqual'
 
 const createAdvancedPureComponent = (Component, toFlattenProps = _ => _) => {
   const AdvancedPureComponent = class extends React.Component {
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps) {
       return !shallowEqual(toFlattenProps(this.props), toFlattenProps(nextProps))
     }
     render() {

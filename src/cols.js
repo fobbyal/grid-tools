@@ -63,14 +63,15 @@ export const yesNoCol = ({ ident, display, ...rest } = {}) => ({
   ...rest,
 })
 
-const dateProps = ({ ident, dataFormat, displayFormat }) => ({
+// eslint-disable-next-line standard/object-curly-even-spacing
+const dateProps = ({ /* ident, */ dataFormat, displayFormat }) => ({
   sortIndexGetter: ({ rowData, header }) => {
     const data = extractData({ rowData, header, dataFormat })
     return R.isNil(data)
       ? undefined
       : moment.isDate(data) || moment.isMoment(data)
-        ? data.valueOf()
-        : moment(data, dataFormat).valueOf()
+      ? data.valueOf()
+      : moment(data, dataFormat).valueOf()
   },
   dataFormat,
   displayFormat,

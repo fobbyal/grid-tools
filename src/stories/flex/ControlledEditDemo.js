@@ -31,7 +31,7 @@ class ControlledEditDemo extends React.Component {
       data: data.filter(row => R.isNil(this.selectedRows) || !this.selectedRows.includes(row)),
     }))
 
-  selectionChange = ({ selectedRows, selectedHeaders }) => {
+  selectionChange = ({ selectedRows }) => {
     this.selectedRows = selectedRows
   }
 

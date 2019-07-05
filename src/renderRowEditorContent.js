@@ -67,14 +67,19 @@ export const defaultInputRowEditRender = ({
         })
       }
       onKeyDown={e => {
+        // eslint-disable-next-line eqeqeq
         if (e.keyCode == 13) onOk()
+        // eslint-disable-next-line eqeqeq
         if (e.keyCode == 17) onCancel()
       }}
       innerRef={ref}
       value={extractData({ header, rowData }) || ''}
     />
   )
-const getMaxWidth = R.compose(R.reduce(R.max, 100), R.map(h => h.width))
+const getMaxWidth = R.compose(
+  R.reduce(R.max, 100),
+  R.map(h => h.width)
+)
 const defaultControlsRender = ({ onOk, onCancel }) => (
   <Buttons>
     <button onClick={onOk}>Save</button>

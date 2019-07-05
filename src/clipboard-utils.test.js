@@ -31,7 +31,7 @@ it('should fit repeat data to selection size when there are extra selected cols 
   expect(expandDataToSelection(selection)(data)).toEqual([['a', 'b', 'a'], ['a', 'b', 'a']])
 })
 
-it('should fit repeat data to selection size when there are extra selected cols and rows', () => {
+it('should fit repeat data to selection size when there are extra selected cols and rows 2', () => {
   const selection = { x1: 1, x2: 3, y1: 1, y2: 1 }
   const data = [['a', 'b'], ['c', 'd']]
   expect(expandDataToSelection(selection)(data)).toEqual([['a', 'b', 'a'], ['c', 'd', 'c']])

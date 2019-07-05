@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-async-promise-executor
 import React from 'react'
 import R from 'ramda'
 import { formatData, extractData } from './utils'
@@ -7,7 +8,8 @@ import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 // import PropTypes from 'prop-types'
 
 // TODO: determine prop types later
-const getInitialState = ({ rowIndex, columnIndex, header, width, height, data, render }) => {
+// eslint-disable-next-line standard/object-curly-even-spacing
+const getInitialState = ({ rowIndex, header, data /* columnIndex, width, height, render */ }) => {
   const value = extractData({ header, rowData: data[rowIndex] }) || ''
   const display = formatData({ header, value, rowData: data[rowIndex] })
   return { value, display }

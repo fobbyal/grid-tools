@@ -7,7 +7,7 @@ const chance = new Chance()
 //* test helpers
 export const randomRow = R.compose(
   R.fromPairs,
-  R.map(({ ident, type, dataFormat, numFormat }) => {
+  R.map(({ ident, type, dataFormat }) => {
     if (ident === 'commitStatusOvr') return [ident, chance.pickone(['UNA', 'ECO', 'EMER', 'MUST'])]
     if (ident === 'unitId') return [ident, chance.pickone(['u1', 'u2', 'u3', 'u4'])]
     if (ident === 'he') return [ident, chance.integer({ min: 1, max: 24 })]
@@ -50,7 +50,7 @@ const unitMap = {
 
 // TODO add documentation
 /** data-formatter */
-const unitDataFormatter = ({ value, header }) => unitMap[value] || value
+const unitDataFormatter = ({ value }) => unitMap[value] || value
 
 /* prettier-ignore */
 export const headers = [
@@ -84,4 +84,7 @@ export const headers = [
   dollarCol({ ident: 'spinPrice', display: 'Spin Price', width:120, }),
 ]
 const createRow = _ => randomRow(headers)
-export const createData = R.compose(R.map(createRow), R.range(0))
+export const createData = R.compose(
+  R.map(createRow),
+  R.range(0)
+)

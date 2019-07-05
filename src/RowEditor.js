@@ -32,7 +32,8 @@ const renderEditor = ({
   )
 }
 
-const createEditRow = ({ showAdd, headers, rowData, modifyNewData }) => {
+// eslint-disable-next-line standard/object-curly-even-spacing
+const createEditRow = ({ showAdd, headers, rowData /*, modifyNewData */ }) => {
   if (!rowData) return {}
   if (!showAdd) return rowData
   const newData = { ...rowData }
@@ -102,7 +103,7 @@ class RowEditor extends React.Component {
   //   if (this.props !== prevProps) this.runValidation()
   // }
 
-  onOk = e => {
+  onOk = _e => {
     const { rowData, headers } = this.props
     const { editedRow } = this.state
     // const validations = validate({
@@ -151,7 +152,7 @@ class RowEditor extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     if (!prevProps.isEditing && this.props.isEditing) {
       if (this.focusNode) {
         if (this.focusNode) this.focusNode.focus()
@@ -159,6 +160,7 @@ class RowEditor extends React.Component {
           this.focusNode.setSelectionRange(0, this.focusNode.value.length)
         }
       }
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ startValidation: false, validations: [] })
     }
   }

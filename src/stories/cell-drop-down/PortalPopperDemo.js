@@ -3,7 +3,7 @@ import PortaledPopper from '../../PortaledPopper'
 
 class Example extends React.Component {
   state = { showPopper: false }
-  togglePopper = e => this.setState(({ showPopper }) => ({ showPopper: !showPopper }))
+  togglePopper = _e => this.setState(({ showPopper }) => ({ showPopper: !showPopper }))
 
   handelRef = n => (this.node = n)
 
@@ -11,7 +11,7 @@ class Example extends React.Component {
     const { showPopper } = this.state
     return (
       <PortaledPopper
-        popperRender={({ ref, style, placement, arrowProps }) => (
+        popperRender={({ ref, style, placement }) => (
           <div ref={ref} style={style} data-placement={placement}>
             <div>row1row1row1row1row1row1</div>
             <div>row1row1row1row1row1row2</div>

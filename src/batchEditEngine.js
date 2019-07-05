@@ -19,7 +19,8 @@ const immutableSet = (key, value) =>
     return m
   })
 
-export const removeRow = ({ editInfo = generateInitialEditInfo(), mutation }) => {
+// eslint-disable-next-line standard/object-curly-even-spacing
+export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow /* mutation */ }) => {
   const { added, updated, dirtyMap, updatedMap, removed, history, ...rest } = editInfo
   const originalRow = dirtyMap.get(currentRow)
   const isUpdated = dirtyMap.has(currentRow)
@@ -50,6 +51,7 @@ export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
 
 export const updateRow = ({ editInfo = generateInitialEditInfo(), currentRow, editedRow }) => {
   if (currentRow === undefined && !R.isNil(editedRow)) {
+    // eslint-disable-next-line standard/object-curly-even-spacing
     const { /* dirtyMap, */ added, history, ...rest } = editInfo
     return {
       added: [...added, editedRow],

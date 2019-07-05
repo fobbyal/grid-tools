@@ -7,7 +7,10 @@ import { headers as rawHeaders, randomRow } from '../data'
 const chance = new Chance()
 
 const mapWithIndex = R.addIndex(R.map)
-const toKeyValue = R.compose(R.fromPairs, mapWithIndex((text, value) => [value, text]))
+const toKeyValue = R.compose(
+  R.fromPairs,
+  mapWithIndex((text, value) => [value, text])
+)
 
 const keyValues = toKeyValue(chance.unique(() => chance.word({ syllables: 4 }), 1000))
 

@@ -220,8 +220,8 @@ const flexGridRenderer = ({
   cellRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
-  editByRow = true,
-  editByCell = false,
+  // editByRow = true,
+  // editByCell = false,
   pagerHeight = 35,
   // TODO: have to get css expert
   // fixedScrollHeightAdjustment = 6,
@@ -240,7 +240,7 @@ const flexGridRenderer = ({
   data,
   hasPaging,
   renderRowEditor,
-  gridContainerRefHandler,
+  // gridContainerRefHandler,
   getClipboardHelperProps,
 }) => {
   const {
@@ -335,80 +335,77 @@ const flexGridRenderer = ({
       </FlexGridRow>
       {/* scrollY && <UpperRight headerRowHeight={headerRowHeight} /> */}
       {/* table body fixed columns */}
-      {numOfFixedCols > 0 &&
-        data &&
-        data.length > 0 && (
-          <TableContent
-            height={scrollPaneHeight}
-            width={fixedHeaderWidth}
-            yOffSet={headerRowHeight}
-            headers={rowHeaders}
-            scroll={scroll}
-            scrollX
-            vertical
-            horizontal={false}
-          >
-            {R.range(0, data.length).map(rowIndex => (
-              <FlexGridRow
-                {...getRowProps({
-                  index: rowIndex,
-                  headers: rowHeaders,
-                  rowHeight,
-                })}
-              >
-                {rowHeaders.map((header, columnIndex) => (
-                  <FlexGridCell
-                    render={cellRenderer}
-                    {...getCellProps({
-                      rowIndex,
-                      columnIndex,
-                      header,
-                      data,
-                    })}
-                  />
-                ))}
-              </FlexGridRow>
-            ))}
-          </TableContent>
-        )}
+      {numOfFixedCols > 0 && data && data.length > 0 && (
+        <TableContent
+          height={scrollPaneHeight}
+          width={fixedHeaderWidth}
+          yOffSet={headerRowHeight}
+          headers={rowHeaders}
+          scroll={scroll}
+          scrollX
+          vertical
+          horizontal={false}
+        >
+          {R.range(0, data.length).map(rowIndex => (
+            <FlexGridRow
+              {...getRowProps({
+                index: rowIndex,
+                headers: rowHeaders,
+                rowHeight,
+              })}
+            >
+              {rowHeaders.map((header, columnIndex) => (
+                <FlexGridCell
+                  render={cellRenderer}
+                  {...getCellProps({
+                    rowIndex,
+                    columnIndex,
+                    header,
+                    data,
+                  })}
+                />
+              ))}
+            </FlexGridRow>
+          ))}
+        </TableContent>
+      )}
       {/* table body data columns */}
-      {data &&
-        data.length > 0 && (
-          <TableContent
-            height={scrollPaneHeight}
-            width={contentViewPortWidth}
-            yOffSet={headerRowHeight}
-            headers={dataHeaders}
-            scroll={scroll}
-            xOffSet={fixedHeaderWidth - 1}
-            scrollX={scrollX}
-            scrollY={scrollY}
-            vertical
-            horizontal
-          >
-            {R.range(0, data.length).map(rowIndex => (
-              <FlexGridRow
-                {...getRowProps({
-                  index: rowIndex,
-                  headers: dataHeaders,
-                  rowHeight,
-                })}
-              >
-                {dataHeaders.map((header, columnIndex) => (
-                  <FlexGridCell
-                    render={cellRenderer}
-                    {...getCellProps({
-                      rowIndex,
-                      columnIndex: columnIndex + numOfFixedCols,
-                      header,
-                      data,
-                    })}
-                  />
-                ))}
-              </FlexGridRow>
-            ))}
-          </TableContent>
-        )}
+      {data && data.length > 0 && (
+        <TableContent
+          height={scrollPaneHeight}
+          width={contentViewPortWidth}
+          yOffSet={headerRowHeight}
+          headers={dataHeaders}
+          scroll={scroll}
+          xOffSet={fixedHeaderWidth - 1}
+          scrollX={scrollX}
+          scrollY={scrollY}
+          vertical
+          horizontal
+        >
+          {R.range(0, data.length).map(rowIndex => (
+            <FlexGridRow
+              {...getRowProps({
+                index: rowIndex,
+                headers: dataHeaders,
+                rowHeight,
+              })}
+            >
+              {dataHeaders.map((header, columnIndex) => (
+                <FlexGridCell
+                  render={cellRenderer}
+                  {...getCellProps({
+                    rowIndex,
+                    columnIndex: columnIndex + numOfFixedCols,
+                    header,
+                    data,
+                  })}
+                />
+              ))}
+            </FlexGridRow>
+          ))}
+        </TableContent>
+      )}
       {data &&
         data.length === 0 &&
         noDataRender &&

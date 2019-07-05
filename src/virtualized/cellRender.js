@@ -44,13 +44,13 @@ export const cellRenderWrapper = (propPreProcessor = _ => _) => render => reactV
 export const defaultRowHeaderRender = ({
   gridToolProps: {
     getColumnHeaderProps,
-    getRowProps,
-    getCellProps,
-    getContainerProps,
+    // getRowProps,
+    // getCellProps,
+    // getContainerProps,
     headers,
     data,
   },
-  reactVirtualizedProps: { columnIndex, key, rowIndex, style },
+  reactVirtualizedProps: { columnIndex, /* key, */ rowIndex, style },
 }) => (
   <ColHeader
     {...getColumnHeaderProps({
@@ -68,17 +68,17 @@ export const defaultRowHeaderRender = ({
 
 export const defaultCellRender = ({
   gridToolProps: {
-    getColumnHeaderProps,
-    getRowProps,
     getCellProps,
-    getContainerProps,
-    getPagerProps,
-    getRowEditorProps,
     headers,
     data,
-    editInfo,
+    // getContainerProps,
+    // getPagerProps,
+    // getRowEditorProps,
+    // getColumnHeaderProps,
+    // getRowProps,
+    // editInfo,
   },
-  reactVirtualizedProps: { columnIndex, key, rowIndex, style },
+  reactVirtualizedProps: { columnIndex, /* key, */ rowIndex, style },
   ...rest
 }) => {
   const cellProps = getCellProps({

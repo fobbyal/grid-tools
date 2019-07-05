@@ -13,7 +13,11 @@ const cellColorOf = props => {
   const color = props.color || 'unset'
   return isHovered && isSelected
     ? hoverSelectionColor
-    : isSelected ? selectionColor : isHovered ? hoverColor : color
+    : isSelected
+    ? selectionColor
+    : isHovered
+    ? hoverColor
+    : color
 }
 const cellBgColorOf = props => {
   const backgroundColor = props.backgroundColor || 'unset'
@@ -24,8 +28,10 @@ const cellBgColorOf = props => {
   return props.isHovered && props.isSelected
     ? hoverSelectionBackgroundColor
     : props.isHovered
-      ? hoverBackgroundColor
-      : props.isSelected ? selectionBackgroundColor : backgroundColor
+    ? hoverBackgroundColor
+    : props.isSelected
+    ? selectionBackgroundColor
+    : backgroundColor
 }
 
 /* prettier-ignore */

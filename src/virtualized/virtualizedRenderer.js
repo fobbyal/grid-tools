@@ -9,16 +9,7 @@ import { equals } from 'ramda'
 
 const colWidthOf = cols => ({ index }) => cols[index].width
 
-const empty = {}
-
-const computeScrollTo = ({
-  contentGrid,
-  x2,
-  y2,
-  previousPosition,
-  fixedHeaderWidth,
-  numOfFixedCols,
-}) => {
+const computeScrollTo = ({ contentGrid, x2, y2, previousPosition, fixedHeaderWidth }) => {
   const scrollPane = contentGrid && contentGrid._scrollingContainer
   if (scrollPane != null) {
     let scrollToColumn = x2
@@ -152,13 +143,13 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     <Provider value={gridRenderProps}>
       <ScrollSync>
         {({
-          clientHeight,
-          clientWidth,
           onScroll,
-          scrollHeight,
           scrollLeft,
           scrollTop,
-          scrollWidth,
+          // clientHeight,
+          // clientWidth,
+          // scrollHeight,
+          // scrollWidth,
         }) => {
           return (
             <div

@@ -68,11 +68,11 @@ const renderVirtualizedList = ({
   highlightedIndex,
   ref,
   style,
-  placement,
-  arrowProps,
   choices,
   minWidth,
   justOpened,
+  // placement,
+  // arrowProps,
 }) => {
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
   // console.log('virtualized style is ', style)
@@ -80,11 +80,11 @@ const renderVirtualizedList = ({
   const visibleChoices = justOpened ? choices : choices.filter(matchesInput(inputValue))
 
   const rowRenderer = ({
-    key, // Unique key within array of rows
     index, // Index of row within collection
-    isScrolling, // The List is currently being scrolled
-    isVisible, // This row is visible within the List (eg it is not an overscanned row)
     style, // Style object to be applied to row (to position it)
+    // key, // Unique key within array of rows
+    // isScrolling, // The List is currently being scrolled
+    // isVisible, // This row is visible within the List (eg it is not an overscanned row)
   }) => {
     return renderListItem({
       getItemProps,
@@ -116,15 +116,15 @@ const renderVirtualizedList = ({
 const renderBasicList = ({
   getItemProps,
   /* isOpen, */
-  inputValue,
   selectedItem,
   highlightedIndex,
   ref,
   style,
-  placement,
-  arrowProps,
   choices,
   minWidth,
+  // inputValue,
+  // placement,
+  // arrowProps,
 }) => {
   // console.log('basic list style is ', style)
   return (
@@ -162,7 +162,7 @@ class DropDownCellEditor extends React.Component {
 
   state = { showSelection: true, justOpened: true }
 
-  inputValueChanged = value => {
+  inputValueChanged = _value => {
     // console.log('value changed to ', value)
     this.setState({ justOpened: false })
   }
@@ -211,7 +211,8 @@ class DropDownCellEditor extends React.Component {
 
   render() {
     const { choices, value, onChange, virtualized } = this.props
-    const { showSelection, justOpened } = this.state
+    // eslint-disable-next-line standard/object-curly-even-spacing
+    const { /* showSelection, */ justOpened } = this.state
     const renderList = virtualized ? renderVirtualizedList : renderBasicList
     const renderSelector = virtualized ? this.renderInput : this.renderComboBox
 
@@ -224,7 +225,8 @@ class DropDownCellEditor extends React.Component {
         defaultHighlightedIndex={hilightedIndex}
         onInputValueChange={this.inputValueChanged}
         onChange={onChange}
-        itemToString={({ vallue, text }) => text || value + ''}
+        // eslint-disable-next-line standard/object-curly-even-spacing
+        itemToString={({ /* vallue, */ text }) => text || value + ''}
       >
         {downshiftProps => (
           <div>

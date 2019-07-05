@@ -6,7 +6,10 @@ const splitFixedCols = (numOfFixedCols, headers) => ({
   dataHeaders: R.drop(numOfFixedCols, headers),
 })
 
-const countKeyCols = R.compose(l => l.length, R.takeWhile(h => h.isKey))
+const countKeyCols = R.compose(
+  l => l.length,
+  R.takeWhile(h => h.isKey)
+)
 
 const computeGridViewProps = ({
   headers,
@@ -16,7 +19,7 @@ const computeGridViewProps = ({
   height,
   scrollBarWidthAdjustment = 17,
   scrollBarHeightAdjustment = 17,
-  fixedScrollHeightAdjustment = 6,
+  //  fixedScrollHeightAdjustment = 6,
   borderSize = 1,
   fixedColCount,
   autoFixColByKey,
@@ -67,7 +70,9 @@ const computeGridViewProps = ({
     fixedHeaderWidth: sumWidth(rowHeaders),
     contentViewPortWidth: hasFixedCols
       ? containerWidth - sumWidth(rowHeaders)
-      : scroll ? containerWidth : null,
+      : scroll
+      ? containerWidth
+      : null,
     totalWidth: sumWidth(headers),
   }
 }

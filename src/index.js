@@ -1,4 +1,3 @@
-// import FreeEditGrid from './free-edit/FreeEditGrid'
 import Grid from './Grid'
 import flexGridRenderer, {
   Cell as FlexCell,

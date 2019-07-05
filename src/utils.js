@@ -17,7 +17,10 @@ export const normalizeBounds = selection => {
   return { x1: xMin, x2: xMax, y1: yMin, y2: yMax }
 }
 
-export const sumWidth = R.compose(R.sum, R.map(({ width }) => width))
+export const sumWidth = R.compose(
+  R.sum,
+  R.map(({ width }) => width)
+)
 
 export const extractPosition = evt => ({
   rowIndex: fromNullable(evt.target.getAttribute(ROW_INDEX_ATTRIBUTE))
@@ -42,12 +45,14 @@ export const extractData = ({ header, rowData = [], dataFormat }) => {
   return dataGetter
     ? dataGetter({ header, rowData })
     : type === 'date-time'
-      ? R.isNil(rowData)
-        ? undefined
-        : moment.isDate(rowData)
-          ? moment(rawData).format(dataFormat)
-          : moment.isMoment(rawData) ? rawData.formatData(dataFormat) : rawData
+    ? R.isNil(rowData)
+      ? undefined
+      : moment.isDate(rowData)
+      ? moment(rawData).format(dataFormat)
+      : moment.isMoment(rawData)
+      ? rawData.formatData(dataFormat)
       : rawData
+    : rawData
 }
 
 export const formatData = ({ header, value, rowData }) => {
@@ -55,12 +60,12 @@ export const formatData = ({ header, value, rowData }) => {
   return dataFormatter
     ? dataFormatter({ header, value, rowData })
     : R.isNil(value)
-      ? ''
-      : type === 'num' && displayFormat
-        ? numeral(value).format(displayFormat)
-        : type === 'date-time' && displayFormat
-          ? moment(value, dataFormat).format(displayFormat)
-          : value + ''
+    ? ''
+    : type === 'num' && displayFormat
+    ? numeral(value).format(displayFormat)
+    : type === 'date-time' && displayFormat
+    ? moment(value, dataFormat).format(displayFormat)
+    : value + ''
 }
 
 export const extractAndFormatData = ({ header, rowData }) =>
@@ -76,7 +81,7 @@ export const toSelectionColProps = keyValues => {
     keyValues.forEach((value, key) => choices.push({ text: value, value: key }))
     return {
       choices,
-      dataFormatter: ({ header, value }) => (keyValues.has(value) ? keyValues.get(value) : value),
+      dataFormatter: ({ value }) => (keyValues.has(value) ? keyValues.get(value) : value),
     }
   } else {
     return {
@@ -85,7 +90,7 @@ export const toSelectionColProps = keyValues => {
         R.sortBy(([_, name]) => name.toLowerCase()),
         R.toPairs
       )(keyValues),
-      dataFormatter: ({ header, value }) => (R.isNil(keyValues[value]) ? value : keyValues[value]),
+      dataFormatter: ({ value }) => (R.isNil(keyValues[value]) ? value : keyValues[value]),
     }
   }
 }
@@ -98,7 +103,7 @@ const isIntermediateNumber = value =>
   value.endsWith('0') ||
   value.endsWith(' ')
 
-export const rawToValue = ({ value, header: { type, numFormat, dataFormat } }) => {
+export const rawToValue = ({ value, header: { type, dataFormat } }) => {
   // console.log('raw value is ', value)
   // TODO: timezone issue
   if (moment.isMoment(value)) {

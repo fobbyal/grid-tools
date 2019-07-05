@@ -57,8 +57,10 @@ const normalizeValue = (val, type) =>
   type === 'num' && typeof val === 'string'
     ? parseFloat(val)
     : type === 'date' && (moment.isDate(val) || moment.isMoment(val))
-      ? val.valueOf()
-      : type === 'date' && typeof val === 'string' ? moment(val).valueOf() : val
+    ? val.valueOf()
+    : type === 'date' && typeof val === 'string'
+    ? moment(val).valueOf()
+    : val
 
 const compare = ({ aVal, bVal, sortOrder }) => {
   const greaterThanResult = sortOrder === 'asc' ? 1 : -1
@@ -119,11 +121,10 @@ const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
 const computeSortOptions = (sortOptions, { ident, display }) => {
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
-      .map(
-        opt =>
-          opt.ident === ident && (opt.display == null || opt.display === display)
-            ? { ident, sortOrder: toggleSortOrder(opt.sortOrder) }
-            : opt
+      .map(opt =>
+        opt.ident === ident && (opt.display == null || opt.display === display)
+          ? { ident, sortOrder: toggleSortOrder(opt.sortOrder) }
+          : opt
       )
       .filter(opt => opt.sortOrder !== undefined)
   } else {
@@ -171,7 +172,10 @@ const computeView = ({
 
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData
-    : R.compose(R.take(rowsPerPage), R.drop((normalizedCurrentPage - 1) * rowsPerPage))(sortredData)
+    : R.compose(
+        R.take(rowsPerPage),
+        R.drop((normalizedCurrentPage - 1) * rowsPerPage)
+      )(sortredData)
 
   return {
     view: pagedData,
@@ -336,7 +340,7 @@ class Grid extends React.PureComponent {
       editInfo !== nextProps.editInfo
     ) {
       this.setState(
-        ({ editingRow, editingColumn, x1, x2, y1, y2, currentPage }) => ({
+        ({ editingRow, editingColumn, /* x1, x2, y1, y2, */ currentPage }) => ({
           // x1: data !== nextProps.data ? undefined : x1,
           // x2: data !== nextProps.data ? undefined : x2,
           // y1: data !== nextProps.data ? undefined : y1,
@@ -377,8 +381,8 @@ class Grid extends React.PureComponent {
     return !this.hasPaging()
       ? undefined
       : R.isNil(this.props.totalPages)
-        ? Math.ceil(this.state.filteredDataLength / this.props.rowsPerPage)
-        : this.props.totalPages
+      ? Math.ceil(this.state.filteredDataLength / this.props.rowsPerPage)
+      : this.props.totalPages
   }
 
   setCurrentPage = page => {
@@ -404,7 +408,8 @@ class Grid extends React.PureComponent {
       if (this.isPagingControlled()) {
         this.props.onPageChange(Math.max(Math.min(this.totalPages(), this.currentPage() + 1), 1))
       } else {
-        this.setState(({ currentPage, view }) => {
+        // eslint-disable-next-line standard/object-curly-even-spacing
+        this.setState(({ currentPage /*, view */ }) => {
           const totalPages = Math.ceil(this.props.data.length / this.props.rowsPerPage)
           const newPage = Math.max(Math.min(totalPages, currentPage + 1), 1)
           if (newPage !== currentPage) {
@@ -425,7 +430,8 @@ class Grid extends React.PureComponent {
       if (this.isPagingControlled()) {
         this.props.onPageChange(Math.max(Math.min(this.totalPages(), this.currentPage() - 1), 1))
       } else {
-        this.setState(({ currentPage, view }) => {
+        // eslint-disable-next-line standard/object-curly-even-spacing
+        this.setState(({ currentPage /*, view */ }) => {
           const totalPages = Math.ceil(this.props.data.length / this.props.rowsPerPage)
           const newPage = Math.max(Math.min(totalPages, currentPage - 1), 1)
           if (newPage !== currentPage) {
@@ -473,7 +479,7 @@ class Grid extends React.PureComponent {
     fuzzyFilter = this.props.fuzzyFilter,
     currentPage = this.currentPage(),
     editInfo = this.editInfo(),
-    altBy = this.props.altBy,
+    // altBy = this.props.altBy,
   } = {}) =>
     computeView({
       data,
@@ -766,7 +772,7 @@ class Grid extends React.PureComponent {
     )
   }
 
-  cellMouseLeave = e => {
+  cellMouseLeave = _e => {
     this.setState(_ => ({ ...this.hoverState() }))
   }
 
@@ -892,7 +898,9 @@ class Grid extends React.PureComponent {
       // TODO: add feature to pop up editor based on some row for add featrues
       showAdd: this.props.showAdd,
       rowData: this.props.showAdd
-        ? addWithSelected ? this.state.view[y1] : {}
+        ? addWithSelected
+          ? this.state.view[y1]
+          : {}
         : this.state.view[this.state.editingRow],
       headers: this.props.headers,
       isEditing: this.isRowEditing(),
