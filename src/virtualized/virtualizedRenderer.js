@@ -1,55 +1,42 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Grid, ScrollSync } from 'react-virtualized'
+import React, { useEffect, useRef, useCallback } from 'react'
+import { Grid } from 'react-virtualized'
 import computeGridProps from '../computeGridProps'
 import scrollbarSize from 'dom-helpers/util/scrollbarSize'
 import { Provider } from './VirtualizedContext'
 // import CellEditContainer from './CellEditContainer'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
-import { equals } from 'ramda'
 
 const colWidthOf = cols => ({ index }) => cols[index].width
 
-const computeScrollTo = ({ contentGrid, x2, y2, previousPosition, fixedHeaderWidth }) => {
+const handleSelectionScroll = ({ contentGrid, x2, y2, previousPosition, fixedHeaderWidth }) => {
   const scrollPane = contentGrid && contentGrid._scrollingContainer
+  if (x2 === previousPosition.x2 && y2 === previousPosition.y2) return
   if (scrollPane != null) {
     let scrollToColumn = x2
     const scrollToRow = y2
-
-    /*
     const scrollLeft = scrollPane.scrollLeft
-    // const scrollTop = scrollPane.scrollTop
-    // console.log(scrollLeft, scrollTop)
-    //
-    const offSet = contentGrid.getOffsetForCell({
-      alignment: 'start',
-      columnIndex: scrollToColumn,
-      rowIndex: scrollToRow,
-    })
-    console.log('offset is', offSet)
-    */
-
     if (x2 < previousPosition.x2) {
-      console.log('going left in ', scrollPane.offsetWidth)
-
-      const scrollLeft = scrollPane.scrollLeft
-
       const offSet = contentGrid.getOffsetForCell({
         alignment: 'start',
         columnIndex: scrollToColumn,
         rowIndex: scrollToRow,
       })
-      console.log(scrollLeft, offSet.scrollLeft, offSet.scrollLeft - fixedHeaderWidth)
       if (scrollLeft > offSet.scrollLeft - fixedHeaderWidth) {
-        scrollPane.scrollLeft = Math.max(offSet.scrollLeft - fixedHeaderWidth, 0)
+        // scrollPane.scrollLeft = Math.max(offSet.scrollLeft - fixedHeaderWidth, 0)
+        const scrollTop = scrollPane.scrollTop
+        contentGrid.scrollToPosition({
+          scrollLeft: Math.max(offSet.scrollLeft - fixedHeaderWidth, 0),
+          scrollTop,
+        })
+        // console.log('need scroll fix')
       }
-      console.log(scrollPane)
-      return null
+      // console.log('scroll towards left')
     } else if (x2 > previousPosition.x2) {
-      console.log('going right')
-      return { scrollToColumn, scrollToRow }
+      // console.log('scroll towards right')
+      contentGrid.scrollToCell({ columnIndex: scrollToColumn, rowIndex: scrollToRow })
     } else {
-      console.log('no left right business')
-      return { scrollToColumn, scrollToRow }
+      // console.log('up and down')
+      contentGrid.scrollToCell({ columnIndex: scrollToColumn, rowIndex: scrollToRow })
     }
   }
   return null
@@ -59,8 +46,9 @@ const computeScrollTo = ({ contentGrid, x2, y2, previousPosition, fixedHeaderWid
 //
 const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
   const contentGridRef = useRef()
+  const rowHeaderGridRef = useRef()
+  const columnHeaderGridRef = useRef()
   const positionRef = useRef()
-  const [scrollInfo, setScrollInfo] = useState(null)
 
   const {
     headers,
@@ -122,144 +110,145 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
   const selectionInfo =
     gridRenderProps && gridRenderProps.getSelectionInfo && gridRenderProps.getSelectionInfo()
   const { x2, y2 } = selectionInfo && selectionInfo.rawPositions ? selectionInfo.rawPositions : {}
+
   useEffect(() => {
     // console.log('pos ref is ', positionRef.current)
     if (positionRef.current != null) {
       // console.log(`transition is ${x2}:${positionRef.current.x2} - ${y2}:${positionRef.current.y2}`)
-      const newScrollInfo = computeScrollTo({
+      handleSelectionScroll({
         contentGrid: contentGridRef.current,
         x2,
         y2,
         fixedHeaderWidth,
         previousPosition: positionRef.current,
       })
-      if (newScrollInfo != null) setScrollInfo(i => (equals(i, newScrollInfo) ? i : newScrollInfo))
     }
-
     positionRef.current = { x2, y2 }
   }, [contentGridRef.current, fixedHeaderWidth, fixedColCount, x2, y2])
 
+  /** scroll sync listener **/
+  const onMainGridScroll = useCallback(scrollInfo => {
+    const { scrollLeft, scrollTop } = scrollInfo
+    if (rowHeaderGridRef.current != null) {
+      rowHeaderGridRef.current.scrollToPosition({ scrollLeft, scrollTop: 0 })
+    }
+    if (columnHeaderGridRef.current != null) {
+      columnHeaderGridRef.current.scrollToPosition({ scrollLeft: 0, scrollTop })
+    }
+  }, [])
+
   return (
     <Provider value={gridRenderProps}>
-      <ScrollSync>
-        {({
-          onScroll,
-          scrollLeft,
-          scrollTop,
-          // clientHeight,
-          // clientWidth,
-          // scrollHeight,
-          // scrollWidth,
-        }) => {
-          return (
-            <div
-              style={{ position: 'relative', ...style }}
-              className={className}
-              {...getContainerProps({ width, height, refKey: 'ref' })}
-              tabIndex="0"
-            >
-              <input {...getClipboardHelperProps()} />
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `0px`,
-                  top: '0px',
-                }}
-              >
-                <Grid
-                  style={{ overflow: 'hidden' }}
-                  cellRenderer={headerRender}
-                  columnWidth={colWidthOf(headers)}
-                  columnCount={headers.length}
-                  height={headerRowHeight}
-                  rowHeight={headerRowHeight}
-                  rowCount={1}
-                  scrollLeft={scrollLeft}
-                  width={width}
-                />
-              </div>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '0px',
-                  top: `${headerRowHeight}px`,
-                }}
-              >
-                <Grid
-                  cellRenderer={dataRender}
-                  columnWidth={colWidthOf(headers)}
-                  columnCount={headers.length}
-                  height={height - headerRowHeight}
-                  rowHeight={rowHeight}
-                  rowCount={data.length}
-                  onScroll={onScroll}
-                  width={width + scrollbarSize()}
-                  ref={contentGridRef}
-                  {...scrollInfo}
-                />
-              </div>
-              {numOfFixedCols > 0 && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '0px',
-                    top: '0px',
-                  }}
-                >
-                  <Grid
-                    cellRenderer={headerRender}
-                    columnWidth={colWidthOf(headers)}
-                    columnCount={numOfFixedCols}
-                    height={headerRowHeight}
-                    rowHeight={headerRowHeight}
-                    rowCount={1}
-                    width={fixedHeaderWidth}
-                  />
-                </div>
-              )}
-              {numOfFixedCols > 0 && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '0px',
-                    top: `${headerRowHeight}px`,
-                    backgroundColor: 'white',
-                    borderRight: '1px solid #ccc',
-                  }}
-                >
-                  <Grid
-                    style={{ overflow: 'hidden' }}
-                    cellRenderer={dataRender}
-                    columnWidth={colWidthOf(headers)}
-                    columnCount={numOfFixedCols}
-                    height={height - headerRowHeight - scrollbarSize()}
-                    rowHeight={rowHeight}
-                    rowCount={data.length}
-                    scrollTop={scrollTop}
-                    width={fixedHeaderWidth}
-                  />
-                </div>
-              )}
-              {scrollY && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `${Math.min(width, totalWidth)}px`,
-                    width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
-                    height: `${headerRowHeight}px`,
-                    top: '0px',
-                    backgroundColor: 'steelblue',
-                    borderRight: '1px solid #ccc',
-                    borderBottom: '1px solid #ccc',
-                    // borderLeft: '1px solid #ccc',
-                    borderTopRightRadius: '3px',
-                  }}
-                />
-              )}
-            </div>
-          )
-        }}
-      </ScrollSync>
+      <div
+        style={{ position: 'relative', ...style }}
+        className={className}
+        {...getContainerProps({ width, height, refKey: 'ref' })}
+        tabIndex="0"
+      >
+        <input {...getClipboardHelperProps()} />
+
+        {/* row headers */}
+        <div
+          style={{
+            position: 'absolute',
+            left: `0px`,
+            top: '0px',
+          }}
+        >
+          <Grid
+            style={{ overflow: 'hidden' }}
+            cellRenderer={headerRender}
+            columnWidth={colWidthOf(headers)}
+            columnCount={headers.length}
+            height={headerRowHeight}
+            rowHeight={headerRowHeight}
+            rowCount={1}
+            width={width}
+            ref={rowHeaderGridRef}
+          />
+        </div>
+        {/* main grid */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '0px',
+            top: `${headerRowHeight}px`,
+          }}
+        >
+          <Grid
+            cellRenderer={dataRender}
+            columnWidth={colWidthOf(headers)}
+            columnCount={headers.length}
+            height={height - headerRowHeight}
+            rowHeight={rowHeight}
+            rowCount={data.length}
+            width={width + scrollbarSize()}
+            ref={contentGridRef}
+            onScroll={onMainGridScroll}
+          />
+        </div>
+        {/* fixed headers upper left - corner */}
+        {numOfFixedCols > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '0px',
+              top: '0px',
+            }}
+          >
+            <Grid
+              cellRenderer={headerRender}
+              columnWidth={colWidthOf(headers)}
+              columnCount={numOfFixedCols}
+              height={headerRowHeight}
+              rowHeight={headerRowHeight}
+              rowCount={1}
+              width={fixedHeaderWidth}
+            />
+          </div>
+        )}
+        {/* fixed body (column headers) */}
+        {numOfFixedCols > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '0px',
+              top: `${headerRowHeight}px`,
+              backgroundColor: 'white',
+              borderRight: '1px solid #ccc',
+            }}
+          >
+            <Grid
+              style={{ overflow: 'hidden' }}
+              cellRenderer={dataRender}
+              columnWidth={colWidthOf(headers)}
+              columnCount={numOfFixedCols}
+              height={height - headerRowHeight - scrollbarSize()}
+              rowHeight={rowHeight}
+              rowCount={data.length}
+              width={fixedHeaderWidth}
+              ref={columnHeaderGridRef}
+            />
+          </div>
+        )}
+        {scrollY && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${Math.min(width, totalWidth)}px`,
+              width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
+              height: `${headerRowHeight}px`,
+              top: '0px',
+              backgroundColor: 'steelblue',
+              borderRight: '1px solid #ccc',
+              borderBottom: '1px solid #ccc',
+              // borderLeft: '1px solid #ccc',
+              borderTopRightRadius: '3px',
+            }}
+          />
+        )}
+      </div>
+      )
     </Provider>
   )
 }
