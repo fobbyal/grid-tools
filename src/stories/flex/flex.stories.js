@@ -144,7 +144,9 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
-  .add('Fuzzy Filter', () => <FilterDemo {...commonProps} render={flexGridRenderer()} />)
+  .add('Fuzzy Filter', () => (
+    <FilterDemo headers={headers} data={tenKData} rowsPerPage={15} render={flexGridRenderer()} />
+  ))
   .add('Scrolled Fixed col with paging', () => (
     <Grid
       {...commonProps}

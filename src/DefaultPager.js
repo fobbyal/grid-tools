@@ -25,44 +25,47 @@ const Pager = ({
   setCurrentPage,
   incrementPage,
   decrementPage,
-}) => (
-  <div
-    style={{
-      ...style,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-    className={className}
-  >
-    {totalPages <= 12
-      ? R.range(1, totalPages + 1).map(page => (
-          <PageButton
-            disabled={page === currentPage}
-            key={'page' + page}
-            onClick={_ => setCurrentPage(page)}
-          >
-            {page}
-          </PageButton>
-        ))
-      : [
-          <PageButton key="left" onClick={decrementPage}>
-            &#x25c0;
-          </PageButton>,
-          <Select key="select" value={currentPage} onChange={e => setCurrentPage(e.target.value)}>
-            {R.range(1, totalPages + 1).map(page => (
-              <option key={page} value={page}>
-                {page}
-              </option>
-            ))}
-          </Select>,
-          <TotalPages key="tp">of {totalPages}</TotalPages>,
-          <PageButton key="right" onClick={incrementPage}>
-            &#x25b6;
-          </PageButton>,
-        ]}
-  </div>
-)
+}) => {
+  console.log('current page is', currentPage)
+  return (
+    <div
+      style={{
+        ...style,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      className={className}
+    >
+      {totalPages <= 12
+        ? R.range(1, totalPages + 1).map(page => (
+            <PageButton
+              disabled={page === currentPage}
+              key={'page' + page}
+              onClick={_ => setCurrentPage(page)}
+            >
+              {page}
+            </PageButton>
+          ))
+        : [
+            <PageButton key="left" onClick={decrementPage}>
+              &#x25c0;
+            </PageButton>,
+            <Select key="select" value={currentPage} onChange={e => setCurrentPage(e.target.value)}>
+              {R.range(1, totalPages + 1).map(page => (
+                <option key={page} value={page}>
+                  {page}
+                </option>
+              ))}
+            </Select>,
+            <TotalPages key="tp">of {totalPages}</TotalPages>,
+            <PageButton key="right" onClick={incrementPage}>
+              &#x25b6;
+            </PageButton>,
+          ]}
+    </div>
+  )
+}
 
 //
 export default Pager

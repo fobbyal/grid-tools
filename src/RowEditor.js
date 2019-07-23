@@ -163,13 +163,17 @@ class RowEditor extends React.Component {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ startValidation: false, validations: [] })
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.rowData !== nextProps.rowData) {
-      this.setState({ editedRow: createEditRow(nextProps) || {} })
+    if (this.props.rowData !== prevProps.rowData) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ editedRow: createEditRow(this.props) || {} })
     }
   }
+
+  // componentWillReceiveProps(nextProps) {
+  //   if (this.props.rowData !== nextProps.rowData) {
+  //     this.setState({ editedRow: createEditRow(nextProps) || {} })
+  //   }
+  // }
 
   render() {
     const { render = renderEditor } = this.props

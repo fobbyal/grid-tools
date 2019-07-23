@@ -168,7 +168,7 @@ const computeView = ({
       ? filteredData
       : R.sort(comparator({ sortOptions, headers }), filteredData)
 
-  const normalizedCurrentPage = Math.min(filteredData.length, currentPage)
+  const normalizedCurrentPage = Math.min(Math.ceil(filteredData.length / rowsPerPage), currentPage)
 
   const pagedData = R.isNil(rowsPerPage)
     ? sortredData
@@ -330,8 +330,9 @@ class Grid extends React.PureComponent {
     window.document.body.removeEventListener('mouseup', this.bodyMouseRelease)
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { data, sortOptions, fuzzyFilter, currentPage, editInfo } = this.props
+  componentDidUpdate(prevProps) {
+    const { data, sortOptions, fuzzyFilter, currentPage, editInfo } = prevProps
+    const nextProps = this.props
     if (
       data !== nextProps.data ||
       sortOptions !== nextProps.sortOptions ||
@@ -339,6 +340,7 @@ class Grid extends React.PureComponent {
       currentPage !== nextProps.currentPage ||
       editInfo !== nextProps.editInfo
     ) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(
         ({ editingRow, editingColumn, /* x1, x2, y1, y2, */ currentPage }) => ({
           // x1: data !== nextProps.data ? undefined : x1,
@@ -351,7 +353,7 @@ class Grid extends React.PureComponent {
             fuzzyFilter:
               fuzzyFilter !== nextProps.fuzzyFilter ? nextProps.fuzzyFilter : fuzzyFilter,
             currentPage:
-              this.isPagingControlled() && this.props.currentPage !== nextProps.currentPage
+              this.isPagingControlled() && currentPage !== nextProps.currentPage
                 ? nextProps.currentPage
                 : currentPage,
             editInfo: editInfo !== nextProps.editInfo ? nextProps.editInfo : this.editInfo(),
@@ -363,6 +365,40 @@ class Grid extends React.PureComponent {
       )
     }
   }
+
+  // componentWillReceiveProps(nextProps) {
+  //   const { data, sortOptions, fuzzyFilter, currentPage, editInfo } = this.props
+  //   if (
+  //     data !== nextProps.data ||
+  //     sortOptions !== nextProps.sortOptions ||
+  //     fuzzyFilter !== nextProps.fuzzyFilter ||
+  //     currentPage !== nextProps.currentPage ||
+  //     editInfo !== nextProps.editInfo
+  //   ) {
+  //     this.setState(
+  //       ({ editingRow, editingColumn, /* x1, x2, y1, y2, */ currentPage }) => ({
+  //         // x1: data !== nextProps.data ? undefined : x1,
+  //         // x2: data !== nextProps.data ? undefined : x2,
+  //         // y1: data !== nextProps.data ? undefined : y1,
+  //         // y2: data !== nextProps.data ? undefined : y2,
+  //         ...this.generateViewProps({
+  //           data: data !== nextProps.data ? nextProps.data : data,
+  //           sortOptions: sortOptions !== nextProps.sortOptions ? nextProps.sortOptions : undefined,
+  //           fuzzyFilter:
+  //             fuzzyFilter !== nextProps.fuzzyFilter ? nextProps.fuzzyFilter : fuzzyFilter,
+  //           currentPage:
+  //             this.isPagingControlled() && this.props.currentPage !== nextProps.currentPage
+  //               ? nextProps.currentPage
+  //               : currentPage,
+  //           editInfo: editInfo !== nextProps.editInfo ? nextProps.editInfo : this.editInfo(),
+  //         }),
+  //         editingRow: data !== nextProps.data ? undefined : editingRow,
+  //         editingColumn: data !== nextProps.data ? undefined : editingColumn,
+  //       }),
+  //       this.selectionChanged
+  //     )
+  //   }
+  // }
 
   /* paging starts */
 
