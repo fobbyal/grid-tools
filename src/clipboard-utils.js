@@ -28,7 +28,7 @@ const parseClipData = rawData =>
   rawData
     .split(rawData.includes('\r') ? '\r' : '\n')
     // excel may copy extra 0 length line
-    .filter(row => row.length > 0)
+    .filter(row => row != null && row.trim().length > 0)
     .map(row => clearNil(row.split('\t')))
 
 export const expandDataToSelection = selection => data => {
