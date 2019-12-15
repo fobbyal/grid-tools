@@ -12,6 +12,7 @@ import { extractAndFormatData } from '../utils'
 import { Consumer } from './VirtualizedContext'
 /* justify-content: ${props => mapAlignmentToJustifyContent(props.alignment) || 'center'}; */
 import CellEditContainer from '../CellEditContainer'
+import GridToolsContext from '../context';
 
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;
@@ -24,16 +25,19 @@ const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
 const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
 
-const ColHeader = ({ header, sortOrder, width, ...rest }) => (
-  <ColHeaderBase width={width} {...rest} sortable={header.sortable}>
-    {header.display}
-    {sortOrder === 'asc' ? (
-      <SortIndicator>&#x25b2;</SortIndicator>
-    ) : sortOrder === 'desc' ? (
-      <SortIndicator>&#x25bc;</SortIndicator>
-    ) : null}
-  </ColHeaderBase>
-)
+const ColHeader = ({ header, sortOrder, width, ...rest }) => {
+  const gridContext = React.useContext(GridToolsContext);
+  return (
+    <ColHeaderBase width={width} {...rest} {...gridContext.columnHeaderProps} sortable={header.sortable}>
+      {header.display}
+      {sortOrder === 'asc' ? (
+        <SortIndicator>&#x25b2;</SortIndicator>
+      ) : sortOrder === 'desc' ? (
+        <SortIndicator>&#x25bc;</SortIndicator>
+      ) : null}
+    </ColHeaderBase>
+  )
+}
 
 export const cellRenderWrapper = (propPreProcessor = _ => _) => render => reactVirtualizedProps => (
   <Consumer key={reactVirtualizedProps.key}>

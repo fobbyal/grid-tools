@@ -13,6 +13,7 @@ import {
   dropdownEditRender,
 } from './Components'
 import CellEditContainer from './CellEditContainer'
+import GridToolsContext from './context';
 // import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
@@ -179,27 +180,26 @@ class FlexGridCell extends React.PureComponent {
   }
 }
 
-export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) => (
-  <ColHeader width={width} {...rest} sortable={header.sortable}>
-    {header.display}
-    {sortOrder === 'asc' ? (
-      <SortIndicator>&#x25b2;</SortIndicator>
-    ) : sortOrder === 'desc' ? (
-      <SortIndicator>&#x25bc;</SortIndicator>
-    ) : null}
-  </ColHeader>
-)
+export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) => {
+  const gridContext = React.useContext(GridToolsContext);
+  return (
+    <ColHeader width={width} {...rest} {...gridContext.columnHeaderProps} sortable={header.sortable}>
+      {header.display}
+      {sortOrder === 'asc' ? (
+        <SortIndicator>&#x25b2;</SortIndicator>
+      ) : sortOrder === 'desc' ? (
+        <SortIndicator>&#x25bc;</SortIndicator>
+      ) : null}
+    </ColHeader>
+  )
+}
 
 // <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
 // <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
 
-class FlexGridColHeader extends React.PureComponent {
-  render() {
-    // console.log('scroll y is ', this.props.scrollY)
-    const { render = defaultColHeaderRenderer, ...rest } = this.props
-    return render(rest)
-  }
-}
+const FlexGridColHeader = ({ render = defaultColHeaderRenderer, ...rest }) => (
+  render(rest)
+)
 
 /* prettier-ignore */
 const FlexGridContainer = styled.div`

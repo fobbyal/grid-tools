@@ -69,7 +69,7 @@ export const BasicColHeader = styled.div`
   text-align: center;
   user-select: none;
   cursor: ${props => (props.sortable ? 'pointer' : 'default')};
-  background-color: ${props => props.backgroundColor || 'steelblue'};
+  background-color: ${props => props.backgroundColor};
   color: ${props => props.color || 'white'};
   line-height: 1.3em;
   font-weight: ${props => props.fontWeight || 'bold'};
