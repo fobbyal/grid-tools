@@ -5,6 +5,7 @@ import scrollbarSize from 'dom-helpers/util/scrollbarSize'
 import { Provider } from './VirtualizedContext'
 // import CellEditContainer from './CellEditContainer'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
+import GridToolsContext from "../context"
 
 const colWidthOf = cols => ({ index }) => cols[index].width
 
@@ -136,6 +137,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
       columnHeaderGridRef.current.scrollToPosition({ scrollLeft: 0, scrollTop })
     }
   }, [])
+  const gridContext = React.useContext(GridToolsContext);
 
   return (
     <Provider value={gridRenderProps}>
@@ -239,7 +241,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
               width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
               height: `${headerRowHeight}px`,
               top: '0px',
-              backgroundColor: 'steelblue',
+              backgroundColor: gridContext.columnHeaderProps.backgroundColor,
               borderRight: '1px solid #ccc',
               borderBottom: '1px solid #ccc',
               // borderLeft: '1px solid #ccc',

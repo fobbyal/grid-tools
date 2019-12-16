@@ -197,9 +197,9 @@ export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) 
 // <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
 // <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
 
-const FlexGridColHeader = ({ render = defaultColHeaderRenderer, ...rest }) => (
+const FlexGridColHeader = React.memo(({ render = defaultColHeaderRenderer, ...rest }) => (
   render(rest)
-)
+))
 
 /* prettier-ignore */
 const FlexGridContainer = styled.div`
