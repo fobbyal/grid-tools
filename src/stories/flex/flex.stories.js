@@ -66,7 +66,7 @@ const OnEditCopyPasteDemo = () => {
     d.map(row => (row === originalRow ? editedRow : row))
 
   return (
-    <GridToolContext.Provider value={{ debug: true }}>
+    <GridToolContext.Provider value={{ debug: true, columnHeaderProps: { backgroundColor: "green" } }}>
       <Grid
         data={data}
         headers={debugHeaders}

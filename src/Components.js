@@ -69,17 +69,17 @@ export const BasicColHeader = styled.div`
   text-align: center;
   user-select: none;
   cursor: ${props => (props.sortable ? 'pointer' : 'default')};
-  background-color: ${props => props.backgroundColor || 'steelblue'};
-  color: ${props => props.color || 'white'};
+  background-color: ${props => props.backgroundColor};
+  color: ${props => props.color};
   line-height: 1.3em;
-  font-weight: ${props => props.fontWeight || 'bold'};
-  font-size: ${props => props.fontSize || '0.85em'};
+  font-weight: ${props => props.fontWeight};
+  font-size: ${props => props.fontSize};
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
   &:first-child {
-    border-left: 1px solid steelblue;
+    border-left: 1px solid ${props => props.backgroundColor};
     border-top-left-radius: 3px;
   }
   &:last-child {
