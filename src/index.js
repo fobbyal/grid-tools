@@ -5,13 +5,16 @@ import flexGridRenderer, {
   defaultCellRenderer as defaultFlexCellRenderer,
   defaultColHeaderRenderer as defaultFlexColHeaderRenderer,
 } from './flexRenderer'
-import { defaultCellRender as defaultVirtualizedCellRender } from './virtualized/cellRender'
+import {
+  defaultCellRender as defaultVirtualizedCellRender,
+  OptimizedContentCell as VirtualizedCell,
+} from './virtualized/cellRender'
 import renderRowEditorContent, { defaultInputRowEditRender } from './renderRowEditorContent'
 import {
   createControlledEditProps,
   extractData,
   formatData,
-  extractAndFormatDataData,
+  extractAndFormatData,
   toSelectionColProps,
 } from './utils'
 import * as freeEditEngine from './editEngine'
@@ -33,7 +36,7 @@ export {
   defaultInputRowEditRender,
   extractData,
   formatData,
-  extractAndFormatDataData,
+  extractAndFormatData,
   toSelectionColProps,
   RowEditor,
   virtualizedGridRenderer,
@@ -41,5 +44,6 @@ export {
   freeEditEngine,
   createControlledEditProps,
   GridToolContext,
+  VirtualizedCell,
 }
 export default Grid

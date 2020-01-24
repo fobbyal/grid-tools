@@ -31,8 +31,25 @@ const redOn3X3Renderer = props => {
   const { rowIndex, columnIndex, width, height, data, header } = props
   if (rowIndex === 3 && columnIndex === 3) {
     return (
-      <FlexCell color="red" fontSize=".8em" fontWeight="bold" width={width} height={height}>
+      <FlexCell
+        style={{ position: 'relative' }}
+        color="red"
+        fontSize=".8em"
+        fontWeight="bold"
+        width={width}
+        height={height}
+      >
         ${data[rowIndex][header.ident]}
+        <div
+          style={{
+            position: 'absolute',
+            top: '0px',
+            right: '0px',
+            width: '10px',
+            height: '10px',
+            backgroundColor: 'blue',
+          }}
+        />
       </FlexCell>
     )
   }
@@ -66,7 +83,9 @@ const OnEditCopyPasteDemo = () => {
     d.map(row => (row === originalRow ? editedRow : row))
 
   return (
-    <GridToolContext.Provider value={{ debug: true, columnHeaderProps: { backgroundColor: "green" } }}>
+    <GridToolContext.Provider
+      value={{ debug: true, columnHeaderProps: { backgroundColor: 'green' } }}
+    >
       <Grid
         data={data}
         headers={debugHeaders}

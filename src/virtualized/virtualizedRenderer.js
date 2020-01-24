@@ -5,7 +5,7 @@ import scrollbarSize from 'dom-helpers/util/scrollbarSize'
 import { Provider } from './VirtualizedContext'
 // import CellEditContainer from './CellEditContainer'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
-import GridToolsContext from "../context"
+import GridToolsContext from '../context'
 
 const colWidthOf = cols => ({ index }) => cols[index].width
 
@@ -137,7 +137,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
       columnHeaderGridRef.current.scrollToPosition({ scrollLeft: 0, scrollTop })
     }
   }, [])
-  const gridContext = React.useContext(GridToolsContext);
+  const gridContext = React.useContext(GridToolsContext)
 
   return (
     <Provider value={gridRenderProps}>

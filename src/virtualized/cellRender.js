@@ -12,7 +12,7 @@ import { extractAndFormatData } from '../utils'
 import { Consumer } from './VirtualizedContext'
 /* justify-content: ${props => mapAlignmentToJustifyContent(props.alignment) || 'center'}; */
 import CellEditContainer from '../CellEditContainer'
-import GridToolsContext from '../context';
+import GridToolsContext from '../context'
 
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;
@@ -23,12 +23,17 @@ export const ColHeaderBase = BasicColHeader.extend`
 
 const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
-const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
+export const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
 
 const ColHeader = ({ header, sortOrder, width, ...rest }) => {
-  const gridContext = React.useContext(GridToolsContext);
+  const gridContext = React.useContext(GridToolsContext)
   return (
-    <ColHeaderBase width={width} {...rest} {...gridContext.columnHeaderProps} sortable={header.sortable}>
+    <ColHeaderBase
+      width={width}
+      {...rest}
+      {...gridContext.columnHeaderProps}
+      sortable={header.sortable}
+    >
       {header.display}
       {sortOrder === 'asc' ? (
         <SortIndicator>&#x25b2;</SortIndicator>

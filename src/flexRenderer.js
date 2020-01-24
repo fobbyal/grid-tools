@@ -13,7 +13,7 @@ import {
   dropdownEditRender,
 } from './Components'
 import CellEditContainer from './CellEditContainer'
-import GridToolsContext from './context';
+import GridToolsContext from './context'
 // import { shallowEqualExplain } from 'shallow-equal-explain'
 
 export const ColHeader = BasicColHeader.extend`
@@ -181,9 +181,14 @@ class FlexGridCell extends React.PureComponent {
 }
 
 export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) => {
-  const gridContext = React.useContext(GridToolsContext);
+  const gridContext = React.useContext(GridToolsContext)
   return (
-    <ColHeader width={width} {...rest} {...gridContext.columnHeaderProps} sortable={header.sortable}>
+    <ColHeader
+      width={width}
+      {...rest}
+      {...gridContext.columnHeaderProps}
+      sortable={header.sortable}
+    >
       {header.display}
       {sortOrder === 'asc' ? (
         <SortIndicator>&#x25b2;</SortIndicator>
@@ -197,9 +202,9 @@ export const defaultColHeaderRenderer = ({ header, sortOrder, width, ...rest }) 
 // <SortIndicator className="fa fa-caret-up" aria-hidden="true" />
 // <SortIndicator className="fa fa-caret-down" aria-hidden="true" />
 
-const FlexGridColHeader = React.memo(({ render = defaultColHeaderRenderer, ...rest }) => (
+const FlexGridColHeader = React.memo(({ render = defaultColHeaderRenderer, ...rest }) =>
   render(rest)
-))
+)
 
 /* prettier-ignore */
 const FlexGridContainer = styled.div`
