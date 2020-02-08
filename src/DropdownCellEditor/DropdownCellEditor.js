@@ -73,6 +73,7 @@ const renderVirtualizedList = ({
   justOpened,
   // placement,
   // arrowProps,
+  zIndex,
 }) => {
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
   // console.log('virtualized style is ', style)
@@ -99,7 +100,7 @@ const renderVirtualizedList = ({
   const index = R.findIndex(a => a === selectedItem, visibleChoices)
 
   return (
-    <div ref={ref} style={style}>
+    <div ref={ref} style={{ ...style, zIndex }}>
       <VirtualizedList
         width={minWidth}
         height={250}
@@ -122,13 +123,14 @@ const renderBasicList = ({
   style,
   choices,
   minWidth,
+  zIndex,
   // inputValue,
   // placement,
   // arrowProps,
 }) => {
   // console.log('basic list style is ', style)
   return (
-    <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px' }}>
+    <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px', zIndex }}>
       {choices.map((item, index) =>
         renderListItem({
           getItemProps,
@@ -210,7 +212,7 @@ class DropDownCellEditor extends React.Component {
   )
 
   render() {
-    const { choices, value, onChange, virtualized } = this.props
+    const { choices, value, onChange, virtualized, zIndex } = this.props
     // eslint-disable-next-line standard/object-curly-even-spacing
     const { /* showSelection, */ justOpened } = this.state
     const renderList = virtualized ? renderVirtualizedList : renderBasicList
@@ -226,7 +228,7 @@ class DropDownCellEditor extends React.Component {
         onInputValueChange={this.inputValueChanged}
         onChange={onChange}
         // eslint-disable-next-line standard/object-curly-even-spacing
-        itemToString={({ /* vallue, */ text }) => text || value + ''}
+        itemToString={({ /* value, */ text }) => text || value + ''}
       >
         {downshiftProps => (
           <div>
@@ -241,6 +243,7 @@ class DropDownCellEditor extends React.Component {
                   minWidth: this.props.width == null ? 150 : this.props.width,
                   justOpened,
                   ref: popperProps.ref,
+                  zIndex,
                 })
               }
             >
