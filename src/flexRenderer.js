@@ -223,6 +223,7 @@ const flexGridRenderer = ({
   fixedColCount = 0,
   autoFixColByKey,
   cellRenderer,
+  editRenderer,
   colHeaderRenderer,
   pagerRenderer = defaultPagerRenderer,
   // editByRow = true,
@@ -362,6 +363,7 @@ const flexGridRenderer = ({
               {rowHeaders.map((header, columnIndex) => (
                 <FlexGridCell
                   render={cellRenderer}
+                  editRender={editRenderer}
                   {...getCellProps({
                     rowIndex,
                     columnIndex,
