@@ -261,8 +261,12 @@ class CellEditContainer extends React.Component {
   }
 
   render() {
-    const { render } = this.props
-    return render({ getInputProps: this.getInputProps, getDropdownProps: this.getDropdownProps })
+    const { render, ...rest } = this.props
+    return render({
+      ...rest,
+      getInputProps: this.getInputProps,
+      getDropdownProps: this.getDropdownProps,
+    })
   }
 }
 
