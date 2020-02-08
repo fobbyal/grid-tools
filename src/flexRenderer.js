@@ -401,6 +401,7 @@ const flexGridRenderer = ({
               {dataHeaders.map((header, columnIndex) => (
                 <FlexGridCell
                   render={cellRenderer}
+                  editRender={editRenderer}
                   {...getCellProps({
                     rowIndex,
                     columnIndex: columnIndex + numOfFixedCols,
