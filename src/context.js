@@ -8,6 +8,7 @@ const options = {
     fontWeight: 'bold',
     fontSize: '0.85em',
   },
+  dropDownZIndex: 10000,
 }
 
 const GridToolsContext = React.createContext(options)

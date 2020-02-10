@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Downshift from 'downshift'
 import PortaledPopper from '../PortaledPopper'
 import styled from 'styled-components'
 import { List } from 'react-virtualized'
 import R from 'ramda'
+import GridContext from '../context'
 
 const listContainerStyle = `
   border: solid 1px #ccc;
@@ -73,8 +74,8 @@ const renderVirtualizedList = ({
   justOpened,
   // placement,
   // arrowProps,
-  zIndex,
 }) => {
+  const { dropDownZIndex: zIndex } = useContext(GridContext)
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
   // console.log('virtualized style is ', style)
 
