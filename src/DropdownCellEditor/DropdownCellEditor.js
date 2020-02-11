@@ -1,10 +1,9 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Downshift from 'downshift'
 import PortaledPopper from '../PortaledPopper'
 import styled from 'styled-components'
 import { List } from 'react-virtualized'
 import R from 'ramda'
-import GridContext from '../context'
 
 const listContainerStyle = `
   border: solid 1px #ccc;
@@ -75,7 +74,6 @@ const renderVirtualizedList = ({
   // placement,
   // arrowProps,
 }) => {
-  const { dropDownZIndex: zIndex } = useContext(GridContext)
   if (process.env.NODE_ENV === 'development') console.log('rendering virtualized list here..')
   // console.log('virtualized style is ', style)
 
@@ -101,7 +99,7 @@ const renderVirtualizedList = ({
   const index = R.findIndex(a => a === selectedItem, visibleChoices)
 
   return (
-    <div ref={ref} style={{ ...style, zIndex }}>
+    <div ref={ref} style={{ ...style, zIndex: 100000 }}>
       <VirtualizedList
         width={minWidth}
         height={250}
@@ -128,10 +126,9 @@ const renderBasicList = ({
   // placement,
   // arrowProps,
 }) => {
-  const { dropDownZIndex: zIndex } = useContext(GridContext)
   // console.log('basic list style is ', style)
   return (
-    <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px', zIndex }}>
+    <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px', zIndex: 100000 }}>
       {choices.map((item, index) =>
         renderListItem({
           getItemProps,

@@ -7,7 +7,7 @@
     "standard-react",
     "prettier",
     "plugin:jest/recommended",
-    "eslint-config-prettier"
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "react/prop-types": "off",
