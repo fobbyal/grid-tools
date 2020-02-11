@@ -124,11 +124,11 @@ const renderBasicList = ({
   style,
   choices,
   minWidth,
-  zIndex,
   // inputValue,
   // placement,
   // arrowProps,
 }) => {
+  const { dropDownZIndex: zIndex } = useContext(GridContext)
   // console.log('basic list style is ', style)
   return (
     <BasicList innerRef={ref} style={{ ...style, minWidth: minWidth + 'px', zIndex }}>
