@@ -139,6 +139,31 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
+  .add('Custom Selection Range', () => {
+    const CustomSelectionStory = () => {
+      const [y1, setY1] = useState(4)
+      return (
+        <>
+          <Grid
+            {...commonProps}
+            data={data.filter((_, index) => index < 5)}
+            render={flexGridRenderer()}
+            onSelectionChange={({ selectedRows }) => {
+              setY1(data.findIndex(r => r.unitId === selectedRows[0].unitId))
+            }}
+          />
+          <br />
+          <br />
+          <Grid
+            {...commonProps}
+            render={flexGridRenderer()}
+            selectionRect={{ x1: 3, y1, x2: 5, y2: 5 }}
+          />
+        </>
+      )
+    }
+    return <CustomSelectionStory />
+  })
   .add('Customized Cell Renderer', () => (
     <Grid
       {...commonProps}
