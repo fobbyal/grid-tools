@@ -309,21 +309,8 @@ class Grid extends React.PureComponent {
     }
   }
 
-  setCustomSelectionRect = (prevSelectionRect, curSelectionRect) => {
-    if (curSelectionRect) {
-      if (
-        !prevSelectionRect ||
-        prevSelectionRect.x1 !== curSelectionRect.x1 ||
-        prevSelectionRect.y1 !== curSelectionRect.y1 ||
-        prevSelectionRect.x2 !== curSelectionRect.x2 ||
-        prevSelectionRect.y2 !== curSelectionRect.y2
-      ) {
-        const { x1, y1, x2, y2 } = curSelectionRect
-        this.setState({ x1, y1, x2, y2 })
-      }
-    } else if (prevSelectionRect) {
-      this.setState({ x1: null, y1: null, x2: null, y2: null })
-    }
+  setSelectedRect = rect => {
+    this.setState(rect)
   }
 
   componentDidMount() {
@@ -342,7 +329,6 @@ class Grid extends React.PureComponent {
         'Please render an INPUT element with getClipboardHelperProps to support copy&paste.'
       )
     }
-    this.setCustomSelectionRect(null, this.props.selectionRect)
   }
   componentWillUnmount() {
     window.document.body.removeEventListener('mouseleave', this.bodyMouseRelease)
@@ -352,7 +338,6 @@ class Grid extends React.PureComponent {
   componentDidUpdate(prevProps) {
     const { data, sortOptions, fuzzyFilter, currentPage, editInfo } = prevProps
     const nextProps = this.props
-    this.setCustomSelectionRect(prevProps.selectionRect, this.props.selectionRect)
     if (
       data !== nextProps.data ||
       sortOptions !== nextProps.sortOptions ||
