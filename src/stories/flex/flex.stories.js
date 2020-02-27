@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 import { storiesOf } from '@storybook/react'
 // import { action } from '@storybook/addon-actions'
@@ -139,6 +139,29 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
+  .add('Custom Selection Range', () => {
+    const CustomSelectionStory = () => {
+      const initialRect = { x1: 3, y1: 2, x2: 5, y2: 5 }
+      const subGridRef = useRef()
+      return (
+        <>
+          <Grid
+            {...commonProps}
+            data={data.filter((_, index) => index < 5)}
+            render={flexGridRenderer()}
+            onSelectionChange={({ selectedRows }) => {
+              const y1 = data.findIndex(r => r.unitId === selectedRows[0].unitId)
+              subGridRef.current.setSelectedRect({ ...initialRect, y1 })
+            }}
+          />
+          <br />
+          <br />
+          <Grid {...commonProps} ref={subGridRef} render={flexGridRenderer()} />
+        </>
+      )
+    }
+    return <CustomSelectionStory />
+  })
   .add('Customized Cell Renderer', () => (
     <Grid
       {...commonProps}

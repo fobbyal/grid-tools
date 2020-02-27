@@ -221,6 +221,7 @@ class Grid extends React.PureComponent {
     onEdit: PropTypes.func,
     showAdd: PropTypes.bool,
     addWithSelected: PropTypes.bool,
+    selectionRect: PropTypes.object,
     onSelectionChange: PropTypes.func,
     renderRowEditor: PropTypes.func,
     // this handles cell edits
@@ -306,6 +307,10 @@ class Grid extends React.PureComponent {
     if (this.selecting && !isPositionValid(extractPosition(e))) {
       this.selecting = false
     }
+  }
+
+  setSelectedRect = rect => {
+    this.setState(rect)
   }
 
   componentDidMount() {
