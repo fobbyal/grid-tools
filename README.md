@@ -17,7 +17,7 @@ This library contians a setup of tools to help React developers to easily create
 - About data-row-index, data-column-index
 - Comparator -- not finished yet.. currenlty cannot handle mapped values unitId/unitName
 - DataGetter
-- Ref - Ref can be assigned to grid to access various methods like `setSelectedRect` to set selection in grid. Refer story `Custom Selection Range` to see the actual usage
+- Ref - Ref can be assigned to grid to access various methods like `setSelectedRect` to set selection in grid. Refer story `Custom Selection Range` to see the actual usage.
 - Copy Helper
 
 ## DataGetter
