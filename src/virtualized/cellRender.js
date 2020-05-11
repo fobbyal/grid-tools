@@ -16,6 +16,9 @@ import GridToolsContext from '../context'
 
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 export const ColHeaderBase = BasicColHeader.extend`
   border-bottom: 1px solid #ccc;

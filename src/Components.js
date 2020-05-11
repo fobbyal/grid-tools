@@ -2,8 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import DropdownCellEditor from './DropdownCellEditor'
 
-const mapAlignmentToJustifyContent = alignment =>
-  alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : alignment
+// const mapAlignmentToJustifyContent = alignment =>
+//   alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : alignment
 
 const cellColorOf = props => {
   const { isSelected, isHovered } = props
@@ -36,13 +36,10 @@ const cellBgColorOf = props => {
 
 /* prettier-ignore */
 export const BasicCell = styled.div`
-  display: flex;
   border-left: 1px solid #ccc;
-  align-items: center;
   user-select: none;
   cursor: default;
-  justify-content: ${props =>
-    mapAlignmentToJustifyContent(props.alignment) || 'center'};
+  ${props => `text-align: ${ props.alignment||'center' };` }
   ${props => `font-size: ${ props.fontSize||'unset' };` }
   ${props =>`color: ${cellColorOf(props)};` }
   ${props =>`background-color:${cellBgColorOf(props)};` }

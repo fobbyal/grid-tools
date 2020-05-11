@@ -14,7 +14,7 @@ export const randomRow = R.compose(
     switch (type) {
       case 'str':
       case 'sel':
-        return [ident, chance.word()]
+        return [ident, chance.word() + ' ' + chance.word() + ' ' + chance.word()]
       case 'num':
         return [ident, chance.floating({ fixed: 2, min: 0, max: 50000 })]
       case 'bool':
@@ -54,11 +54,11 @@ const unitDataFormatter = ({ value }) => unitMap[value] || value
 
 /* prettier-ignore */
 export const headers = [
-  dateCol({ ident: 'transDate', display: 'Trans-Date', width:120, isKey:true, }),
-  strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataFormatter:unitDataFormatter,choices:unitChoices }),
-  intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
+  dateCol({ ident: 'transDate', display: 'Trans-Date', width: 120, isKey: true, }),
+  strCol({ ident: 'unitId', display: 'Unit', width: 180, isKey: true, dataFormatter: unitDataFormatter, choices: unitChoices }),
+  intCol({ ident: 'he', display: 'HE', width: 40, isKey: true, numFormat: "0", }),
   strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
-  numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', displayFormat: null }),
+  numCol({ ident: 'emerMinOvr', display: 'Emer Min', width: 120, alignment: 'right', displayFormat: null }),
   numCol({ ident: 'ecoMinOvr', display: 'Eco Min', }),
   numCol({ ident: 'ecoMaxOvr', display: 'Eco Max', }),
   numCol({ ident: 'emerMaxOvr', display: 'Emer Max', }),
@@ -68,20 +68,20 @@ export const headers = [
   numCol({ ident: 'regMaxOvr', display: 'Reg Max', }),
   strCol({ ident: 'regAStatusOvr', display: 'Reg A Status', }),
   strCol({ ident: 'spilling', display: 'Spilling', }),
-  pctCol({ ident: 'reducedRampRatePct', display: 'Reduce Ramp Percent', width:220, }),
-  dollarCol({ ident: 'regAPrice', display: 'Reg A Price', width:120, }),
-  dollarCol({ ident: 'regACost', display: 'Reg A Cost', width:120, }),
-  dollarCol({ ident: 'regAPerfPrice', display: 'Reg A Perf Price', width:120, }),
-  dollarCol({ ident: 'regAPerfCost', display: 'Reg A Perf Cost', width:120, }),
+  pctCol({ ident: 'reducedRampRatePct', display: 'Reduce Ramp Percent', width: 220, }),
+  dollarCol({ ident: 'regAPrice', display: 'Reg A Price', width: 120, }),
+  dollarCol({ ident: 'regACost', display: 'Reg A Cost', width: 120, }),
+  dollarCol({ ident: 'regAPerfPrice', display: 'Reg A Perf Price', width: 120, }),
+  dollarCol({ ident: 'regAPerfCost', display: 'Reg A Perf Cost', width: 120, }),
   strCol({ ident: 'regDStatus', display: 'Reg D status', }),
-  dollarCol({ ident: 'regDPrice', display: 'Reg D Price', width:120, }),
-  dollarCol({ ident: 'regDCost', display: 'Reg D Cost', width:120, }),
-  dollarCol({ ident: 'regDPerfPrice', display: 'Reg D Perf Price', width:120, }),
-  dollarCol({ ident: 'regDPerfCost', display: 'Reg D Perf Cost', width:120, }),
+  dollarCol({ ident: 'regDPrice', display: 'Reg D Price', width: 120, }),
+  dollarCol({ ident: 'regDCost', display: 'Reg D Cost', width: 120, }),
+  dollarCol({ ident: 'regDPerfPrice', display: 'Reg D Perf Price', width: 120, }),
+  dollarCol({ ident: 'regDPerfCost', display: 'Reg D Perf Cost', width: 120, }),
   numCol({ ident: 'spinMwOvr', display: 'Spin Mw', }),
   numCol({ ident: 'spinMaxOvr', display: 'Spin Max', }),
   strCol({ ident: 'spinStatusOvr', display: 'Spin Status', }),
-  dollarCol({ ident: 'spinPrice', display: 'Spin Price', width:120, }),
+  dollarCol({ ident: 'spinPrice', display: 'Spin Price', width: 120, }),
 ]
 const createRow = _ => randomRow(headers)
 export const createData = R.compose(
