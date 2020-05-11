@@ -30,7 +30,6 @@ export const ColHeader = BasicColHeader.extend`
 /* prettier-ignore */
 /* to have the ellipsis we need dispay block instead of flex */
 export const Cell = BasicCell.extend`
-  flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
   white-space: nowrap;
   overflow: hidden;

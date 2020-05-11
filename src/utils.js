@@ -55,6 +55,15 @@ export const extractData = ({ header, rowData = [], dataFormat }) => {
     : rawData
 }
 
+export const isDataValid = ({ header, value }) => {
+  const { type, dataFormat } = header
+  return type === 'num'
+    ? !isNaN(value)
+    : type === 'date-time'
+    ? moment(value, dataFormat).isValid()
+    : true
+}
+
 export const formatData = ({ header, value, rowData }) => {
   const { type, dataFormat, displayFormat, dataFormatter } = header
   return dataFormatter

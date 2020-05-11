@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-async-promise-executor
 import React from 'react'
 import R from 'ramda'
-import { formatData, extractData } from './utils'
+import { formatData, extractData, isDataValid } from './utils'
 /* eslint-disable no-unused-vars  */
 import { ROW_INDEX_ATTRIBUTE, COLUMN_INDEX_ATTRIBUTE } from './constants.js'
 /* eslint-enable  no-unused-vars */
@@ -50,6 +50,11 @@ class CellEditContainer extends React.Component {
      **/
     const { rowIndex, header, data, commitRowEdit } = this.props
     const value = R.isNil(committedValue) ? this.state.value : committedValue
+
+    if (!isDataValid({ header, value })) {
+      this.cancelEdit()
+      return
+    }
 
     const rowData = data[rowIndex]
 

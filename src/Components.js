@@ -97,7 +97,6 @@ export const dropdownEditRender = ({ getDropdownProps }) => (
   <DropdownCellEditor {...getDropdownProps({ refKey: 'innerRef' })} />
 )
 export const CellInputEditor = BasicCellInput.extend`
-  flex: 0 0 ${props => props.width}px;
   width: ${props => props.width}px;
   max-width: ${props => props.width}px;
 `
