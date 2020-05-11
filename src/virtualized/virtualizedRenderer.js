@@ -174,7 +174,10 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
           }}
         >
           <Grid
-            style={{ overflow: 'hidden' }}
+            style={{
+              overflowX: 'hidden',
+              overflowY: 'hidden',
+            }}
             cellRenderer={headerRender}
             columnWidth={colWidthOf(headers)}
             columnCount={headers.length}
