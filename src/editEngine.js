@@ -24,7 +24,7 @@ export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
   let finalEdit = editInfo
   for (let i = 0; i < rows.length; i++) {
     if (rows[i]) {
-      finalEdit = removeRow({ editInfo: finalEdit, row: rows[i] }, true)
+      finalEdit = removeRow({ editInfo: finalEdit, currentRow: rows[i] }, true)
     }
   }
   return { ...finalEdit, history: [...history, finalEdit] }
