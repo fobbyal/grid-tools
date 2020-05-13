@@ -3,16 +3,16 @@ import { fromNullable } from 'data.maybe'
 import { fromEmpty } from './utils'
 
 // prettier-ignore
-const combineCliboardCells = R.reduce( (a, b) => (a === '' ? b : `${a}\t${b}`), '')
+const combineClipboardCells = R.reduce( (a, b) => (a === '' ? b : `${a}\t${b}`), '')
 
 // prettier-ignore
-const combineCliboardRows = R.reduce( (a, b) => (a === '' ? b : `${a}\r${b}`), '')
+const combineClipboardRows = R.reduce( (a, b) => (a === '' ? b : `${a}\n${b}`), '')
 
 const normalizeCellsForClipboard = R.map(a => fromEmpty(a).getOrElse(''))
 
 export const toClipboardData = R.compose(
-  combineCliboardRows,
-  R.map(combineCliboardCells),
+  combineClipboardRows,
+  R.map(combineClipboardCells),
   R.map(normalizeCellsForClipboard)
 )
 

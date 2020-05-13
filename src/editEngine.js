@@ -24,7 +24,7 @@ export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
   let finalEdit = editInfo
   for (let i = 0; i < rows.length; i++) {
     if (rows[i]) {
-      finalEdit = removeRow({ editInfo: finalEdit, row: rows[i] }, false)
+      finalEdit = removeRow({ editInfo: finalEdit, row: rows[i] }, true)
     }
   }
   return { ...finalEdit, history: [...history, finalEdit] }
@@ -58,8 +58,15 @@ export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, 
   }
 }
 
-export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) =>
-  batchUpdateRow({ editInfo, updates: rows.map(editedRow => ({ editedRow })) })
+export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) => {
+  const { added, history, ...rest } = editInfo
+  return {
+    added: [...added, ...rows],
+    // dirtyMap: immutableSet(editedRow, undefined)(dirtyMap),
+    history: [editInfo, ...history],
+    ...rest,
+  }
+}
 
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })
@@ -70,7 +77,7 @@ export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates }
   for (let i = 0; i < updates.length; i++) {
     if (updates[i]) {
       const { currentRow, editedRow } = updates[i]
-      finalEdit = updateRow({ editInfo: finalEdit, currentRow, editedRow }, false)
+      finalEdit = updateRow({ editInfo: finalEdit, currentRow, editedRow }, true)
     }
   }
   return { ...finalEdit, history: [...history, finalEdit] }
