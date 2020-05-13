@@ -20,12 +20,14 @@ export const numCol = (
   display: display || ident,
   type: 'num',
   displayFormat,
+  isValid: ({ value }) => !isNaN(value),
   ...defaultProps,
   ...rest,
 })
 
 export const intCol = props => ({
   ...numCol(props),
+  isValid: ({ value }) => Number.isInteger(value),
   displayFormat: '0',
 })
 
@@ -75,6 +77,7 @@ const dateProps = ({ /* ident, */ dataFormat, displayFormat }) => ({
   },
   dataFormat,
   displayFormat,
+  isValid: ({ value }) => moment(value, dataFormat).isValid(),
 })
 
 export const dateCol = ({
