@@ -21,7 +21,6 @@ const immutableSet = (key, value) =>
 
 export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
   const { added, updated, dirtyMap, updatedMap, removed, history, ...rest } = editInfo
-  let finalEdit = editInfo
   const rowsToRemoveFromAdded = []
   const rowsToRemoveFromUpdated = []
   const rowsToAddInRemoved = []
@@ -46,7 +45,6 @@ export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
           rowsToAddInRemoved.push(currentRow)
         }
       }
-      finalEdit = removeRow({ editInfo: finalEdit, currentRow: rows[i] }, true)
     }
   }
   return {
