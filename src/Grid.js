@@ -851,7 +851,7 @@ class Grid extends React.PureComponent {
     scrollY,
   })
 
-  getCellProps = ({ key, rowIndex, columnIndex, header, data, rowData, rowHeight, ...rest }) => {
+  getCellProps = ({ key, rowIndex, columnIndex, header, data, rowHeight, ...rest }) => {
     const { selectionType, hoverType } = this.props
     return {
       [ROW_INDEX_ATTRIBUTE]: rowIndex,
@@ -871,6 +871,15 @@ class Grid extends React.PureComponent {
         hoverType === 'cell'
           ? this.state.hoveredRow === rowIndex && this.state.hoveredColumn === columnIndex
           : this.state.hoveredRow === rowIndex,
+      invalid:
+        header.invalidate &&
+        header.invalidate({
+          header,
+          rowData: data[rowIndex],
+          value: data[rowIndex][header.ident],
+          rowIndex,
+          data,
+        }),
       data,
       rowIndex,
       columnIndex,
@@ -895,6 +904,7 @@ class Grid extends React.PureComponent {
       hoverSelectionBackgroundColor: header.hoverSelectionBackgroundColor,
       hoverBackgroundColor: header.hoverBackgroundColor,
       selectionBackgroundColor: header.selectionBackgroundColor,
+      validationErrorBackgroundColor: header.validationErrorBackgroundColor,
       hoverSelectionColor: header.hoverSelectionColor,
       hoverColor: header.hoverColor,
       selectionColor: header.selectionColor,

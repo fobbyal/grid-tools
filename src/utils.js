@@ -62,7 +62,9 @@ export const formatData = ({ header, value, rowData }) => {
     : R.isNil(value)
     ? ''
     : type === 'num' && displayFormat
-    ? numeral(value).format(displayFormat)
+    ? isNaN(value)
+      ? value
+      : numeral(value).format(displayFormat)
     : type === 'date-time' && displayFormat
     ? moment(value, dataFormat).format(displayFormat)
     : value + ''
