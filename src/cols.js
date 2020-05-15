@@ -10,6 +10,14 @@ const defaultProps = {
   showInRowEditor: true,
 }
 
+export const numberValidator = ({ value }) => value && isNaN(value) && 'Invalid Number'
+
+export const intValidator = ({ value }) =>
+  value && (isNaN(value) || !Number.isInteger(+value)) && 'Invalid Integer'
+
+export const dateValidator = ({ value, header }) =>
+  value && !moment(value, header.dataFormat).isValid() && 'Invalid Date'
+
 // numearls display is here
 export const numCol = (
   { ident, display, displayFormat = '0.00', ...rest } = {
@@ -20,15 +28,14 @@ export const numCol = (
   display: display || ident,
   type: 'num',
   displayFormat,
-  invalidate: ({ value }) => value && isNaN(value) && 'Invalid Number',
+  invalidate: numberValidator,
   ...defaultProps,
   ...rest,
 })
 
 export const intCol = props => ({
   ...numCol(props),
-  invalidate: ({ value }) =>
-    value && (isNaN(value) || !Number.isInteger(+value)) && 'Invalid Integer',
+  invalidate: intValidator,
   displayFormat: '0',
 })
 
@@ -78,7 +85,7 @@ const dateProps = ({ /* ident, */ dataFormat, displayFormat }) => ({
   },
   dataFormat,
   displayFormat,
-  invalidate: ({ value }) => value && !moment(value, dataFormat).isValid() && 'Invalid Date',
+  invalidate: dateValidator,
 })
 
 export const dateCol = ({

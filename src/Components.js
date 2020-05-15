@@ -24,7 +24,7 @@ const cellBgColorOf = props => {
   const hoverSelectionBackgroundColor = props.hoverSelectionBackgroundColor || '#333'
   const hoverBackgroundColor = props.hoverBackgroundColor || '#ddd'
   const selectionBackgroundColor = props.selectionBackgroundColor || '#666'
-  const validationErrorBackgroundColor = props.errorBackgroundColor || '#ff0033'
+  const validationErrorBackgroundColor = props.errorBackgroundColor || '#ff726f'
 
   if (props.invalid) {
     return validationErrorBackgroundColor
