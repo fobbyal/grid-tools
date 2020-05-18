@@ -5,6 +5,7 @@ import {
   SortIndicator,
   inputCellEditRender,
   dropdownEditRender,
+  EllipsisCell,
 } from '../Components'
 import R from 'ramda'
 import pureComponent from '../AdvancedPureComponent'
@@ -17,6 +18,7 @@ import GridToolsContext from '../context'
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;
 `
+
 export const ColHeaderBase = BasicColHeader.extend`
   border-bottom: 1px solid #ccc;
 `
@@ -24,6 +26,8 @@ export const ColHeaderBase = BasicColHeader.extend`
 const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
 export const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
+
+export const OptimizedEllipsisCell = pureComponent(EllipsisCell, flattenCellProps)
 
 const ColHeader = ({ header, sortOrder, width, ...rest }) => {
   const gridContext = React.useContext(GridToolsContext)
@@ -103,6 +107,17 @@ export const defaultCellRender = ({
       cellProps.editRender || cellProps.header.choices ? dropdownEditRender : inputCellEditRender
 
     return <CellEditContainer {...cellProps} render={computedEditRender} />
+  }
+
+  if (cellProps.header.ellipsis) {
+    return (
+      <OptimizedEllipsisCell {...R.omit(['data'], cellProps)}>
+        {extractAndFormatData({
+          rowData: data[rowIndex],
+          header: headers[columnIndex],
+        })}
+      </OptimizedEllipsisCell>
+    )
   }
 
   // if (cellProps.style.position == null) console.log('no position')

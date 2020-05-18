@@ -20,14 +20,42 @@ const immutableSet = (key, value) =>
   })
 
 export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
-  const { history } = editInfo
-  let finalEdit = editInfo
+  const { added, updated, dirtyMap, updatedMap, removed, history, ...rest } = editInfo
+  const rowsToRemoveFromAdded = []
+  const rowsToRemoveFromUpdated = []
+  const rowsToAddInRemoved = []
+
+  let modifiedDirtyMap = dirtyMap
+  let modifiedUpdatedMap = updatedMap
   for (let i = 0; i < rows.length; i++) {
-    if (rows[i]) {
-      finalEdit = removeRow({ editInfo: finalEdit, row: rows }, false)
+    const currentRow = rows[i]
+    if (currentRow) {
+      const isAdded = added.includes(currentRow)
+      if (isAdded) {
+        rowsToRemoveFromAdded.push(currentRow)
+      } else {
+        const originalRow = dirtyMap.get(currentRow)
+        const isUpdated = dirtyMap.has(currentRow)
+        if (isUpdated) {
+          rowsToRemoveFromUpdated.push(currentRow)
+          rowsToAddInRemoved.push(originalRow)
+          modifiedDirtyMap.delete(currentRow)
+          modifiedUpdatedMap.delete(originalRow)
+        } else {
+          rowsToAddInRemoved.push(currentRow)
+        }
+      }
     }
   }
-  return { ...finalEdit, history: [...history, finalEdit] }
+  return {
+    removed: [...removed, ...rowsToAddInRemoved],
+    added: added.filter(row => !rowsToRemoveFromAdded.includes(row)),
+    updated: updated.filter(row => !rowsToRemoveFromUpdated.includes(row)),
+    dirtyMap: modifiedDirtyMap,
+    updatedMap: modifiedUpdatedMap,
+    history: [editInfo, ...history],
+    ...rest,
+  }
 }
 
 export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, ignoreHistory) => {
@@ -53,27 +81,68 @@ export const removeRow = ({ editInfo = generateInitialEditInfo(), currentRow }, 
           return m
         })(updatedMap)
       : updatedMap,
-    history: ignoreHistory ? undefined : [...history, editInfo],
+    history: ignoreHistory ? undefined : [editInfo, ...history],
     ...rest,
   }
 }
 
-export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) =>
-  batchUpdateRow({ editInfo, updates: rows.map(editedRow => ({ editedRow })) })
+export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) => {
+  const { added, history, ...rest } = editInfo
+  return {
+    added: [...added, ...rows],
+    // dirtyMap: immutableSet(editedRow, undefined)(dirtyMap),
+    history: [editInfo, ...history],
+    ...rest,
+  }
+}
 
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })
 
-export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates }) => {
-  const { history } = editInfo
-  let finalEdit = editInfo
+export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates = [] }) => {
+  const { added, dirtyMap, updatedMap, updated, history, ...rest } = editInfo
+  const rowsToRemoveFromAdded = []
+  const rowsToAddInAdded = []
+  const rowsToRemoveFromUpdated = []
+  const rowsToAddInUpdated = []
+
+  let modifiedDirtyMap = dirtyMap
+  let modifiedUpdatedMap = updatedMap
   for (let i = 0; i < updates.length; i++) {
     if (updates[i]) {
       const { currentRow, editedRow } = updates[i]
-      finalEdit = updateRow({ editInfo: finalEdit, currentRow, editedRow }, false)
+      if ((currentRow === undefined || R.isEmpty(currentRow)) && !R.isNil(editedRow)) {
+        rowsToAddInAdded.push(editedRow)
+      } else if (added.includes(currentRow)) {
+        rowsToRemoveFromAdded.push(currentRow)
+        rowsToAddInAdded.push(editedRow)
+      } else {
+        if (dirtyMap.has(currentRow)) {
+          const originalRow = dirtyMap.get(currentRow)
+          rowsToRemoveFromUpdated.push(currentRow)
+          modifiedDirtyMap.delete(currentRow)
+          modifiedDirtyMap.set(editedRow, originalRow)
+          modifiedUpdatedMap.set(originalRow, editedRow)
+        } else {
+          modifiedDirtyMap.set(editedRow, currentRow)
+          modifiedUpdatedMap.set(currentRow, editedRow)
+        }
+        rowsToAddInUpdated.push(editedRow)
+      }
     }
   }
-  return { ...finalEdit, history: [...history, finalEdit] }
+
+  return {
+    added: [...added.filter(row => !rowsToRemoveFromAdded.includes(row)), ...rowsToAddInAdded],
+    updated: [
+      ...updated.filter(row => !rowsToRemoveFromUpdated.includes(row)),
+      ...rowsToAddInUpdated,
+    ],
+    dirtyMap: modifiedDirtyMap,
+    updatedMap: modifiedUpdatedMap,
+    history: [editInfo, ...history],
+    ...rest,
+  }
 }
 
 export const updateRow = (

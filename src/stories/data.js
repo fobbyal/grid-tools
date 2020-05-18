@@ -14,7 +14,7 @@ export const randomRow = R.compose(
     switch (type) {
       case 'str':
       case 'sel':
-        return [ident, chance.word()]
+        return [ident, chance.word() + ' ' + chance.word() + ' ' + chance.word()]
       case 'num':
         return [ident, chance.floating({ fixed: 2, min: 0, max: 50000 })]
       case 'bool':
@@ -57,7 +57,7 @@ export const headers = [
   dateCol({ ident: 'transDate', display: 'Trans-Date', width:120, isKey:true, }),
   strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataFormatter:unitDataFormatter,choices:unitChoices }),
   intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),
-  strCol({ ident: 'fixedGen', display: 'Fixed Gen' }),
+  strCol({ ident: 'fixedGen', display: 'Fixed Gen' , ellipsis : true }),
   numCol({ ident: 'emerMinOvr', display: 'Emer Min', width:120, alignment:'right', displayFormat: null }),
   numCol({ ident: 'ecoMinOvr', display: 'Eco Min', }),
   numCol({ ident: 'ecoMaxOvr', display: 'Eco Max', }),
@@ -67,7 +67,7 @@ export const headers = [
   numCol({ ident: 'regMinOvr', display: 'Reg Min', }),
   numCol({ ident: 'regMaxOvr', display: 'Reg Max', }),
   strCol({ ident: 'regAStatusOvr', display: 'Reg A Status', }),
-  strCol({ ident: 'spilling', display: 'Spilling', }),
+  strCol({ ident: 'spilling', display: 'Spilling', ellipsis:true }),
   pctCol({ ident: 'reducedRampRatePct', display: 'Reduce Ramp Percent', width:220, }),
   dollarCol({ ident: 'regAPrice', display: 'Reg A Price', width:120, }),
   dollarCol({ ident: 'regACost', display: 'Reg A Cost', width:120, }),

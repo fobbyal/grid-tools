@@ -56,7 +56,7 @@ const customizedCellRender = params => {
   return defaultVirtualizedCellRender(params)
 }
 
-const data = createData(80)
+const data = createData(200)
 storiesOf('Virtualized grid', module)
   .add('Basic', () => <Grid data={data} headers={headers} render={virtualizedGridRenderer()} />)
   .add('Fixed Col and Free edit', () => (

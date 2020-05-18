@@ -7,6 +7,8 @@ import { Provider } from './VirtualizedContext'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
 import GridToolsContext from '../context'
 
+const totalColWidth = cols => cols.map(c => c.width).reduce((c1, c2) => c1 + c2)
+
 const colWidthOf = cols => ({ index }) => cols[index].width
 
 const handleSelectionScroll = ({ contentGrid, x2, y2, previousPosition, fixedHeaderWidth }) => {
@@ -58,6 +60,8 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     getClipboardHelperProps,
     // getSelectionInfo,
   } = gridRenderProps
+
+  const previousColumnWidth = useRef(totalColWidth(headers))
 
   const {
     style,
@@ -127,6 +131,18 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     positionRef.current = { x2, y2 }
   }, [contentGridRef.current, fixedHeaderWidth, fixedColCount, x2, y2])
 
+  useEffect(() => {
+    const currentTotalColumnWidth = totalColWidth(headers)
+    if (previousColumnWidth.current !== currentTotalColumnWidth) {
+      previousColumnWidth.current = currentTotalColumnWidth
+      contentGridRef.current && contentGridRef.current.recomputeGridSize()
+      rowHeaderGridRef.current && rowHeaderGridRef.current.recomputeGridSize()
+      numOfFixedCols > 0 &&
+        columnHeaderGridRef.current &&
+        columnHeaderGridRef.current.recomputeGridSize()
+    }
+  }, [headers])
+
   /** scroll sync listener **/
   const onMainGridScroll = useCallback(scrollInfo => {
     const { scrollLeft, scrollTop } = scrollInfo
@@ -158,7 +174,10 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
           }}
         >
           <Grid
-            style={{ overflow: 'hidden' }}
+            style={{
+              overflowX: 'hidden',
+              overflowY: 'hidden',
+            }}
             cellRenderer={headerRender}
             columnWidth={colWidthOf(headers)}
             columnCount={headers.length}
@@ -250,7 +269,6 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
           />
         )}
       </div>
-      )
     </Provider>
   )
 }

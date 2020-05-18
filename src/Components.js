@@ -24,6 +24,11 @@ const cellBgColorOf = props => {
   const hoverSelectionBackgroundColor = props.hoverSelectionBackgroundColor || '#333'
   const hoverBackgroundColor = props.hoverBackgroundColor || '#ddd'
   const selectionBackgroundColor = props.selectionBackgroundColor || '#666'
+  const validationErrorBackgroundColor = props.errorBackgroundColor || '#ff726f'
+
+  if (props.invalidMessage) {
+    return validationErrorBackgroundColor
+  }
 
   return props.isHovered && props.isSelected
     ? hoverSelectionBackgroundColor
@@ -47,6 +52,23 @@ export const BasicCell = styled.div`
   ${props =>`color: ${cellColorOf(props)};` }
   ${props =>`background-color:${cellBgColorOf(props)};` }
   ${props => `font-weight: ${ props.fontWeight ||'normal' };` }
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+`
+
+export const EllipsisCell = styled.div`
+  border-bottom: 1px solid #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 1px solid #ccc;
+  user-select: none;
+  cursor: default;
+  ${props => `text-align: ${props.alignment || 'center'}`};
+  ${props => `font-size: ${props.fontSize || 'unset'};`}
+  ${props => `color: ${cellColorOf(props)};`}
+  ${props => `background-color:${cellBgColorOf(props)};`}
+  ${props => `font-weight: ${props.fontWeight || 'normal'};`}
   padding-left: 0.2em;
   padding-right: 0.2em;
 `
