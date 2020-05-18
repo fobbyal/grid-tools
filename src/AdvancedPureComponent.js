@@ -10,7 +10,7 @@ const createAdvancedPureComponent = (Component, toFlattenProps = _ => _) => {
     render() {
       const { children, ...props } = this.props
       return (
-        <Component title={props.invalid || children} {...props}>
+        <Component title={props.invalidMessage || children} {...props}>
           {children}
         </Component>
       )

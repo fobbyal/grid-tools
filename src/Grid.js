@@ -871,9 +871,9 @@ class Grid extends React.PureComponent {
         hoverType === 'cell'
           ? this.state.hoveredRow === rowIndex && this.state.hoveredColumn === columnIndex
           : this.state.hoveredRow === rowIndex,
-      invalid:
-        header.invalidate &&
-        header.invalidate({
+      invalidMessage:
+        header.setInvalidMessage &&
+        header.setInvalidMessage({
           header,
           rowData: data[rowIndex],
           value: data[rowIndex][header.ident],

@@ -28,14 +28,14 @@ export const numCol = (
   display: display || ident,
   type: 'num',
   displayFormat,
-  invalidate: numberValidator,
+  setInvalidMessage: numberValidator,
   ...defaultProps,
   ...rest,
 })
 
 export const intCol = props => ({
   ...numCol(props),
-  invalidate: intValidator,
+  setInvalidMessage: intValidator,
   displayFormat: '0',
 })
 
@@ -85,7 +85,7 @@ const dateProps = ({ /* ident, */ dataFormat, displayFormat }) => ({
   },
   dataFormat,
   displayFormat,
-  invalidate: dateValidator,
+  setInvalidMessage: dateValidator,
 })
 
 export const dateCol = ({

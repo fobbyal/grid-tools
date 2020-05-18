@@ -49,8 +49,8 @@ export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
   }
   return {
     removed: [...removed, ...rowsToAddInRemoved],
-    added: added.filter(row => rowsToRemoveFromAdded.includes(row)),
-    updated: updated.filter(row => rowsToRemoveFromUpdated.includes(row)),
+    added: added.filter(row => !rowsToRemoveFromAdded.includes(row)),
+    updated: updated.filter(row => !rowsToRemoveFromUpdated.includes(row)),
     dirtyMap: modifiedDirtyMap,
     updatedMap: modifiedUpdatedMap,
     history: [editInfo, ...history],
@@ -99,7 +99,7 @@ export const batchAddRow = ({ editInfo = generateInitialEditInfo(), rows }) => {
 export const addRow = ({ editInfo = generateInitialEditInfo(), editedRow }) =>
   updateRow({ editInfo, editedRow })
 
-export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates }) => {
+export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates = [] }) => {
   const { added, dirtyMap, updatedMap, updated, history, ...rest } = editInfo
   const rowsToRemoveFromAdded = []
   const rowsToAddInAdded = []
@@ -111,21 +111,23 @@ export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates }
   for (let i = 0; i < updates.length; i++) {
     if (updates[i]) {
       const { currentRow, editedRow } = updates[i]
-      if (added.includes(currentRow)) {
+      if ((currentRow === undefined || R.isEmpty(currentRow)) && !R.isNil(editedRow)) {
+        rowsToAddInAdded.push(editedRow)
+      } else if (added.includes(currentRow)) {
         rowsToRemoveFromAdded.push(currentRow)
         rowsToAddInAdded.push(editedRow)
-        // editing data that has been editted before
       } else {
         if (dirtyMap.has(currentRow)) {
           const originalRow = dirtyMap.get(currentRow)
           rowsToRemoveFromUpdated.push(currentRow)
           modifiedDirtyMap.delete(currentRow)
           modifiedDirtyMap.set(editedRow, originalRow)
+          modifiedUpdatedMap.set(originalRow, editedRow)
         } else {
           modifiedDirtyMap.set(editedRow, currentRow)
+          modifiedUpdatedMap.set(currentRow, editedRow)
         }
         rowsToAddInUpdated.push(editedRow)
-        modifiedUpdatedMap.set(currentRow, editedRow)
       }
     }
   }

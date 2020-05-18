@@ -53,7 +53,7 @@ class CellEditContainer extends React.Component {
 
     const rowData = data[rowIndex]
 
-    // if (header.invalidate && header.invalidate({ header, rowData, value, rowIndex, data })) {
+    // if (header.setInvalidMessage && header.setInvalidMessage({ header, rowData, value, rowIndex, data })) {
     //   this.cancelEdit()
     //   return
     // }

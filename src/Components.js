@@ -26,7 +26,7 @@ const cellBgColorOf = props => {
   const selectionBackgroundColor = props.selectionBackgroundColor || '#666'
   const validationErrorBackgroundColor = props.errorBackgroundColor || '#ff726f'
 
-  if (props.invalid) {
+  if (props.invalidMessage) {
     return validationErrorBackgroundColor
   }
 
