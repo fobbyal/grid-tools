@@ -23,24 +23,42 @@ export const isRowSelected = (rowIndex, selection) => {
   return rowIndex <= y2 && rowIndex >= y1
 }
 
-export const left = (selection, expand) => {
+export const left = (selection, expand, colCount, rowCount) => {
   const { x1, y1, x2, y2 } = selection
 
   if (!expand) {
-    const x = Math.max(x1 - 1, 0)
-    return { x1: x, x2: x, y1, y2: y1 }
+    let x = x1 - 1
+    let y = y1
+    if (x < 0) {
+      x = colCount - 1
+      if (y > 0) {
+        y--
+      } else {
+        y = rowCount - 1
+      }
+    }
+    return { x1: x, x2: x, y1: y, y2: y }
   }
   const x = Math.max(x2 - 1, 0)
 
   return { x1, x2: x, y1, y2 }
 }
 
-export const right = (selection, expand, colCount) => {
+export const right = (selection, expand, colCount, rowCount) => {
   const { x1, y1, x2, y2 } = selection
 
   if (!expand) {
-    const x = Math.min(x1 + 1, colCount - 1)
-    return { x1: x, x2: x, y1, y2: y1 }
+    let x = x1 + 1
+    let y = y1
+    if (x > colCount - 1) {
+      x = 0
+      if (y < rowCount - 1) {
+        y++
+      } else {
+        y = 0
+      }
+    }
+    return { x1: x, x2: x, y1: y, y2: y }
   }
   const x = Math.min(x2 + 1, colCount - 1)
 
@@ -68,12 +86,19 @@ export const down = (selection, expand, rowCount) => {
   return { x1, x2, y1, y2: y }
 }
 
-export const selector = { left, right, up, down }
+export const selectAll = (colCount, rowCount) => ({
+  x1: 0,
+  x2: colCount - 1,
+  y1: 0,
+  y2: rowCount - 1,
+})
+
+export const selector = { left, right, up, down, selectAll }
 
 export const getSelectedData = ({ data, headers }, { x1, y1, x2, y2 }) => {
   const rows = R.range(y1, y2 + 1)
   const cols = R.range(x1, x2 + 1)
-  // console.log('rows', rows, 'cols', cols, 'data ', data, ' headers ', headers)
+  // console.log('rows', rows, 'cols', cols, 'data ', data, ' headers ', headers, { x1, y1, x2, y2 })
 
   const getData = rowIdx => colIndex =>
     extractData({ rowData: data[rowIdx], header: headers[colIndex] })
