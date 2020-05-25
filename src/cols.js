@@ -10,6 +10,18 @@ const defaultProps = {
   showInRowEditor: true,
 }
 
+export const multiValidator = ({ validators, exitOnFirstInvalid = false }) => props => {
+  const errors = []
+  for (const validator of validators) {
+    const errMessage = validator(props)
+    if (errMessage) {
+      errors.push(errMessage)
+      if (exitOnFirstInvalid) break
+    }
+  }
+  if (errors.length > 0) return errors.reduce((e1, e2) => `${e1}\n${e2}`)
+}
+
 export const numberValidator = ({ value }) => value && isNaN(value) && 'Invalid Number'
 
 export const intValidator = ({ value }) =>

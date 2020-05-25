@@ -1,5 +1,6 @@
 /* eslint-env jest */
 import * as editEngine from './editEngine'
+import { numCol, numberValidator, multiValidator } from './cols'
 
 test('initial edit info should not be dirty', () => {
   expect(editEngine.isDirty(editEngine.generateInitialEditInfo())).toBe(false)
@@ -244,4 +245,59 @@ test('should update and remove row with batchOp properly', () => {
   const result3 = editEngine.applyEdits({ data: [row1], editInfo: deleted2 })
   expect(result3).toContain(rowAddedUpdate)
   expect(result3.length).toBe(1)
+})
+
+test('should validate data properly', () => {
+  const editInfo = editEngine.generateInitialEditInfo()
+
+  const headers = [
+    numCol({
+      ident: 'id',
+      display: 'ID',
+      setInvalidMessage: props =>
+        multiValidator({
+          validators: [numberValidator, ({ value }) => value > 50 && 'Invalid Data'],
+        })(props),
+    }),
+  ]
+
+  const addedRow1 = {
+    id: 'abcd',
+  }
+  const addedInfo1 = editEngine.addRow({
+    editInfo,
+    editedRow: addedRow1,
+  })
+
+  const errors1 = editEngine.validateData({ orignalData: [], editInfo: addedInfo1, headers })
+  expect(errors1.length).toBe(1)
+
+  const addedRow2 = {
+    id: 34,
+  }
+  const addedInfo2 = editEngine.addRow({
+    editInfo,
+    editedRow: addedRow2,
+  })
+
+  const errors2 = editEngine.validateData({ orignalData: [], editInfo: addedInfo2, headers })
+  expect(errors2.length).toBe(0)
+
+  const headers2 = [
+    numCol({
+      ident: 'id',
+      display: 'ID',
+      setInvalidMessage: props =>
+        multiValidator({
+          validators: [numberValidator, ({ value }) => value < 50 && 'Invalid Data'],
+        })(props),
+    }),
+  ]
+
+  const errors3 = editEngine.validateData({
+    orignalData: [],
+    editInfo: addedInfo2,
+    headers: headers2,
+  })
+  expect(errors3.length).toBe(1)
 })
