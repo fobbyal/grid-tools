@@ -205,6 +205,29 @@ export const undo = (editInfo = generateInitialEditInfo()) =>
 export const isDirty = (editInfo = generateInitialEditInfo()) =>
   editInfo.added.length > 0 || editInfo.removed.length > 0 || editInfo.updated.length > 0
 
+export const validateData = ({ orignalData, editInfo = generateInitialEditInfo(), headers }) => {
+  const editedData = applyEdits({ data: orignalData, editInfo })
+  return validateEditedData({ editedData, headers })
+}
+
+export const validateEditedData = ({ editedData, headers }) => {
+  const errors = []
+  const headersWithValidation = headers.filter(h => h.setInvalidMessage)
+  editedData.forEach((rowData, rowIndex) => {
+    for (const header of headersWithValidation) {
+      const errMessage = header.setInvalidMessage({
+        header,
+        rowData,
+        value: rowData[header.ident],
+        rowIndex: rowIndex,
+        data: editedData,
+      })
+      if (errMessage) errors.push(errMessage)
+    }
+  })
+  return errors
+}
+
 export const apply = editInfo =>
   R.compose(
     R.filter(row => !editInfo.removed.includes(row)),

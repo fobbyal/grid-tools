@@ -25,21 +25,19 @@ const customizedCellRender = params => {
     ...rest,
   })
 
-  // const cellData = extractAndFormatData({
-  //   rowData: data[rowIndex],
-  //   header: headers[columnIndex],
-  // })
+  const cellData = extractAndFormatData({
+    rowData: data[rowIndex],
+    header: headers[columnIndex],
+  })
 
   // console.log('cell data is',cellData)
   // eslint-disable-next-line eqeqeq
   if (columnIndex == 1 && rowIndex == 1) {
     return (
-      <VirtualizedCell {...R.omit(['data'], cellProps)}>
-        {extractAndFormatData({
-          rowData: data[rowIndex],
-          header: headers[columnIndex],
-        })}
+      <VirtualizedCell {...R.omit(['data'], cellProps)} title={cellData}>
+        {cellData}
         <div
+          title="purple marker"
           style={{
             position: 'absolute',
             top: '0px',

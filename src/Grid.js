@@ -537,13 +537,16 @@ class Grid extends React.PureComponent {
 
   selectRight = expand => {
     this.setState(
-      selector.right(this.state, expand, this.props.headers.length),
+      selector.right(this.state, expand, this.props.headers.length, this.state.view.length),
       this.selectionChanged
     )
   }
 
   selectLeft = expand => {
-    this.setState(selector.left(this.state, expand), this.selectionChanged)
+    this.setState(
+      selector.left(this.state, expand, this.props.headers.length, this.state.view.length),
+      this.selectionChanged
+    )
   }
 
   selectTop = expand => {
@@ -552,6 +555,13 @@ class Grid extends React.PureComponent {
 
   selectBottom = expand => {
     this.setState(selector.down(this.state, expand, this.state.view.length), this.selectionChanged)
+  }
+
+  selectAll = () => {
+    this.setState(
+      selector.selectAll(this.props.headers.length, this.state.view.length),
+      this.selectionChanged
+    )
   }
 
   startSelectionState(rowIndex, columnIndex) {
@@ -749,9 +759,10 @@ class Grid extends React.PureComponent {
       if (e.keyCode === 39) this.selectRight(e.shiftKey)
       if (e.keyCode === 38) this.selectTop(e.shiftKey)
       if (e.keyCode === 40) this.selectBottom(e.shiftKey)
+      if (e.ctrlKey && e.keyCode === 65) this.selectAll()
       if (e.keyCode === 9) {
         e.preventDefault()
-        this.selectRight()
+        e.shiftKey ? this.selectLeft() : this.selectRight()
       }
       if (e.keyCode === 46) {
         e.preventDefault()

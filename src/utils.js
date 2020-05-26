@@ -42,32 +42,44 @@ export const eventBroadcaster = listeners => e =>
 export const extractData = ({ header, rowData = [], dataFormat }) => {
   const { dataGetter, type, ident } = header
   const rawData = rowData[ident]
-  return dataGetter
-    ? dataGetter({ header, rowData })
-    : type === 'date-time'
-    ? R.isNil(rowData)
+
+  if (dataGetter) {
+    return dataGetter({ header, rowData })
+  }
+
+  if (type === 'date-time') {
+    return R.isNil(rowData)
       ? undefined
       : moment.isDate(rowData)
       ? moment(rawData).format(dataFormat)
       : moment.isMoment(rawData)
       ? rawData.formatData(dataFormat)
       : rawData
-    : rawData
+  }
+
+  return rawData
 }
 
 export const formatData = ({ header, value, rowData }) => {
   const { type, dataFormat, displayFormat, dataFormatter } = header
-  return dataFormatter
-    ? dataFormatter({ header, value, rowData })
-    : R.isNil(value)
-    ? ''
-    : type === 'num' && displayFormat
-    ? isNaN(value)
-      ? value
-      : numeral(value).format(displayFormat)
-    : type === 'date-time' && displayFormat
-    ? moment(value, dataFormat).format(displayFormat)
-    : value + ''
+
+  if (dataFormatter) {
+    return dataFormatter({ header, value, rowData })
+  }
+
+  if (R.isNil(value)) {
+    return ''
+  }
+
+  if (type === 'num' && displayFormat) {
+    return isNaN(parseInt(value)) ? value : numeral(value).format(displayFormat)
+  }
+
+  if (type === 'date-time' && displayFormat) {
+    return moment(value, dataFormat).format(displayFormat)
+  }
+
+  return value + ''
 }
 
 export const extractAndFormatData = ({ header, rowData }) =>
