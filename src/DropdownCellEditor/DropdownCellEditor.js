@@ -162,8 +162,12 @@ class DropDownCellEditor extends React.Component {
 
   state = { showSelection: true, justOpened: true }
 
-  inputValueChanged = _value => {
+  inputValueChanged = value => {
     // console.log('value changed to ', value)
+    const { acceptRawText, valueChanged } = this.props
+    if (acceptRawText) {
+      valueChanged(value)
+    }
     this.setState({ justOpened: false })
   }
 
@@ -210,11 +214,11 @@ class DropDownCellEditor extends React.Component {
   )
 
   render() {
-    const { choices, value, onChange, virtualized, zIndex } = this.props
+    const { choices, value, onChange, virtualized, zIndex, acceptRawText } = this.props
     // eslint-disable-next-line standard/object-curly-even-spacing
     const { /* showSelection, */ justOpened } = this.state
     const renderList = virtualized ? renderVirtualizedList : renderBasicList
-    const renderSelector = virtualized ? this.renderInput : this.renderComboBox
+    const renderSelector = virtualized || acceptRawText ? this.renderInput : this.renderComboBox
 
     const selectedItem = R.find(c => value === c.value, choices)
     const hilightedIndex = R.findIndex(c => value === c.value, choices)
