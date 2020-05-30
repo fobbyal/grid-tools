@@ -25,8 +25,8 @@ export const batchRemove = ({ editInfo = generateInitialEditInfo(), rows }) => {
   const rowsToRemoveFromUpdated = []
   const rowsToAddInRemoved = []
 
-  let modifiedDirtyMap = dirtyMap
-  let modifiedUpdatedMap = updatedMap
+  let modifiedDirtyMap = new Map(dirtyMap)
+  let modifiedUpdatedMap = new Map(updatedMap)
   for (let i = 0; i < rows.length; i++) {
     const currentRow = rows[i]
     if (currentRow) {
@@ -106,8 +106,8 @@ export const batchUpdateRow = ({ editInfo = generateInitialEditInfo(), updates =
   const rowsToRemoveFromUpdated = []
   const rowsToAddInUpdated = []
 
-  let modifiedDirtyMap = dirtyMap
-  let modifiedUpdatedMap = updatedMap
+  let modifiedDirtyMap = new Map(dirtyMap)
+  let modifiedUpdatedMap = new Map(updatedMap)
   for (let i = 0; i < updates.length; i++) {
     if (updates[i]) {
       const { currentRow, editedRow } = updates[i]
