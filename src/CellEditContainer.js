@@ -251,6 +251,7 @@ class CellEditContainer extends React.Component {
 
   getDropdownProps = ({ refKey = 'ref' }) => {
     const choices = this.props.header && this.props.header.choices
+    const acceptRawText = (this.props.header && this.props.header.acceptRawText) || false
     const virtualized = choices && choices.length > 10
     const onKeyDown = virtualized ? this.dropdownInputKeyDown : this.dropdownKeyDown
     return {
@@ -261,6 +262,8 @@ class CellEditContainer extends React.Component {
       onKeyDown,
       choices,
       virtualized,
+      acceptRawText,
+      valueChanged: this.valueChanged,
       'data-testid': 'cell-editing-element',
     }
   }

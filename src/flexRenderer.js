@@ -161,7 +161,15 @@ export const defaultCellRenderer = ({
   // hoverColor={hoverColor}
   // selectionColor={selectionColor}
   // color={color}
-  return <PureCell title={value + ''} width={width} height={height} display={display} {...rest} />
+  return (
+    <PureCell
+      title={rest.invalidMessage || value + ''}
+      width={width}
+      height={height}
+      display={display}
+      {...rest}
+    />
+  )
 }
 
 const defaultPagerRenderer = props => <DefaultPager {...props} />
