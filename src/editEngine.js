@@ -7,7 +7,7 @@ export const generateInitialEditInfo = ({ addedFirst } = {}) => ({
   removed: [],
   // originalRow => editedRow
   updatedMap: new Map(),
-  // editedRow => orignalRow
+  // editedRow => originalRow
   dirtyMap: new Map(),
   history: [],
 })

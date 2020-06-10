@@ -753,20 +753,21 @@ class Grid extends React.PureComponent {
         // })
         this.edit(rowIndex, columnIndex)
       }
-    }
-    if (!this.isGridEditing()) {
-      if (e.keyCode === 37) this.selectLeft(e.shiftKey)
-      if (e.keyCode === 39) this.selectRight(e.shiftKey)
-      if (e.keyCode === 38) this.selectTop(e.shiftKey)
-      if (e.keyCode === 40) this.selectBottom(e.shiftKey)
-      if (e.ctrlKey && e.keyCode === 65) this.selectAll()
-      if (e.keyCode === 9) {
-        e.preventDefault()
-        e.shiftKey ? this.selectLeft() : this.selectRight()
-      }
-      if (e.keyCode === 46) {
-        e.preventDefault()
-        this.deleteSelection()
+
+      if (!this.isGridEditing()) {
+        if (e.keyCode === 37) this.selectLeft(e.shiftKey)
+        if (e.keyCode === 39) this.selectRight(e.shiftKey)
+        if (e.keyCode === 38) this.selectTop(e.shiftKey)
+        if (e.keyCode === 40) this.selectBottom(e.shiftKey)
+        if (e.ctrlKey && e.keyCode === 65) this.selectAll()
+        if (e.keyCode === 9) {
+          e.preventDefault()
+          e.shiftKey ? this.selectLeft() : this.selectRight()
+        }
+        if (e.keyCode === 46) {
+          e.preventDefault()
+          this.deleteSelection()
+        }
       }
     }
   }
