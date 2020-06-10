@@ -269,7 +269,7 @@ test('should validate data properly', () => {
     editedRow: addedRow1,
   })
 
-  const errors1 = editEngine.validateData({ orignalData: [], editInfo: addedInfo1, headers })
+  const errors1 = editEngine.validateData({ originalData: [], editInfo: addedInfo1, headers })
   expect(errors1.length).toBe(1)
 
   const addedRow2 = {
@@ -280,7 +280,7 @@ test('should validate data properly', () => {
     editedRow: addedRow2,
   })
 
-  const errors2 = editEngine.validateData({ orignalData: [], editInfo: addedInfo2, headers })
+  const errors2 = editEngine.validateData({ originalData: [], editInfo: addedInfo2, headers })
   expect(errors2.length).toBe(0)
 
   const headers2 = [
@@ -295,7 +295,7 @@ test('should validate data properly', () => {
   ]
 
   const errors3 = editEngine.validateData({
-    orignalData: [],
+    originalData: [],
     editInfo: addedInfo2,
     headers: headers2,
   })

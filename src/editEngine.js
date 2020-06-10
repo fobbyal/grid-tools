@@ -1,12 +1,13 @@
 import R from 'ramda'
 
-export const generateInitialEditInfo = () => ({
+export const generateInitialEditInfo = ({ addedFirst } = {}) => ({
   updated: [],
   added: [],
+  addedFirst,
   removed: [],
   // originalRow => editedRow
   updatedMap: new Map(),
-  // editedRow => orignalRow
+  // editedRow => originalRow
   dirtyMap: new Map(),
   history: [],
 })
@@ -205,8 +206,8 @@ export const undo = (editInfo = generateInitialEditInfo()) =>
 export const isDirty = (editInfo = generateInitialEditInfo()) =>
   editInfo.added.length > 0 || editInfo.removed.length > 0 || editInfo.updated.length > 0
 
-export const validateData = ({ orignalData, editInfo = generateInitialEditInfo(), headers }) => {
-  const editedData = applyEdits({ data: orignalData, editInfo })
+export const validateData = ({ originalData, editInfo = generateInitialEditInfo(), headers }) => {
+  const editedData = applyEdits({ data: originalData, editInfo })
   return validateEditedData({ editedData, headers })
 }
 
@@ -235,4 +236,8 @@ export const apply = editInfo =>
   )
 
 export const applyEdits = ({ data, editInfo }) =>
-  isDirty(editInfo) ? [...apply(editInfo)(data), ...editInfo.added] : data
+  isDirty(editInfo)
+    ? editInfo.addedFirst
+      ? [...editInfo.added, ...apply(editInfo)(data)]
+      : [...apply(editInfo)(data), ...editInfo.added]
+    : data
