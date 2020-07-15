@@ -41,23 +41,23 @@ export const eventBroadcaster = listeners => e =>
 
 export const extractData = ({ header, rowData = [], dataFormat }) => {
   const { dataGetter, type, ident } = header
-  const rawData = rowData[ident]
+  const rawValue = rowData[ident]
 
   if (dataGetter) {
     return dataGetter({ header, rowData })
   }
 
   if (type === 'date-time') {
-    return R.isNil(rowData)
+    return R.isNil(rawValue)
       ? undefined
-      : moment.isDate(rowData)
-      ? moment(rawData).format(dataFormat)
-      : moment.isMoment(rawData)
-      ? rawData.formatData(dataFormat)
-      : rawData
+      : moment.isDate(rawValue)
+      ? moment(rawValue).format(dataFormat)
+      : moment.isMoment(rawValue)
+      ? rawValue.format(dataFormat)
+      : rawValue
   }
 
-  return rawData
+  return rawValue
 }
 
 export const formatData = ({ header, value, rowData }) => {
