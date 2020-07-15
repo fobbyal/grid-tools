@@ -118,7 +118,14 @@ const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
   return 0
 }
 
-const computeSortOptions = (sortOptions, { ident, display }) => {
+const computeSortOptions = (sortOptions, { ident, display }, singleSorted = false) => {
+  if (singleSorted) {
+    const opt = sortOptions[0]
+    return opt != null && opt.ident === ident
+      ? [{ ident: opt.ident, sortOrder: toggleSortOrder(opt.sortOrder) }]
+      : [{ ident, display, sortOrder: 'asc' }]
+  }
+
   if (R.find(opt => opt.ident === ident, sortOptions) !== undefined) {
     return sortOptions
       .map(opt =>
@@ -195,6 +202,13 @@ const sortOrderOf = header => options => {
   )(options)
 }
 
+const sortOrderIndexOf = header => options => {
+  if (R.isNil(options)) return -1
+  return R.findIndex(
+    opt => opt.ident === header.ident && (opt.display == null || opt.display === header.display)
+  )(options)
+}
+
 class Grid extends React.PureComponent {
   /* compond components */
   static SyncedScrollPane = ScrollPane
@@ -207,6 +221,7 @@ class Grid extends React.PureComponent {
     selectionType: PropTypes.oneOf(['row', 'cell']).isRequired,
     hoverType: PropTypes.oneOf(['row', 'cell']).isRequired,
     sortEnabled: PropTypes.bool.isRequired,
+    singleSorted: PropTypes.bool.isRequired,
     isEditable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]).isRequired,
     editMode: PropTypes.oneOf(['row', 'cell']).isRequired,
     /* optional stuff */
@@ -238,6 +253,7 @@ class Grid extends React.PureComponent {
     hoverType: 'row',
     editMode: 'row',
     sortEnabled: true,
+    singleSorted: false,
     isEditable: false,
     showAdd: false,
     addWithSelected: false,
@@ -496,10 +512,12 @@ class Grid extends React.PureComponent {
 
   toggleSort = header => {
     if (this.isSortControlled()) {
-      this.props.onSortOptionsChange(computeSortOptions(this.sortOptions(), header))
+      this.props.onSortOptionsChange(
+        computeSortOptions(this.sortOptions(), header, this.props.singleSorted)
+      )
     } else {
       this.setState(({ sortOptions = [] }) => {
-        const newOptions = computeSortOptions(sortOptions, header)
+        const newOptions = computeSortOptions(sortOptions, header, this.props.singleSorted)
         return {
           sortOptions: newOptions,
           ...this.generateViewProps({ sortOptions: newOptions }),
@@ -888,7 +906,7 @@ class Grid extends React.PureComponent {
         header.setInvalidMessage({
           header,
           rowData: data[rowIndex],
-          value: data[rowIndex][header.ident],
+          value: extractData({ rowData: data[rowIndex], header }),
           rowIndex,
           data,
         }),
@@ -938,7 +956,11 @@ class Grid extends React.PureComponent {
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
     onClick: this.props.sortEnabled ? this.columnHeaderClick : undefined,
-    sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.state.sortOptions) : undefined,
+    sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.sortOptions()) : undefined,
+    sortOrderIndex:
+      this.props.sortEnabled && !this.props.singleSorted
+        ? sortOrderIndexOf(header)(this.sortOptions()) + 1
+        : 0,
     'data-column-index': index,
     ...rest,
   })
