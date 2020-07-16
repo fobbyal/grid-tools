@@ -89,7 +89,7 @@ const compare = ({ aVal, bVal, sortOrder }) => {
   return 0
 }
 
-const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
+export const defaultDataComparator = ({ sortOptions, headers }) => (a, b) => {
   // const headerMap = R.compose(R.fromPairs, R.map(header => [header.ident, header]))(headers)
   // console.log('**$$**$$sorting**$$**$$')
 
@@ -170,7 +170,7 @@ const computeView = ({
       ? filterData(editedData, headers, fuzzyFilter)
       : editedData
 
-  const sortredData =
+  const sortedData =
     R.isNil(sortOptions) || R.isEmpty(sortOptions)
       ? filteredData
       : R.sort(comparator({ sortOptions, headers }), filteredData)
@@ -178,11 +178,11 @@ const computeView = ({
   const normalizedCurrentPage = Math.min(Math.ceil(filteredData.length / rowsPerPage), currentPage)
 
   const pagedData = R.isNil(rowsPerPage)
-    ? sortredData
+    ? sortedData
     : R.compose(
         R.take(rowsPerPage),
         R.drop((normalizedCurrentPage - 1) * rowsPerPage)
-      )(sortredData)
+      )(sortedData)
 
   return {
     view: pagedData,
