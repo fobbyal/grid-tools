@@ -7,7 +7,7 @@ import { Provider } from './VirtualizedContext'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
 import GridToolsContext from '../context'
 
-const totalColWidth = cols => cols.map(c => c.width).reduce((c1, c2) => c1 + c2)
+const totalColWidth = cols => cols.map(c => c.width).reduce((c1, c2) => c1 + c2, 0)
 
 const colWidthOf = cols => ({ index }) => cols[index].width
 

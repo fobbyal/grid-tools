@@ -23,8 +23,9 @@ class CellEditContainer extends React.Component {
     // console.log(this.node.focus)
     if (this.node && this.node.focus) {
       this.node.focus()
-      if (this.node.setSelectionRange) {
-        this.node.setSelectionRange(0, this.node.value.length)
+      if (this.node.select) {
+        this.node.select()
+        // this.node.setSelectionRange(0, this.node.value.length)
       }
     }
   }
