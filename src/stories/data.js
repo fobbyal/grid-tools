@@ -54,7 +54,7 @@ const unitDataFormatter = ({ value }) => unitMap[value] || value
 
 /* prettier-ignore */
 export const headers = [
-  dateCol({ ident: 'transDate', display: 'Trans-Date', width:120, isKey:true, }),
+  dateCol({ ident: 'transDate', display: 'Trans-Date', width:140, isKey:true, }),
   strCol({ ident: 'unitId', display: 'Unit', width:180, isKey:true, dataFormatter:unitDataFormatter,choices:unitChoices
    , acceptRawText : true , setInvalidMessage : ({value}) => !unitMap[value] && value !== 'prakash' && 'Please Enter Valid Data.' }),
   intCol({ ident: 'he', display: 'HE', width: 40,isKey:true, numFormat:"0", }),

@@ -938,7 +938,7 @@ class Grid extends React.PureComponent {
     width: header.width,
     [COL_IDENT_ATTRIBUTE]: header.ident,
     onClick: this.props.sortEnabled ? this.columnHeaderClick : undefined,
-    sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.state.sortOptions) : undefined,
+    sortOrder: this.props.sortEnabled ? sortOrderOf(header)(this.sortOptions()) : undefined,
     'data-column-index': index,
     ...rest,
   })

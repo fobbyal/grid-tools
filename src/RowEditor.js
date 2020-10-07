@@ -156,8 +156,9 @@ class RowEditor extends React.Component {
     if (!prevProps.isEditing && this.props.isEditing) {
       if (this.focusNode) {
         if (this.focusNode) this.focusNode.focus()
-        if (this.focusNode.setSelectionRange) {
-          this.focusNode.setSelectionRange(0, this.focusNode.value.length)
+        if (this.focusNode.select) {
+          this.focusNode.select()
+          // this.focusNode.setSelectionRange(0, this.focusNode.value.length)
         }
       }
       // eslint-disable-next-line react/no-did-update-set-state

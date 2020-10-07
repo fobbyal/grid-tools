@@ -9,6 +9,7 @@ import Grid, {
   VirtualizedCell,
 } from '../../index'
 import { createData, headers } from '../data'
+import { CellInputEditor } from '../../Components'
 
 const customizedCellRender = params => {
   const { gridToolProps, reactVirtualizedProps, ...rest } = params
@@ -54,9 +55,29 @@ const customizedCellRender = params => {
   return defaultVirtualizedCellRender(params)
 }
 
+export const dateInputCellEditRender = ({ getInputProps }) => (
+  <CellInputEditor type="date" {...getInputProps({ refKey: 'innerRef' })} />
+)
+
 const data = createData(200)
 storiesOf('Virtualized grid', module)
-  .add('Basic', () => <Grid data={data} headers={headers} render={virtualizedGridRenderer()} />)
+  .add('Basic', () => (
+    <Grid
+      data={data}
+      headers={headers}
+      render={virtualizedGridRenderer({
+        cellRender: props => {
+          const type = props.gridToolProps.headers[props.reactVirtualizedProps.columnIndex].type
+          return defaultVirtualizedCellRender({
+            ...props,
+            editRender: (type === 'date-time' || type === 'date') && dateInputCellEditRender,
+          })
+        },
+      })}
+      editMode="cell"
+      isEditable={() => true}
+    />
+  ))
   .add('Fixed Col and Free edit', () => (
     <GridToolContext.Provider value={{ columnHeaderProps: { backgroundColor: 'pink' } }}>
       <Grid
