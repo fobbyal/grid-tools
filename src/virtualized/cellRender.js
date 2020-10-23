@@ -104,7 +104,7 @@ export const defaultCellRender = ({
   })
   if (cellProps.isEditing) {
     const computedEditRender =
-      cellProps.editRender || cellProps.header.choices ? dropdownEditRender : inputCellEditRender
+      cellProps.editRender || (cellProps.header.choices ? dropdownEditRender : inputCellEditRender)
 
     return <CellEditContainer {...cellProps} render={computedEditRender} />
   }
