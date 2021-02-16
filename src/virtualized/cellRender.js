@@ -5,7 +5,6 @@ import {
   SortIndicator,
   inputCellEditRender,
   dropdownEditRender,
-  EllipsisCell,
 } from '../Components'
 import R from 'ramda'
 import pureComponent from '../AdvancedPureComponent'
@@ -17,6 +16,13 @@ import GridToolsContext from '../context'
 
 export const Cell = BasicCell.extend`
   border-bottom: 1px solid #ccc;
+`
+
+export const EllipsisCell = Cell.extend`
+  display: initial;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 export const ColHeaderBase = BasicColHeader.extend`
@@ -100,6 +106,7 @@ export const defaultCellRender = ({
     header: headers[columnIndex],
     data,
     style,
+    isLastInRow: headers.length === columnIndex + 1,
     ...rest,
   })
   if (cellProps.isEditing) {

@@ -368,7 +368,7 @@ const flexGridRenderer = ({
                 rowHeight,
               })}
             >
-              {rowHeaders.map((header, columnIndex) => (
+              {rowHeaders.map((header, columnIndex, all) => (
                 <FlexGridCell
                   render={cellRenderer}
                   editRender={editRenderer}
@@ -377,6 +377,7 @@ const flexGridRenderer = ({
                     columnIndex,
                     header,
                     data,
+                    isLastInRow: all.length === columnIndex + 1,
                   })}
                 />
               ))}
@@ -406,7 +407,7 @@ const flexGridRenderer = ({
                 rowHeight,
               })}
             >
-              {dataHeaders.map((header, columnIndex) => (
+              {dataHeaders.map((header, columnIndex, all) => (
                 <FlexGridCell
                   render={cellRenderer}
                   editRender={editRenderer}
@@ -415,6 +416,7 @@ const flexGridRenderer = ({
                     columnIndex: columnIndex + numOfFixedCols,
                     header,
                     data,
+                    isLastInRow: all.length === columnIndex + 1,
                   })}
                 />
               ))}
