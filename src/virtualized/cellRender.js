@@ -23,6 +23,7 @@ export const EllipsisCell = Cell.extend`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: ${props => props.alignment || 'center'};
 `
 
 export const ColHeaderBase = BasicColHeader.extend`
