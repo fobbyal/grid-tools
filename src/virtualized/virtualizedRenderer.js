@@ -48,7 +48,7 @@ const handleSelectionScroll = ({ contentGrid, x2, y2, previousPosition, fixedHea
 //
 //
 const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
-  const contentGridRef = useRef()
+  const internalContentGridRef = useRef()
   const rowHeaderGridRef = useRef()
   const columnHeaderGridRef = useRef()
   const positionRef = useRef()
@@ -74,12 +74,15 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     autoFixColByKey,
     cellRender = defaultCellRender,
     rowHeaderRender = defaultRowHeaderRender,
+    contentGridRef: externalContentGridRef,
     // colHeaderRenderer,
     // pagerRenderer = defaultPagerRenderer,
     // editByRow = true,
     // editByCell = false,
     // fixedScrollHeightAdjustment = 6,
   } = renderOptions
+
+  const contentGridRef = externalContentGridRef || internalContentGridRef
 
   const {
     scrollY,
