@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { storiesOf } from '@storybook/react'
 import R from 'ramda'
 import Grid, {
@@ -59,6 +59,43 @@ export const dateInputCellEditRender = ({ getInputProps }) => (
   <CellInputEditor type="date" {...getInputProps({ refKey: 'innerRef' })} />
 )
 
+const GridWithScrollTrigger = () => {
+  const [rowNo, setRowNo] = useState()
+  const gridRef = useRef()
+  return (
+    <div>
+      <div style={{ margin: 10 }}>
+        <input type="number" value={rowNo} onChange={e => setRowNo(e.target.value)} />
+        <button
+          onClick={() => {
+            if (gridRef.current && rowNo) {
+              gridRef.current.scrollToCell({ columnIndex: 0, rowIndex: +rowNo })
+            }
+          }}
+        >
+          Scroll To
+        </button>
+      </div>
+      <Grid
+        data={data}
+        headers={headers}
+        render={virtualizedGridRenderer({
+          cellRender: props => {
+            const type = props.gridToolProps.headers[props.reactVirtualizedProps.columnIndex].type
+            return defaultVirtualizedCellRender({
+              ...props,
+              editRender: (type === 'date-time' || type === 'date') && dateInputCellEditRender,
+            })
+          },
+          contentGridRef: gridRef,
+        })}
+        editMode="cell"
+        isEditable={() => true}
+      />
+    </div>
+  )
+}
+
 const data = createData(200)
 storiesOf('Virtualized grid', module)
   .add('Basic', () => (
@@ -94,3 +131,4 @@ storiesOf('Virtualized grid', module)
       />
     </GridToolContext.Provider>
   ))
+  .add('Scroll Trigger', () => <GridWithScrollTrigger />)
