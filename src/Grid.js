@@ -310,7 +310,7 @@ class Grid extends React.PureComponent {
   }
 
   setSelectedRect = rect => {
-    this.setState(rect)
+    this.setState(rect, this.selectionChanged)
   }
 
   componentDidMount() {
