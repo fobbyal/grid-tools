@@ -310,7 +310,7 @@ class Grid extends React.PureComponent {
   }
 
   setSelectedRect = rect => {
-    this.setState(rect)
+    this.setState(rect, this.selectionChanged)
   }
 
   componentDidMount() {
@@ -587,10 +587,10 @@ class Grid extends React.PureComponent {
       const { view } = this.state
 
       for (let r = y1; r <= y2; r++) {
-        selectedRows.push(view[r])
+        if (view[r] != null) selectedRows.push(view[r])
       }
       for (let c = x1; c <= x2; c++) {
-        selectedHeaders.push(headers[c])
+        if (headers[c] != null) selectedHeaders.push(headers[c])
       }
 
       onSelectionChange({ selectedRows, selectedHeaders })
