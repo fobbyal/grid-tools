@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
 import { storiesOf } from '@storybook/react'
 // import { action } from '@storybook/addon-actions'
@@ -18,6 +18,7 @@ import Grid, {
   GridToolContext,
 } from '../../index'
 import FilterDemo from './FilterDemo'
+import ScrollSyncHelper from '../../ScrollSyncHelper'
 
 // const createRow = _ => randomRow(headers)
 
@@ -103,6 +104,50 @@ const OnEditCopyPasteDemo = () => {
   )
 }
 
+const GridWithScrollSync = () => {
+  const gridRef = useRef()
+  const divRef = useRef()
+
+  useEffect(() => {
+    let pane
+    if (gridRef.current && divRef.current) {
+      pane = divRef.current
+      gridRef.current.scrollSync.registerPane(pane, ScrollSyncHelper.HORIZONTAL)
+    }
+    return () => {
+      if (pane) {
+        gridRef.current.scrollSync.unReisterPane(pane)
+      }
+    }
+  }, [])
+
+  return (
+    <div>
+      <div ref={divRef} style={{ overflow: 'auto', width: 800 }}>
+        <div
+          style={{
+            padding: 20,
+            background: 'red',
+            width: headers.map(h => h.width || 150).reduce((sum, val) => sum + val, 0),
+          }}
+        >
+          Scroll Me!!!
+        </div>
+      </div>
+      <Grid
+        ref={gridRef}
+        {...commonProps}
+        render={flexGridRenderer({
+          headerRowHeight: 60,
+          width: 800,
+          height: 400,
+          autoFixColByKey: true,
+        })}
+      />
+    </div>
+  )
+}
+
 storiesOf('Flex Grid', module)
   .add('debug', () => (
     <Grid
@@ -139,6 +184,7 @@ storiesOf('Flex Grid', module)
       })}
     />
   ))
+  .add('Scroll Sync', () => <GridWithScrollSync />)
   .add('Custom Selection Range', () => {
     const CustomSelectionStory = () => {
       const initialRect = { x1: 3, y1: 2, x2: 5, y2: 5 }

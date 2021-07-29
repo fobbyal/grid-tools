@@ -75,6 +75,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     cellRender = defaultCellRender,
     rowHeaderRender = defaultRowHeaderRender,
     contentGridRef: externalContentGridRef,
+    onScroll,
     // colHeaderRenderer,
     // pagerRenderer = defaultPagerRenderer,
     // editByRow = true,
@@ -208,7 +209,12 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
             rowCount={data.length}
             width={width + scrollbarSize()}
             ref={contentGridRef}
-            onScroll={onMainGridScroll}
+            onScroll={scrollInfo => {
+              onMainGridScroll(scrollInfo)
+              if (onScroll != null) {
+                onScroll(scrollInfo)
+              }
+            }}
           />
         </div>
         {/* fixed headers upper left - corner */}
