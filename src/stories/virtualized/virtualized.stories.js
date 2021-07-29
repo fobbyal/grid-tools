@@ -69,7 +69,7 @@ const GridWithScrollTrigger = () => {
         <button
           onClick={() => {
             if (gridRef.current && rowNo) {
-              gridRef.current.scrollToCell({ columnIndex: 0, rowIndex: +rowNo })
+              gridRef.current.scrollToCell({ rowIndex: +rowNo })
             }
           }}
         >
@@ -88,6 +88,58 @@ const GridWithScrollTrigger = () => {
             })
           },
           contentGridRef: gridRef,
+        })}
+        editMode="cell"
+        isEditable={() => true}
+      />
+    </div>
+  )
+}
+
+const GridWithScrollSync = () => {
+  const gridRef = useRef()
+  const divRef = useRef()
+  return (
+    <div>
+      <div
+        ref={divRef}
+        style={{ overflow: 'auto', width: 1100 }}
+        onScroll={e => {
+          const scrollLeft = e.target.scrollLeft
+          if (scrollLeft && gridRef.current) {
+            gridRef.current.scrollToPosition({ scrollLeft })
+          }
+        }}
+      >
+        <div
+          style={{
+            padding: 20,
+            background: 'red',
+            width: headers.map(h => h.width || 150).reduce((sum, val) => sum + val, 0),
+          }}
+        >
+          Scroll Me!!!
+        </div>
+      </div>
+      <Grid
+        data={data}
+        headers={headers}
+        render={virtualizedGridRenderer({
+          cellRender: props => {
+            const type = props.gridToolProps.headers[props.reactVirtualizedProps.columnIndex].type
+            return defaultVirtualizedCellRender({
+              ...props,
+              editRender: (type === 'date-time' || type === 'date') && dateInputCellEditRender,
+            })
+          },
+          contentGridRef: gridRef,
+          onScroll: ({ scrollLeft }) => {
+            if (scrollLeft && divRef.current) {
+              divRef.current.scrollTo({
+                left: scrollLeft,
+              })
+            }
+          },
         })}
         editMode="cell"
         isEditable={() => true}
@@ -132,3 +184,4 @@ storiesOf('Virtualized grid', module)
     </GridToolContext.Provider>
   ))
   .add('Scroll Trigger', () => <GridWithScrollTrigger />)
+  .add('Scroll Sync', () => <GridWithScrollSync />)
