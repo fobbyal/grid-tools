@@ -64,7 +64,7 @@
     "prop-types": "^15.7.2",
     "react-hot-loader": "^4.12.3",
     "rimraf": "^2.6.3",
-    "semantic-release": "^15.13.18",
+    "semantic-release": "^17.2.3",
     "shallow-equal-explain": "^0.0.4"
   },
   "dependencies": {
