@@ -348,10 +348,9 @@ class Grid extends React.PureComponent {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(
         ({ editingRow, editingColumn, /* x1, x2, y1, y2, */ currentPage }) => ({
-          // x1: data !== nextProps.data ? undefined : x1,
-          // x2: data !== nextProps.data ? undefined : x2,
-          // y1: data !== nextProps.data ? undefined : y1,
-          // y2: data !== nextProps.data ? undefined : y2,
+          ...(fuzzyFilter !== nextProps.fuzzyFilter
+            ? { x1: undefined, x2: undefined, y1: undefined, y2: undefined }
+            : {}),
           ...this.generateViewProps({
             data: data !== nextProps.data ? nextProps.data : data,
             sortOptions: sortOptions !== nextProps.sortOptions ? nextProps.sortOptions : undefined,
