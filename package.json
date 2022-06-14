@@ -70,7 +70,7 @@
   "dependencies": {
     "data.maybe": "^1.2.3",
     "dom-helpers": "^3.4.0",
-    "downshift": "^3.2.7",
+    "downshift": "^4.0.0",
     "fbjs": "^1.0.0",
     "ramda": "^0.25.0",
     "react": "^16.8.6",
