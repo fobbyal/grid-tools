@@ -168,7 +168,29 @@ storiesOf('Virtualized grid', module)
     />
   ))
   .add('Fixed Col and Free edit', () => (
-    <GridToolContext.Provider value={{ columnHeaderProps: { backgroundColor: 'pink' } }}>
+    <GridToolContext.Provider
+      value={{
+        columnHeaderProps: {
+          backgroundColor: 'pink',
+          color: '#3F4752',
+          border: '1px solid #ccc',
+          fontSize: '14px',
+          headerRowHeight: 30,
+        },
+        rowContentProps: {
+          color: '#3F4752',
+          border: '1px solid #ccc',
+          // rowHeight: 30,
+          fontSize: '14px',
+        },
+        fixedColData: {
+          border: '1px solid #ccc',
+          color: '#3F4752',
+          rowHeight: 30,
+          verticalAlign: 'baseline',
+        },
+      }}
+    >
       <Grid
         isEditable={() => true}
         editMode="cell"
@@ -185,3 +207,59 @@ storiesOf('Virtualized grid', module)
   ))
   .add('Scroll Trigger', () => <GridWithScrollTrigger />)
   .add('Scroll Sync', () => <GridWithScrollSync />)
+  .add('ngrid', () => (
+    <GridToolContext.Provider
+      value={{
+        columnHeaderProps: {
+          backgroundColor: '#EFEFEF',
+          color: '#3F4752',
+          border: '1px solid #DADADA',
+          fontSize: '12px',
+          fontWeight: 500,
+          headerRowHeight: 30,
+          fontFamily: 'sans-serif',
+        },
+        rowContentProps: {
+          color: '#0D0106',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #DADADA',
+          rowHeight: 30,
+          fontSize: '12px',
+          fontWeight: 400,
+          fontFamily: 'sans-serif',
+          paddingTop: '4px',
+        },
+        fixedColHead: {
+          backgroundColor: '#EFEFEF',
+          border: '1px solid #DADADA',
+          color: '#0D0106',
+          rowHeight: 30,
+          fontSize: '12px',
+          fontWeight: 400,
+          fontFamily: 'sans-serif',
+          paddingTop: '4px',
+        },
+        fixedColData: {
+          backgroundColor: '#f2f2f2',
+          border: '1px solid #DADADA',
+          borderRadius: '12px 12px 0px 0px',
+          color: '#0D0106',
+          rowHeight: 30,
+          fontFamily: 'sans-serif',
+          fontSize: '12px',
+          fontWeight: 400,
+        },
+      }}
+    >
+      <Grid
+        isEditable={() => false}
+        editMode="cell"
+        data={data}
+        headers={headers}
+        render={virtualizedGridRenderer({
+          autoFixColByKey: true,
+          // cellRender: fixedCellRender,
+        })}
+      />
+    </GridToolContext.Provider>
+  ))

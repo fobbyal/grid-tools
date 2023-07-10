@@ -25,11 +25,13 @@ const cellBgColorOf = props => {
   const hoverBackgroundColor = props.hoverBackgroundColor || '#ddd'
   const selectionBackgroundColor = props.selectionBackgroundColor || '#666'
   const validationErrorBackgroundColor = props.errorBackgroundColor || '#ff726f'
-
+  // const fixCellBackgroundColor = props.fixedColData.backgroundColor || 'f2f2f2'
   if (props.invalidMessage) {
     return validationErrorBackgroundColor
   }
-
+  // if (props.headers[columnIndex].isKey === true) {
+  //   return fixCellBackgroundColor
+  // }
   return props.isHovered && props.isSelected
     ? hoverSelectionBackgroundColor
     : props.isHovered
@@ -44,8 +46,10 @@ export const BasicCell = styled.div`
   display: flex;
   border-left: 1px solid #ccc;
   align-items: center;
+  text-align: center;
   user-select: none;
   cursor: default;
+  font-family: ${props => props.fontFamily};
   justify-content: ${props =>
     mapAlignmentToJustifyContent(props.alignment) || 'center'};
   ${props => `font-size: ${props.fontSize || 'unset'};`}
@@ -54,6 +58,7 @@ export const BasicCell = styled.div`
   ${props => `font-weight: ${props.fontWeight || 'normal'};`}
   padding-left: 0.2em;
   padding-right: 0.2em;
+  vertical-align: baseline;
   ${props => `border-right: ${props.isLastInRow ? ' 1px solid #ccc' : 'unset'};`}
 `
 
@@ -77,7 +82,8 @@ export const BasicColHeader = styled.div`
   cursor: ${props => (props.sortable ? 'pointer' : 'default')};
   background-color: ${props => props.backgroundColor};
   color: ${props => props.color};
-  line-height: 1.3em;
+  line-height: 120%;
+  font-family: ${props => props.fontFamily};
   font-weight: ${props => props.fontWeight};
   font-size: ${props => props.fontSize};
   padding-left: 0.5em;

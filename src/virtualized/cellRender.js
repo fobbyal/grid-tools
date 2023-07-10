@@ -15,7 +15,7 @@ import CellEditContainer from '../CellEditContainer'
 import GridToolsContext from '../context'
 
 export const Cell = BasicCell.extend`
-  border-bottom: 1px solid #ccc;
+  border: ${props => props.border};
 `
 
 export const EllipsisCell = Cell.extend`
@@ -23,28 +23,27 @@ export const EllipsisCell = Cell.extend`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: ${props => props.alignment || 'center'};
+  text-align: ${props => props.verticalAlign || 'center'};
+  padding-top: ${props => props.paddingTop};
 `
 
 export const ColHeaderBase = BasicColHeader.extend`
-  border-bottom: 1px solid #ccc;
+  border: ${props => props.border};
 `
-
 const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
 export const OptimizedContentCell = pureComponent(Cell, flattenCellProps)
 
 export const OptimizedEllipsisCell = pureComponent(EllipsisCell, flattenCellProps)
 
-const ColHeader = ({ header, sortOrder, width, ...rest }) => {
+const ColHeader = ({ header, sortOrder, width, typeData = 'nonfixed-data', ...rest }) => {
   const gridContext = React.useContext(GridToolsContext)
+  const contextProps =
+    typeData === 'nonfixed-data'
+      ? gridContext.columnHeaderProps
+      : { ...gridContext.columnHeaderProps, ...gridContext.fixedColHead }
   return (
-    <ColHeaderBase
-      width={width}
-      {...rest}
-      {...gridContext.columnHeaderProps}
-      sortable={header.sortable}
-    >
+    <ColHeaderBase width={width} {...rest} {...contextProps} sortable={header.sortable}>
       {header.display}
       {sortOrder === 'asc' ? (
         <SortIndicator>&#x25b2;</SortIndicator>
@@ -88,6 +87,7 @@ export const defaultRowHeaderRender = ({
 
 export const defaultCellRender = ({
   gridToolProps: {
+    // getRowContentProps,
     getCellProps,
     headers,
     data,
@@ -99,9 +99,11 @@ export const defaultCellRender = ({
     // editInfo,
   },
   reactVirtualizedProps: { columnIndex, /* key, */ rowIndex, style },
+  gridContext,
+  typeData = 'nonfixed-data',
   ...rest
 }) => {
-  const cellProps = getCellProps({
+  let cellProps = getCellProps({
     rowIndex: rowIndex,
     columnIndex,
     header: headers[columnIndex],
@@ -117,9 +119,20 @@ export const defaultCellRender = ({
     return <CellEditContainer {...cellProps} render={computedEditRender} />
   }
 
+  const { formatCell } = headers[columnIndex]
+  if (formatCell) {
+    const customizeColumnStyle = formatCell({ headers, data, rowIndex, columnIndex }) || {}
+    cellProps = { ...cellProps, style: { ...cellProps.style, ...customizeColumnStyle } }
+  }
+
+  const contextProps =
+    typeData === 'nonfixed-data'
+      ? gridContext.rowContentProps
+      : { ...gridContext.rowContentProps, ...gridContext.fixedColData } || {}
+
   if (cellProps.header.ellipsis) {
     return (
-      <OptimizedEllipsisCell {...R.omit(['data'], cellProps)}>
+      <OptimizedEllipsisCell {...R.omit(['data'], cellProps)} {...contextProps}>
         {extractAndFormatData({
           rowData: data[rowIndex],
           header: headers[columnIndex],
@@ -127,10 +140,9 @@ export const defaultCellRender = ({
       </OptimizedEllipsisCell>
     )
   }
-
   // if (cellProps.style.position == null) console.log('no position')
   return (
-    <OptimizedContentCell {...R.omit(['data'], cellProps)}>
+    <OptimizedContentCell {...R.omit(['data'], cellProps)} {...contextProps}>
       {extractAndFormatData({
         rowData: data[rowIndex],
         header: headers[columnIndex],
