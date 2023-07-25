@@ -2,6 +2,7 @@ import React from 'react'
 
 const options = {
   debug: false,
+  border: '1px solid #DADADA',
   columnHeaderProps: {
     color: 'white',
     backgroundColor: 'steelblue',

@@ -1,14 +1,9 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import Grid, {
-  virtualizedGridRenderer,
-  GridToolContext,
-  strCol,
-  dateCol,
-  intCol,
-  numCol,
-} from '../../index'
 import { createData, headers } from '../data'
+// import R from 'ramda'
+// import { CellInputEditor } from '../../Components'
+import Grid, { strCol, intCol, numCol, virtualizedGridRenderer, GridToolContext } from '../../index'
 
 const colSpecificData = [
   { a: 'abc', b: 'xddyz', c: 17, d: 101 },
@@ -19,7 +14,7 @@ const colSpecificData = [
   { a: 'abffc', b: 'xyznbn', c: 25, d: 105 },
 ]
 
-const hour25Style = ({ headers, data, rowIndex, columnIndex }) => {
+const hour25Style = ({ data, rowIndex }) => {
   const val = data[rowIndex].c
   console.log(val)
   if (val === 25) {
@@ -119,6 +114,7 @@ storiesOf('AG-Virtualized grid', module)
         headers={headers}
         render={virtualizedGridRenderer({
           autoFixColByKey: true,
+          getRowStyle: _ => ({ backgroundColor: 'green', color: 'white' }),
           // cellRender: fixedCellRender,
         })}
       />

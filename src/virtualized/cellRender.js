@@ -101,8 +101,10 @@ export const defaultCellRender = ({
   reactVirtualizedProps: { columnIndex, /* key, */ rowIndex, style },
   gridContext,
   typeData = 'nonfixed-data',
+  getRowStyle = _ => ({}),
   ...rest
 }) => {
+  console.log(rest)
   let cellProps = getCellProps({
     rowIndex: rowIndex,
     columnIndex,
@@ -116,20 +118,30 @@ export const defaultCellRender = ({
     const computedEditRender =
       cellProps.editRender || (cellProps.header.choices ? dropdownEditRender : inputCellEditRender)
 
+    cellProps = { ...cellProps, style: { ...cellProps.style } }
+
     return <CellEditContainer {...cellProps} render={computedEditRender} />
   }
 
+  // const { getRowStyle } = data[rowIndex]
+  const rowStyle = getRowStyle
+    ? getRowStyle({ cellProps, headers, data, rowIndex, columnIndex })
+    : {}
+  // let currentCellStyle = { ...cellProps.style, ...rowStyle }
+  let customizeColumnStyle = {}
   const { formatCell } = headers[columnIndex]
   if (formatCell) {
-    const customizeColumnStyle = formatCell({ headers, data, rowIndex, columnIndex }) || {}
-    cellProps = { ...cellProps, style: { ...cellProps.style, ...customizeColumnStyle } }
+    customizeColumnStyle = formatCell({ headers, data, rowIndex, columnIndex }) || {}
+    // cellProps = {
+    //   ...cellProps,
+    //   style: { ...cellProps.style, ...customizeColumnStyle },
+    // }
   }
-
   const contextProps =
     typeData === 'nonfixed-data'
       ? gridContext.rowContentProps
       : { ...gridContext.rowContentProps, ...gridContext.fixedColData } || {}
-
+  cellProps = { ...cellProps, style: { ...cellProps.style, ...rowStyle, ...customizeColumnStyle } }
   if (cellProps.header.ellipsis) {
     return (
       <OptimizedEllipsisCell {...R.omit(['data'], cellProps)} {...contextProps}>
@@ -140,6 +152,7 @@ export const defaultCellRender = ({
       </OptimizedEllipsisCell>
     )
   }
+  // cellProps = { ...cellProps, style: { ...cellProps.style, ...rowStyle, ...customizeColumnStyle } }
   // if (cellProps.style.position == null) console.log('no position')
   return (
     <OptimizedContentCell {...R.omit(['data'], cellProps)} {...contextProps}>

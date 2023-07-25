@@ -6,7 +6,6 @@ import { Provider } from './VirtualizedContext'
 // import CellEditContainer from './CellEditContainer'
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
 import GridToolsContext from '../context'
-import { props } from 'ramda'
 
 const totalColWidth = cols => cols.map(c => c.width).reduce((c1, c2) => c1 + c2, 0)
 
@@ -64,7 +63,6 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
 
   const previousColumnWidth = useRef(totalColWidth(headers))
   const gridContext = React.useContext(GridToolsContext)
-  console.log(gridContext)
   const {
     style,
     className,
@@ -78,6 +76,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     rowHeaderRender = defaultRowHeaderRender,
     contentGridRef: externalContentGridRef,
     onScroll,
+    getRowStyle = _ => ({}),
     // colHeaderRenderer,
     // pagerRenderer = defaultPagerRenderer,
     // editByRow = true,
@@ -114,7 +113,9 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
   })
 
   const dataRender = (props, typeData = 'nonfixed-data') =>
-    cellRenderWrapper()(props => cellRender({ ...props, gridContext, typeData }))(props)
+    cellRenderWrapper()(props => cellRender({ ...props, gridContext, getRowStyle, typeData }))(
+      props
+    )
   // const dataCellRender = cellRenderWrapper(offSetColumn)(cellRender)
   // const headerRender = (props, typeData = 'nonfixed-data') =>
   //   cellRenderWrapper()(props => rowHeaderRender({ ...props, typeData }))(props)

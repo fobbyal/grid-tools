@@ -60,7 +60,12 @@ export const BasicCell = styled.div`
   padding-right: 0.2em;
   vertical-align: baseline;
   ${props => `border-right: ${props.isLastInRow ? ' 1px solid #ccc' : 'unset'};`}
+
 `
+
+// border: ${props => {
+//   console.log(props,"props")
+//   return props.border}};
 
 /* prettier-ignore */
 export const BasicCellInput = styled.input`
