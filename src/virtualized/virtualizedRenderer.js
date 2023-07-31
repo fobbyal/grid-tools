@@ -274,7 +274,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
               backgroundColor: gridContext?.columnHeaderProps?.backgroundColor,
               borderTop: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
               borderRight: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
-              borderBottom: gridContext.columnHeaderProps.border || '1px solid #ccc',
+              borderBottom: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
               // borderLeft: '1px solid #ccc',
               borderTopRightRadius: '3px',
             }}
