@@ -3,7 +3,7 @@ import { Grid } from 'react-virtualized'
 import computeGridProps from '../computeGridProps'
 import scrollbarSize from 'dom-helpers/util/scrollbarSize'
 import { Provider } from './VirtualizedContext'
-// import CellEditContainer from './CellEditContainer'
+
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
 import GridToolsContext from '../context'
 
@@ -69,7 +69,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     height = 600,
     width = 1100,
     rowHeight = 23,
-    headerRowHeight = gridContext.columnHeaderProps.headerRowHeight,
+    headerRowHeight = gridContext?.columnHeaderProps?.headerRowHeight || 60,
     fixedColCount = 0,
     autoFixColByKey,
     cellRender = defaultCellRender,
@@ -116,10 +116,6 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     cellRenderWrapper()(props => cellRender({ ...props, gridContext, getRowStyle, typeData }))(
       props
     )
-  // const dataCellRender = cellRenderWrapper(offSetColumn)(cellRender)
-  // const headerRender = (props, typeData = 'nonfixed-data') =>
-  //   cellRenderWrapper()(props => rowHeaderRender({ ...props, typeData }))(props)
-  // const upperRightRender = cellRenderWrapper(offSetColumn)(rowHeaderRender)
   const headerRender = cellRenderWrapper()(rowHeaderRender)
 
   const selectionInfo =
@@ -275,10 +271,10 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
               width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
               height: `${headerRowHeight}px`,
               top: '0px',
-              backgroundColor: gridContext.columnHeaderProps.backgroundColor,
-              borderTop: gridContext.columnHeaderProps.border,
-              borderRight: gridContext.columnHeaderProps.border,
-              borderBottom: gridContext.columnHeaderProps.border,
+              backgroundColor: gridContext?.columnHeaderProps?.backgroundColor,
+              borderTop: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
+              borderRight: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
+              borderBottom: gridContext.columnHeaderProps.border || '1px solid #ccc',
               // borderLeft: '1px solid #ccc',
               borderTopRightRadius: '3px',
             }}

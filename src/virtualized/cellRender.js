@@ -15,7 +15,7 @@ import CellEditContainer from '../CellEditContainer'
 import GridToolsContext from '../context'
 
 export const Cell = BasicCell.extend`
-  border: ${props => props.border};
+  border: ${props => props.border || '1px solid #ccc'};
 `
 
 export const EllipsisCell = Cell.extend`
@@ -28,7 +28,7 @@ export const EllipsisCell = Cell.extend`
 `
 
 export const ColHeaderBase = BasicColHeader.extend`
-  border: ${props => props.border};
+  border: ${props => props.border || '1px solid #ccc'};
 `
 const flattenCellProps = ({ style, ...props }) => ({ ...style, ...props })
 
@@ -104,7 +104,6 @@ export const defaultCellRender = ({
   getRowStyle = _ => ({}),
   ...rest
 }) => {
-  console.log(rest)
   let cellProps = getCellProps({
     rowIndex: rowIndex,
     columnIndex,
@@ -123,19 +122,14 @@ export const defaultCellRender = ({
     return <CellEditContainer {...cellProps} render={computedEditRender} />
   }
 
-  // const { getRowStyle } = data[rowIndex]
   const rowStyle = getRowStyle
     ? getRowStyle({ cellProps, headers, data, rowIndex, columnIndex })
     : {}
-  // let currentCellStyle = { ...cellProps.style, ...rowStyle }
+
   let customizeColumnStyle = {}
   const { formatCell } = headers[columnIndex]
   if (formatCell) {
     customizeColumnStyle = formatCell({ headers, data, rowIndex, columnIndex }) || {}
-    // cellProps = {
-    //   ...cellProps,
-    //   style: { ...cellProps.style, ...customizeColumnStyle },
-    // }
   }
   const contextProps =
     typeData === 'nonfixed-data'
@@ -152,8 +146,6 @@ export const defaultCellRender = ({
       </OptimizedEllipsisCell>
     )
   }
-  // cellProps = { ...cellProps, style: { ...cellProps.style, ...rowStyle, ...customizeColumnStyle } }
-  // if (cellProps.style.position == null) console.log('no position')
   return (
     <OptimizedContentCell {...R.omit(['data'], cellProps)} {...contextProps}>
       {extractAndFormatData({
