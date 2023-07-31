@@ -38,7 +38,7 @@ const options = {
     verticalAlign: 'baseline',
   },
   fixedColData: {
-    backgroundColor: '#f2f2f2',
+    // backgroundColor: '#f2f2f2',
     border: '1px solid #DADADA',
     borderRadius: '12px 12px 0px 0px',
     color: '#0D0106',
