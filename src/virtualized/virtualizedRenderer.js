@@ -63,13 +63,14 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
 
   const previousColumnWidth = useRef(totalColWidth(headers))
   const gridContext = React.useContext(GridToolsContext)
+  const { columnHeaderProps = {} } = gridContext
   const {
     style,
     className,
     height = 600,
     width = 1100,
     rowHeight = 23,
-    headerRowHeight = gridContext?.columnHeaderProps?.headerRowHeight || 60,
+    headerRowHeight = columnHeaderProps.headerRowHeight || 60,
     fixedColCount = 0,
     autoFixColByKey,
     cellRender = defaultCellRender,
@@ -271,10 +272,10 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
               width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
               height: `${headerRowHeight}px`,
               top: '0px',
-              backgroundColor: gridContext?.columnHeaderProps?.backgroundColor,
-              borderTop: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
-              borderRight: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
-              borderBottom: gridContext?.columnHeaderProps?.border || '1px solid #ccc',
+              backgroundColor: columnHeaderProps.backgroundColor,
+              borderTop: columnHeaderProps.border || '1px solid #ccc',
+              borderRight: columnHeaderProps.border || '1px solid #ccc',
+              borderBottom: columnHeaderProps.border || '1px solid #ccc',
               // borderLeft: '1px solid #ccc',
               borderTopRightRadius: '3px',
             }}
