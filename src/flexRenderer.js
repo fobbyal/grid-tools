@@ -37,7 +37,7 @@ export const Cell = BasicCell.extend`
   text-overflow: ellipsis;
   /*display: block;*/
   height: 100%;
-  text-align: center;
+  text-align: ${props => props.alignment || 'center'};
 `
 
 /* prettier-ignore */
