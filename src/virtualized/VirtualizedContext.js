@@ -1,5 +1,6 @@
 import React from 'react'
 // console.log(' ****inside context ******')
+// console.log('test')
 const emptyPropGetter = () => {}
 // import { createContext } from 'react-broadcast'
 const { Provider, Consumer } = React.createContext({
