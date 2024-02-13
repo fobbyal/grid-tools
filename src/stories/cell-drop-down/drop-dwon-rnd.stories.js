@@ -13,7 +13,7 @@ import { storiesOf } from '@storybook/react'
 
 const chance = new Chance()
 
-console.log('chance is ', chance)
+// console.log('chance is ', chance)
 
 const Content = styled.div`
   width: 100vw;
