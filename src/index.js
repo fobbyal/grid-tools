@@ -22,7 +22,6 @@ import RowEditor from './RowEditor'
 
 import virtualizedGridRenderer from './virtualized'
 import GridToolContext from './context'
-
 export * from './cols'
 
 export {

@@ -3,7 +3,7 @@ import { Grid } from 'react-virtualized'
 import computeGridProps from '../computeGridProps'
 import scrollbarSize from 'dom-helpers/util/scrollbarSize'
 import { Provider } from './VirtualizedContext'
-// import CellEditContainer from './CellEditContainer'
+
 import { defaultCellRender, cellRenderWrapper, defaultRowHeaderRender } from './cellRender'
 import GridToolsContext from '../context'
 
@@ -62,20 +62,22 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
   } = gridRenderProps
 
   const previousColumnWidth = useRef(totalColWidth(headers))
-
+  const gridContext = React.useContext(GridToolsContext)
+  const { columnHeaderProps = {} } = gridContext
   const {
     style,
     className,
     height = 600,
     width = 1100,
     rowHeight = 23,
-    headerRowHeight = 60,
+    headerRowHeight = columnHeaderProps.headerRowHeight || 60,
     fixedColCount = 0,
     autoFixColByKey,
     cellRender = defaultCellRender,
     rowHeaderRender = defaultRowHeaderRender,
     contentGridRef: externalContentGridRef,
     onScroll,
+    getRowStyle = _ => ({}),
     // colHeaderRenderer,
     // pagerRenderer = defaultPagerRenderer,
     // editByRow = true,
@@ -111,10 +113,11 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
     headerRowHeight,
   })
 
-  const dataRender = cellRenderWrapper()(cellRender)
-  // const dataCellRender = cellRenderWrapper(offSetColumn)(cellRender)
+  const dataRender = (props, typeData = 'nonfixed-data') =>
+    cellRenderWrapper()(props => cellRender({ ...props, gridContext, getRowStyle, typeData }))(
+      props
+    )
   const headerRender = cellRenderWrapper()(rowHeaderRender)
-  // const upperRightRender = cellRenderWrapper(offSetColumn)(rowHeaderRender)
 
   const selectionInfo =
     gridRenderProps && gridRenderProps.getSelectionInfo && gridRenderProps.getSelectionInfo()
@@ -157,8 +160,6 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
       columnHeaderGridRef.current.scrollToPosition({ scrollLeft: 0, scrollTop })
     }
   }, [])
-  const gridContext = React.useContext(GridToolsContext)
-
   return (
     <Provider value={gridRenderProps}>
       <div
@@ -182,7 +183,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
               overflowX: 'hidden',
               overflowY: 'hidden',
             }}
-            cellRenderer={headerRender}
+            cellRenderer={props => headerRender(props, 'nonfixed-data')}
             columnWidth={colWidthOf(headers)}
             columnCount={headers.length}
             height={headerRowHeight}
@@ -201,7 +202,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
           }}
         >
           <Grid
-            cellRenderer={dataRender}
+            cellRenderer={props => dataRender(props, 'nonfixed-data')}
             columnWidth={colWidthOf(headers)}
             columnCount={headers.length}
             height={height - headerRowHeight}
@@ -227,7 +228,7 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
             }}
           >
             <Grid
-              cellRenderer={headerRender}
+              cellRenderer={props => headerRender(props, 'fixed-data')}
               columnWidth={colWidthOf(headers)}
               columnCount={numOfFixedCols}
               height={headerRowHeight}
@@ -250,7 +251,8 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
           >
             <Grid
               style={{ overflow: 'hidden' }}
-              cellRenderer={dataRender}
+              // cellRenderer={dataRender}
+              cellRenderer={props => dataRender(props, 'fixed-data')}
               columnWidth={colWidthOf(headers)}
               columnCount={numOfFixedCols}
               height={height - headerRowHeight - scrollbarSize()}
@@ -264,14 +266,16 @@ const VirtualizedRender = ({ renderOptions = {}, gridRenderProps }) => {
         {scrollY && (
           <div
             style={{
+              // display: 'none',
               position: 'absolute',
               left: `${Math.min(width, totalWidth)}px`,
               width: `${scrollbarSize() + (scrollX ? 0 : width - totalWidth)}px`,
               height: `${headerRowHeight}px`,
               top: '0px',
-              backgroundColor: gridContext.columnHeaderProps.backgroundColor,
-              borderRight: '1px solid #ccc',
-              borderBottom: '1px solid #ccc',
+              backgroundColor: columnHeaderProps.backgroundColor,
+              borderTop: columnHeaderProps.border || '1px solid #ccc',
+              borderRight: columnHeaderProps.border || '1px solid #ccc',
+              borderBottom: columnHeaderProps.border || '1px solid #ccc',
               // borderLeft: '1px solid #ccc',
               borderTopRightRadius: '3px',
             }}

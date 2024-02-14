@@ -168,7 +168,29 @@ storiesOf('Virtualized grid', module)
     />
   ))
   .add('Fixed Col and Free edit', () => (
-    <GridToolContext.Provider value={{ columnHeaderProps: { backgroundColor: 'pink' } }}>
+    <GridToolContext.Provider
+      value={{
+        columnHeaderProps: {
+          backgroundColor: 'pink',
+          color: '#3F4752',
+          border: '1px solid #ccc',
+          fontSize: '14px',
+          headerRowHeight: 30,
+        },
+        rowContentProps: {
+          color: '#3F4752',
+          border: '1px solid #ccc',
+          // rowHeight: 30,
+          fontSize: '14px',
+        },
+        fixedColData: {
+          border: '1px solid #ccc',
+          color: '#3F4752',
+          rowHeight: 30,
+          verticalAlign: 'baseline',
+        },
+      }}
+    >
       <Grid
         isEditable={() => true}
         editMode="cell"
